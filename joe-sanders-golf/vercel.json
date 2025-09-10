@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "src/app/api/**/*.ts": {
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/admin",
+      "destination": "/admin/index.html"
+    }
+  ]
+}

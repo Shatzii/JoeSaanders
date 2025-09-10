@@ -1,0 +1,49 @@
+backend:
+  name: github
+  repo: Shatzii/JoeSaanders
+  branch: main
+  base_url: https://joesandersgolf.com
+  auth_endpoint: /api/auth
+
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+collections:
+  - name: "tournaments"
+    label: "Tournaments"
+    folder: "content/tournaments"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Date", name: "date", widget: "date"}
+      - {label: "Result", name: "result", widget: "string", required: false}
+      - {label: "Recap Text", name: "recap_text", widget: "text", required: false}
+      - {label: "Video URL", name: "video_url", widget: "string", required: false}
+      - {label: "Photo URLs", name: "photo_urls", widget: "list", required: false, field: {label: "URL", name: "url", widget: "string"}}
+      - {label: "Draft", name: "draft", widget: "boolean", default: false}
+
+  - name: "sponsors"
+    label: "Sponsors"
+    folder: "content/sponsors"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Name", name: "name", widget: "string"}
+      - {label: "Logo", name: "logo", widget: "image", required: false}
+      - {label: "Tier", name: "tier", widget: "select", options: ["Bronze", "Silver", "Gold", "Platinum"]}
+      - {label: "Website URL", name: "website_url", widget: "string", required: false}
+      - {label: "Draft", name: "draft", widget: "boolean", default: false}
+
+  - name: "merch"
+    label: "Merchandise"
+    folder: "content/merch"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Name", name: "name", widget: "string"}
+      - {label: "Description", name: "description", widget: "text", required: false}
+      - {label: "Price ID", name: "price_id", widget: "string"}
+      - {label: "Image", name: "image", widget: "image", required: false}
+      - {label: "Active", name: "active", widget: "boolean", default: true}
+      - {label: "Draft", name: "draft", widget: "boolean", default: false}
