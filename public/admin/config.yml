@@ -1,0 +1,113 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "tournaments"
+    label: "Tournaments"
+    folder: "content/tournaments"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Date", name: "date", widget: "datetime"}
+      - {label: "Location", name: "location", widget: "string"}
+      - {label: "Result", name: "result", widget: "string", required: false}
+      - {label: "Purse", name: "purse", widget: "number"}
+      - {label: "Earnings", name: "earnings", widget: "number", required: false}
+      - {label: "Description", name: "description", widget: "text"}
+      - {label: "Highlights", name: "highlights", widget: "list", required: false}
+      - {label: "Featured Image", name: "featured_image", widget: "image", required: false}
+      - {label: "Gallery", name: "gallery", widget: "list", field: {label: "Image", name: "image", widget: "image"}, required: false}
+
+  - name: "products"
+    label: "Products"
+    folder: "content/products"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Name", name: "name", widget: "string"}
+      - {label: "Description", name: "description", widget: "text"}
+      - {label: "Price", name: "price", widget: "number", value_type: "float"}
+      - {label: "Category", name: "category", widget: "select", options: ["apparel", "equipment", "accessories"]}
+      - {label: "In Stock", name: "in_stock", widget: "boolean", default: true}
+      - {label: "Featured", name: "featured", widget: "boolean", default: false}
+      - {label: "Images", name: "images", widget: "list", field: {label: "Image", name: "image", widget: "image"}}
+      - {label: "Stripe Price ID", name: "stripe_price_id", widget: "string", required: false}
+
+  - name: "pages"
+    label: "Pages"
+    files:
+      - file: "content/pages/home.md"
+        label: "Home Page"
+        name: "home"
+        fields:
+          - {label: "Title", name: "title", widget: "string"}
+          - {label: "Hero Title", name: "hero_title", widget: "string"}
+          - {label: "Hero Subtitle", name: "hero_subtitle", widget: "string"}
+          - {label: "Hero Description", name: "hero_description", widget: "text"}
+          - {label: "Career Stats", name: "career_stats", widget: "list", fields: [
+              {label: "Label", name: "label", widget: "string"},
+              {label: "Value", name: "value", widget: "string"},
+              {label: "Description", name: "description", widget: "string"}
+            ]}
+          - {label: "Story Title", name: "story_title", widget: "string"}
+          - {label: "Story Content", name: "story_content", widget: "markdown"}
+
+      - file: "content/pages/about.md"
+        label: "About Page"
+        name: "about"
+        fields:
+          - {label: "Title", name: "title", widget: "string"}
+          - {label: "Bio", name: "bio", widget: "markdown"}
+          - {label: "Profile Image", name: "profile_image", widget: "image"}
+          - {label: "Career Highlights", name: "career_highlights", widget: "list"}
+
+  - name: "blog"
+    label: "Blog Posts"
+    folder: "content/blog"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Publish Date", name: "date", widget: "datetime"}
+      - {label: "Author", name: "author", widget: "string", default: "Joe Sanders"}
+      - {label: "Featured Image", name: "featured_image", widget: "image"}
+      - {label: "Excerpt", name: "excerpt", widget: "text"}
+      - {label: "Body", name: "body", widget: "markdown"}
+      - {label: "Tags", name: "tags", widget: "list", required: false}
+      - {label: "Published", name: "published", widget: "boolean", default: false}
+
+  - name: "settings"
+    label: "Settings"
+    files:
+      - file: "content/settings/general.md"
+        label: "General Settings"
+        name: "general"
+        fields:
+          - {label: "Site Title", name: "site_title", widget: "string"}
+          - {label: "Site Description", name: "site_description", widget: "text"}
+          - {label: "Contact Email", name: "contact_email", widget: "string"}
+          - {label: "Social Media", name: "social_media", widget: "object", fields: [
+              {label: "Instagram", name: "instagram", widget: "string", required: false},
+              {label: "Twitter", name: "twitter", widget: "string", required: false},
+              {label: "Facebook", name: "facebook", widget: "string", required: false}
+            ]}
+          - {label: "SEO Image", name: "seo_image", widget: "image"}
+
+      - file: "content/settings/sponsorship.md"
+        label: "Sponsorship Settings"
+        name: "sponsorship"
+        fields:
+          - {label: "Page Title", name: "page_title", widget: "string"}
+          - {label: "Page Description", name: "page_description", widget: "text"}
+          - {label: "Partnership Tiers", name: "partnership_tiers", widget: "list", fields: [
+              {label: "Name", name: "name", widget: "string"},
+              {label: "Price", name: "price", widget: "number"},
+              {label: "Description", name: "description", widget: "text"},
+              {label: "Benefits", name: "benefits", widget: "list"},
+              {label: "Featured", name: "featured", widget: "boolean", default: false}
+            ]}
