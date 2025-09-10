@@ -1,7 +1,28 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['localhost', 'supabase.co', 'githubusercontent.com'], // Add domains for images from Supabase, GitHub, etc.
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'https',
+        hostname: 'supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'githubusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'fonts.gstatic.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'fonts.googleapis.com',
+      },
+    ],
   },
 }
 

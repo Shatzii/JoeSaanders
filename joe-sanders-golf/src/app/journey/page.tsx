@@ -1,37 +1,99 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { supabase } from '@/lib/supabase'
+import { dataClient } from '@/lib/data-client'
 import { Tournament } from '@/types'
+import { Plus, Image as ImageIcon, CheckCircle, TrendingUp, Users, Building } from 'lucide-react'
+
+// Sample tournament data for development
+const sampleTournaments: Tournament[] = [
+  {
+    id: '1',
+    date: '2025-08-15',
+    name: 'Stones Golf Championship',
+    result: 'T-5th',
+    recap_text: 'A breakthrough performance at the Stones Golf Championship! Despite challenging weather conditions, I managed to finish in a tie for 5th place. This tournament showcased the importance of mental resilience and course management.',
+    photo_urls: [],
+    video_url: 'https://youtube.com/watch?v=stones2025',
+    created_at: '2025-08-15T00:00:00Z',
+    updated_at: '2025-08-15T00:00:00Z'
+  },
+  {
+    id: '2',
+    date: '2025-07-22',
+    name: 'Uncle Joe Classic',
+    result: '2nd Place',
+    recap_text: 'Runner-up at the Uncle Joe Classic! This was my best finish of the season so far. I led after the first two rounds but a tough third round put me back in the pack.',
+    photo_urls: [],
+    video_url: 'https://youtube.com/watch?v=unclejoe2025',
+    created_at: '2025-07-22T00:00:00Z',
+    updated_at: '2025-07-22T00:00:00Z'
+  },
+  {
+    id: '3',
+    date: '2025-06-10',
+    name: 'PGA Tour Qualifying Tournament',
+    result: 'T-12th',
+    recap_text: 'Successfully advanced through PGA Tour Qualifying! This was a grueling 108-hole tournament that tested every aspect of my game.',
+    photo_urls: [],
+    video_url: 'https://youtube.com/watch?v=pgaqualifying2025',
+    created_at: '2025-06-10T00:00:00Z',
+    updated_at: '2025-06-10T00:00:00Z'
+  },
+  {
+    id: '4',
+    date: '2025-05-18',
+    name: 'Korn Ferry Tour Championship',
+    result: 'T-8th',
+    recap_text: 'Strong showing at the Korn Ferry Tour Championship! Despite being the youngest player in the field, I held my own and finished in a tie for 8th.',
+    photo_urls: [],
+    video_url: 'https://youtube.com/watch?v=kornferry2025',
+    created_at: '2025-05-18T00:00:00Z',
+    updated_at: '2025-05-18T00:00:00Z'
+  },
+  {
+    id: '5',
+    date: '2025-04-05',
+    name: 'Spring Classic Invitational',
+    result: '1st Place',
+    recap_text: 'VICTORY! My first professional win at the Spring Classic Invitational! This was an emotional moment that validated all the hard work.',
+    photo_urls: [],
+    video_url: 'https://youtube.com/watch?v=springclassic2025',
+    created_at: '2025-04-05T00:00:00Z',
+    updated_at: '2025-04-05T00:00:00Z'
+  },
+  {
+    id: '6',
+    date: '2025-03-14',
+    name: 'Mini-Tour Championship',
+    result: 'T-3rd',
+    recap_text: 'Consistent performance at the Mini-Tour Championship! I started the tournament with three straight rounds in the 60s.',
+    photo_urls: [],
+    video_url: 'https://youtube.com/watch?v=minitour2025',
+    created_at: '2025-03-14T00:00:00Z',
+    updated_at: '2025-03-14T00:00:00Z'
+  }
+]
 
 async function getTournaments(): Promise<Tournament[]> {
-  if (!supabase) {
-    return []
-  }
-
-  const { data, error } = await supabase
-    .from('tournaments')
-    .select('*')
-    .order('date', { ascending: false })
-
-  if (error) {
+  try {
+    return await dataClient.getTournaments()
+  } catch (error) {
     console.error('Error fetching tournaments:', error)
-    return []
+    return sampleTournaments // Fallback to sample data
   }
-
-  return data || []
 }
 
 export default async function JourneyPage() {
   const tournaments = await getTournaments()
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-joe-black">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-green-600 to-green-800 text-white py-16">
+      <section className="hero-container text-joe-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">The Journey</h1>
-            <p className="text-xl text-green-100 max-w-3xl mx-auto">
+            <h1 className="hero-tagline mb-4">The Journey</h1>
+            <p className="text-xl text-joe-stone max-w-3xl mx-auto font-joe-body">
               Every tournament, every shot, every lesson learned. Follow my path
               from amateur to professional golfer.
             </p>
@@ -40,22 +102,20 @@ export default async function JourneyPage() {
       </section>
 
       {/* Tournaments Grid */}
-      <section className="py-16">
+      <section className="py-16 bg-joe-stone">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {tournaments.length === 0 ? (
             <div className="text-center py-16">
-              <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
+              <div className="w-24 h-24 bg-joe-black rounded-full flex items-center justify-center mx-auto mb-6">
+                <Plus className="w-12 h-12 text-joe-gold" />
               </div>
-              <h3 className="text-2xl font-semibold text-gray-900 mb-2">No Tournaments Yet</h3>
-              <p className="text-gray-600 mb-6">Tournament data will appear here once added to the CMS.</p>
+              <h3 className="text-2xl font-joe-heading font-semibold text-joe-gold mb-2">No Tournaments Yet</h3>
+              <p className="text-joe-white mb-6 font-joe-body">Tournament data will appear here once added to the CMS.</p>
               <Link
                 href="/admin"
-                className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+                className="merch-button px-6 py-3 rounded-lg font-joe-accent font-bold text-lg"
               >
-                Add Tournament Data
+                <span>Add Tournament Data</span>
               </Link>
             </div>
           ) : (
@@ -64,9 +124,9 @@ export default async function JourneyPage() {
                 <Link
                   key={tournament.id}
                   href={`/journey/${tournament.id}`}
-                  className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden"
+                  className="merch-card"
                 >
-                  <div className="aspect-video bg-gray-200 relative">
+                  <div className="aspect-video bg-joe-black relative">
                     {tournament.photo_urls && tournament.photo_urls.length > 0 ? (
                       <Image
                         src={tournament.photo_urls[0]}
@@ -76,34 +136,32 @@ export default async function JourneyPage() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
+                        <ImageIcon className="w-12 h-12 text-joe-gold" />
                       </div>
                     )}
                   </div>
                   <div className="p-6">
-                    <div className="text-sm text-gray-500 mb-2">
+                    <div className="text-sm text-joe-stone mb-2 font-joe-accent">
                       {new Date(tournament.date).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric'
                       })}
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    <h3 className="text-xl font-joe-heading font-semibold text-joe-gold mb-2">
                       {tournament.name}
                     </h3>
                     {tournament.result && (
-                      <p className="text-green-600 font-medium mb-2">
+                      <p className="text-joe-gold font-medium mb-2 font-joe-accent">
                         Result: {tournament.result}
                       </p>
                     )}
                     {tournament.recap_text && (
-                      <p className="text-gray-600 text-sm line-clamp-3">
+                      <p className="text-joe-white text-sm line-clamp-3 font-joe-body">
                         {tournament.recap_text}
                       </p>
                     )}
-                    <div className="mt-4 text-green-600 font-medium">
+                    <div className="mt-4 text-joe-gold font-medium font-joe-accent">
                       Read Full Recap →
                     </div>
                   </div>
@@ -115,52 +173,44 @@ export default async function JourneyPage() {
       </section>
 
       {/* Journey Stats */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-joe-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Journey Milestones</h2>
-            <p className="text-lg text-gray-600">Key achievements and progress markers</p>
+            <h2 className="text-3xl font-joe-heading font-semibold text-joe-gold mb-4">Journey Milestones</h2>
+            <p className="text-lg text-joe-stone font-joe-body">Key achievements and progress markers</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+              <div className="w-16 h-16 bg-joe-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-8 h-8 text-joe-gold" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">First Professional Win</h3>
-              <p className="text-gray-600">Achieved professional status and secured first victory</p>
+              <h3 className="text-xl font-joe-heading font-semibold text-joe-gold mb-2">First Professional Win</h3>
+              <p className="text-joe-stone font-joe-body">Achieved professional status and secured first victory</p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
+              <div className="w-16 h-16 bg-joe-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <TrendingUp className="w-8 h-8 text-joe-gold" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Consistent Performance</h3>
-              <p className="text-gray-600">Maintaining competitive scoring average under par</p>
+              <h3 className="text-xl font-joe-heading font-semibold text-joe-gold mb-2">Consistent Performance</h3>
+              <p className="text-joe-stone font-joe-body">Maintaining competitive scoring average under par</p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
+              <div className="w-16 h-16 bg-joe-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-joe-gold" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Growing Fanbase</h3>
-              <p className="text-gray-600">Building a community of supporters and followers</p>
+              <h3 className="text-xl font-joe-heading font-semibold text-joe-gold mb-2">Growing Fanbase</h3>
+              <p className="text-joe-stone font-joe-body">Building a community of supporters and followers</p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
+              <div className="w-16 h-16 bg-joe-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Building className="w-8 h-8 text-joe-gold" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Sponsorship Growth</h3>
-              <p className="text-gray-600">Attracting partners and building brand partnerships</p>
+              <h3 className="text-xl font-joe-heading font-semibold text-joe-gold mb-2">Sponsorship Growth</h3>
+              <p className="text-joe-stone font-joe-body">Attracting partners and building brand partnerships</p>
             </div>
           </div>
         </div>

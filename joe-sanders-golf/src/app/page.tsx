@@ -1,24 +1,16 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
+import { dataClient } from '@/lib/data-client'
 import { Sponsor } from '@/types'
+import { Check, Zap, Heart, Users } from 'lucide-react'
 
 async function getSponsors(): Promise<Sponsor[]> {
-  if (!supabase) {
-    return []
-  }
-
-  const { data, error } = await supabase
-    .from('sponsors')
-    .select('*')
-    .order('tier', { ascending: false })
-
-  if (error) {
+  try {
+    return await dataClient.getSponsors()
+  } catch (error) {
     console.error('Error fetching sponsors:', error)
     return []
   }
-
-  return data || []
 }
 
 export default async function Home() {
@@ -27,83 +19,112 @@ export default async function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-green-600 to-green-800 text-white">
-        <div className="absolute inset-0 bg-black bg-opacity-30"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Joe Sanders
+      <section className="hero-container relative min-h-screen flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-joe-black via-joe-black/95 to-joe-black/90"></div>
+
+        {/* Stones Golf Integration */}
+        <div className="stones-logo-container absolute top-8 right-8 z-10">
+          <div className="stones-dot"></div>
+          <div className="stones-dot"></div>
+          <div className="stones-dot"></div>
+        </div>
+
+        <div className="relative z-10 text-center max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="hero-tagline mb-8">
+            <h1 className="text-5xl md:text-7xl font-joe-heading font-bold text-joe-gold mb-4">
+              Say Uncle
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-green-100">
-              Professional Golfer • PGA Tour Journey
+            <p className="text-xl md:text-2xl text-joe-stone font-joe-body mb-8">
+              Professional Golfer • PGA Tour Dreamer • Storyteller
             </p>
-            <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto">
-              Follow my journey from amateur to professional golfer. Experience the highs,
-              the lows, and the dedication it takes to chase the PGA Tour dream.
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <Link
+              href="/journey"
+              className="merch-button px-8 py-4 rounded-lg font-joe-accent font-bold text-lg"
+            >
+              <span>Follow The Journey</span>
+            </Link>
+            <Link
+              href="/shop"
+              className="btn-outline border-2 border-joe-gold text-joe-gold hover:bg-joe-gold hover:text-joe-black px-8 py-4 rounded-lg font-joe-accent font-bold text-lg"
+            >
+              Visit Pro Shop
+            </Link>
+          </div>
+
+          <div className="mt-12">
+            <p className="text-joe-stone font-joe-body text-lg mb-4">
+              Building a legacy one swing at a time
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/journey"
-                className="bg-white text-green-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-              >
-                Follow The Journey
-              </Link>
-              <Link
-                href="/fan-club"
-                className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-green-600 transition-colors"
-              >
-                Join Fan Club
-              </Link>
+            <div className="flex justify-center space-x-8">
+              <div className="text-center">
+                <div className="text-3xl font-joe-heading font-bold text-joe-gold">47</div>
+                <div className="text-sm text-joe-stone font-joe-accent">Tournaments</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-joe-heading font-bold text-joe-gold">12</div>
+                <div className="text-sm text-joe-stone font-joe-accent">Top 10s</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-joe-heading font-bold text-joe-gold">3</div>
+                <div className="text-sm text-joe-stone font-joe-accent">Wins</div>
+              </div>
             </div>
           </div>
+        </div>
+
+        {/* Decorative Elements */}
+        <div className="absolute bottom-8 left-8 opacity-20">
+          <div className="w-32 h-32 border border-joe-gold rounded-full"></div>
+        </div>
+        <div className="absolute top-16 left-16 opacity-20">
+          <div className="w-24 h-24 border border-joe-gold rounded-full"></div>
         </div>
       </section>
 
       {/* Progress Bar Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-joe-stone">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">The Journey Progress</h2>
-            <p className="text-lg text-gray-600">Tracking my path to the PGA Tour</p>
+            <h2 className="text-3xl font-joe-heading font-semibold text-joe-gold mb-4">The Journey Progress</h2>
+            <p className="text-lg text-joe-white font-joe-body">Tracking my path to the PGA Tour</p>
           </div>
 
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-lg shadow-lg p-8">
+            <div className="bg-joe-black rounded-lg shadow-lg p-8 border border-joe-gold/20">
               <div className="flex justify-between items-center mb-6">
-                <span className="text-sm font-medium text-gray-600">Amateur</span>
-                <span className="text-sm font-medium text-gray-600">Mini-Tours</span>
-                <span className="text-sm font-medium text-gray-600">Korn Ferry Tour</span>
-                <span className="text-sm font-medium text-gray-600">PGA Tour</span>
+                <span className="text-sm font-joe-accent font-medium text-joe-stone">Amateur</span>
+                <span className="text-sm font-joe-accent font-medium text-joe-stone">Mini-Tours</span>
+                <span className="text-sm font-joe-accent font-medium text-joe-stone">Korn Ferry Tour</span>
+                <span className="text-sm font-joe-accent font-medium text-joe-stone">PGA Tour</span>
               </div>
 
-              <div className="w-full bg-gray-200 rounded-full h-4 mb-4">
-                <div className="bg-green-600 h-4 rounded-full" style={{ width: '35%' }}></div>
+              <div className="w-full bg-joe-stone rounded-full h-4 mb-4">
+                <div className="bg-joe-gold h-4 rounded-full" style={{ width: '35%' }}></div>
               </div>
 
               <div className="grid grid-cols-4 gap-4 text-center">
-                <div className="text-green-600">
-                  <div className="w-8 h-8 bg-green-600 rounded-full mx-auto mb-2 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
+                <div className="text-joe-gold">
+                  <div className="w-8 h-8 bg-joe-gold rounded-full mx-auto mb-2 flex items-center justify-center">
+                    <Check className="w-4 h-4 text-joe-black" />
                   </div>
-                  <p className="text-sm font-medium">Completed</p>
+                  <p className="text-sm font-joe-accent font-medium text-joe-gold">Completed</p>
                 </div>
-                <div className="text-green-600">
-                  <div className="w-8 h-8 bg-green-600 rounded-full mx-auto mb-2 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
+                <div className="text-joe-gold">
+                  <div className="w-8 h-8 bg-joe-gold rounded-full mx-auto mb-2 flex items-center justify-center">
+                    <Check className="w-4 h-4 text-joe-black" />
                   </div>
-                  <p className="text-sm font-medium">In Progress</p>
+                  <p className="text-sm font-joe-accent font-medium text-joe-gold">In Progress</p>
                 </div>
-                <div className="text-gray-400">
-                  <div className="w-8 h-8 bg-gray-400 rounded-full mx-auto mb-2"></div>
-                  <p className="text-sm font-medium">Next Goal</p>
+                <div className="text-joe-stone">
+                  <div className="w-8 h-8 bg-joe-stone rounded-full mx-auto mb-2"></div>
+                  <p className="text-sm font-joe-accent font-medium text-joe-stone">Next Goal</p>
                 </div>
-                <div className="text-gray-400">
-                  <div className="w-8 h-8 bg-gray-400 rounded-full mx-auto mb-2"></div>
-                  <p className="text-sm font-medium">Ultimate Goal</p>
+                <div className="text-joe-stone">
+                  <div className="w-8 h-8 bg-joe-stone rounded-full mx-auto mb-2"></div>
+                  <p className="text-sm font-joe-accent font-medium text-joe-stone">Ultimate Goal</p>
                 </div>
               </div>
             </div>
@@ -112,35 +133,35 @@ export default async function Home() {
       </section>
 
       {/* Stats Ticker */}
-      <section className="py-16 bg-green-600 text-white">
+      <section className="py-16 bg-joe-gold text-joe-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold mb-2">47</div>
-              <div className="text-green-100">Tournaments Played</div>
+              <div className="text-4xl font-joe-heading font-bold mb-2">47</div>
+              <div className="text-joe-black/80 font-joe-body">Tournaments Played</div>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">12</div>
-              <div className="text-green-100">Top 10 Finishes</div>
+              <div className="text-4xl font-joe-heading font-bold mb-2">12</div>
+              <div className="text-joe-black/80 font-joe-body">Top 10 Finishes</div>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">3</div>
-              <div className="text-green-100">Professional Wins</div>
+              <div className="text-4xl font-joe-heading font-bold mb-2">3</div>
+              <div className="text-joe-black/80 font-joe-body">Professional Wins</div>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">72.3</div>
-              <div className="text-green-100">Scoring Average</div>
+              <div className="text-4xl font-joe-heading font-bold mb-2">72.3</div>
+              <div className="text-joe-black/80 font-joe-body">Scoring Average</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Why Joe Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-joe-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Joe?</h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <h2 className="text-3xl font-joe-heading font-semibold text-joe-gold mb-4">Why Joe?</h2>
+            <p className="text-lg text-joe-stone font-joe-body max-w-3xl mx-auto">
               Discover what makes my journey unique and why I&apos;m building something special
               in the world of professional golf.
             </p>
@@ -148,39 +169,33 @@ export default async function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
+              <div className="w-16 h-16 bg-joe-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Zap className="w-8 h-8 text-joe-gold" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Relentless Work Ethic</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-joe-heading font-semibold text-joe-gold mb-2">Relentless Work Ethic</h3>
+              <p className="text-joe-stone font-joe-body">
                 Every practice session, every swing, every putt - I give 100% effort
                 to improve and achieve my goals.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
+              <div className="w-16 h-16 bg-joe-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Heart className="w-8 h-8 text-joe-gold" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Passionate Storyteller</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-joe-heading font-semibold text-joe-gold mb-2">Passionate Storyteller</h3>
+              <p className="text-joe-stone font-joe-body">
                 I believe in sharing the real journey - the struggles, the victories,
                 and the lessons learned along the way.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
+              <div className="w-16 h-16 bg-joe-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-joe-gold" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Community Builder</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-joe-heading font-semibold text-joe-gold mb-2">Community Builder</h3>
+              <p className="text-joe-stone font-joe-body">
                 Building a supportive community of golf enthusiasts who believe
                 in the power of perseverance and passion.
               </p>
@@ -191,16 +206,16 @@ export default async function Home() {
 
       {/* Sponsors Section */}
       {sponsors.length > 0 && (
-        <section className="py-16 bg-gray-50">
+        <section className="py-16 bg-joe-stone">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Proudly Sponsored By</h2>
-              <p className="text-lg text-gray-600">Thank you to our amazing partners</p>
+              <h2 className="text-3xl font-joe-heading font-semibold text-joe-gold mb-4">Proudly Sponsored By</h2>
+              <p className="text-lg text-joe-white font-joe-body">Thank you to our amazing partners</p>
             </div>
 
             <div className="flex flex-wrap justify-center items-center gap-8">
               {sponsors.map((sponsor) => (
-                <div key={sponsor.id} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <div key={sponsor.id} className="bg-joe-black p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-joe-gold/20">
                   {sponsor.logo_url ? (
                     <Image
                       src={sponsor.logo_url}
@@ -210,11 +225,11 @@ export default async function Home() {
                       className="object-contain"
                     />
                   ) : (
-                    <div className="w-32 h-16 bg-gray-200 rounded flex items-center justify-center">
-                      <span className="text-gray-500 font-medium">{sponsor.name}</span>
+                    <div className="w-32 h-16 bg-joe-stone rounded flex items-center justify-center">
+                      <span className="text-joe-gold font-joe-accent font-medium">{sponsor.name}</span>
                     </div>
                   )}
-                  <p className="text-center mt-2 text-sm text-gray-600 capitalize">{sponsor.tier} Partner</p>
+                  <p className="text-center mt-2 text-sm text-joe-gold font-joe-accent capitalize">{sponsor.tier} Partner</p>
                 </div>
               ))}
             </div>
@@ -223,24 +238,24 @@ export default async function Home() {
       )}
 
       {/* Call to Action */}
-      <section className="py-16 bg-green-600 text-white">
+      <section className="py-16 bg-joe-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">Join The Journey</h2>
-          <p className="text-xl mb-8 text-green-100">
+          <h2 className="text-3xl font-joe-heading font-semibold text-joe-gold mb-4">Join The Journey</h2>
+          <p className="text-xl mb-8 text-joe-stone font-joe-body">
             Be part of something special. Follow my progress and support my PGA Tour dreams.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
             <Link
               href="/journey"
-              className="bg-white text-green-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+              className="merch-button px-8 py-4 rounded-lg font-joe-accent font-bold text-lg"
             >
-              Explore The Journey
+              <span>Follow The Journey</span>
             </Link>
             <Link
               href="/fan-club"
-              className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-green-600 transition-colors"
+              className="btn-outline border-2 border-joe-gold text-joe-gold hover:bg-joe-gold hover:text-joe-black px-8 py-4 rounded-lg font-joe-accent font-bold text-lg"
             >
-              Become a Fan Club Member
+              Join Fan Club
             </Link>
           </div>
         </div>

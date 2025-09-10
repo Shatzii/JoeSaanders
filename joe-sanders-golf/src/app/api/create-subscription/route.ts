@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: 'Joe Sanders Fan Club',
+              name: 'Uncle Joes Golf Fan Club',
               description: 'Monthly subscription for exclusive content and benefits',
             },
             unit_amount: 999, // $9.99

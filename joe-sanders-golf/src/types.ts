@@ -1,4 +1,4 @@
-// TypeScript type definitions for the Joe Sanders Golf Platform
+// TypeScript type definitions for the Uncle Joes Golf Platform
 
 export interface Profile {
   id: string;

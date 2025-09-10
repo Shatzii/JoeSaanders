@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { dataClient } from '@/lib/data-client'
 import { Resend } from 'resend'
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 export async function POST(request: NextRequest) {
   try {
-    if (!supabase) {
-      return NextResponse.json(
-        { error: 'Service configuration error' },
-        { status: 500 }
-      )
-    }
-
     const { email } = await request.json()
 
     if (!email || !email.includes('@')) {
@@ -22,29 +15,24 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Add to Supabase newsletter table
-    const { error: dbError } = await supabase
-      .from('newsletter_emails')
-      .insert([{ email }])
-
-    if (dbError && !dbError.message.includes('duplicate key')) {
-      console.error('Database error:', dbError)
-      return NextResponse.json(
-        { error: 'Failed to subscribe' },
-        { status: 500 }
-      )
+    // Add to newsletter (using data client)
+    try {
+      await dataClient.subscribeToNewsletter(email)
+    } catch (error) {
+      console.error('Newsletter subscription error:', error)
+      // Continue even if local storage fails
     }
 
     // Send welcome email via Resend
     if (resend) {
       try {
         await resend.emails.send({
-          from: 'Joe Sanders Golf <noreply@joesandersgolf.com>',
+          from: 'Uncle Joes Golf <noreply@unclejoesgolf.com>',
           to: email,
-          subject: 'Welcome to Joe Sanders Golf!',
+          subject: 'Welcome to Uncle Joes Golf!',
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h1 style="color: #16a34a;">Welcome to the Joe Sanders Golf Community!</h1>
+              <h1 style="color: #d4af37;">Welcome to the Uncle Joes Golf Community!</h1>
               <p>Thank you for subscribing to updates about my professional golf journey.</p>
               <p>You'll be the first to know about:</p>
               <ul>
@@ -53,8 +41,8 @@ export async function POST(request: NextRequest) {
                 <li>Exclusive merchandise releases</li>
                 <li>Fan Club opportunities</li>
               </ul>
-              <p>Follow my progress at <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://joesandersgolf.com'}">joesandersgolf.com</a></p>
-              <p>Best regards,<br>Joe Sanders</p>
+              <p>Follow my progress at <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}">unclejoesgolf.com</a></p>
+              <p>Best regards,<br>Uncle Joe</p>
             </div>
           `,
         })

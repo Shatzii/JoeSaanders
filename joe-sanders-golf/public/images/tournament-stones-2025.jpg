@@ -1,0 +1,7 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#0a0a0a"/>
+  <rect x="0" y="500" width="800" height="100" fill="#d4af37"/>
+  <text x="400" y="300" text-anchor="middle" fill="#d4af37" font-family="Arial" font-size="48" font-weight="bold">Stones Golf Championship</text>
+  <text x="400" y="350" text-anchor="middle" fill="#fafafa" font-family="Arial" font-size="24">T-5th Place</text>
+  <text x="400" y="550" text-anchor="middle" fill="#0a0a0a" font-family="Arial" font-size="18">Tournament Photo</text>
+</svg>
