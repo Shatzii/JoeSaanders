@@ -49,6 +49,9 @@ export default function Header() {
             <Link href="/fan-club" className="nav-link">
               Fan Club
             </Link>
+            <Link href="/simulator" className="nav-link">
+              Golf Simulator
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -104,6 +107,13 @@ export default function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Fan Club
+              </Link>
+              <Link
+                href="/simulator"
+                className="block px-3 py-3 text-joe-white hover:text-joe-gold hover:bg-joe-gold/10 transition-all duration-300 rounded-lg font-joe-accent font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Golf Simulator
               </Link>
             </div>
           </div>
