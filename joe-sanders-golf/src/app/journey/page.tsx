@@ -8,7 +8,11 @@ import { Plus, Image as ImageIcon, CheckCircle, TrendingUp, Users, Building } fr
 const sampleTournaments: Tournament[] = [
   {
     id: '1',
+    title: 'Stones Golf Championship',
     date: '2025-08-15',
+    location: 'Stones Golf Club',
+    description: 'Major tournament at Stones Golf Club',
+    status: 'completed',
     name: 'Stones Golf Championship',
     result: 'T-5th',
     recap_text: 'A breakthrough performance at the Stones Golf Championship! Despite challenging weather conditions, I managed to finish in a tie for 5th place. This tournament showcased the importance of mental resilience and course management.',
@@ -19,7 +23,11 @@ const sampleTournaments: Tournament[] = [
   },
   {
     id: '2',
+    title: 'Uncle Joe Classic',
     date: '2025-07-22',
+    location: 'Uncle Joe Golf Course',
+    description: 'Signature tournament at Uncle Joe Golf Course',
+    status: 'completed',
     name: 'Uncle Joe Classic',
     result: '2nd Place',
     recap_text: 'Runner-up at the Uncle Joe Classic! This was my best finish of the season so far. I led after the first two rounds but a tough third round put me back in the pack.',
@@ -30,7 +38,11 @@ const sampleTournaments: Tournament[] = [
   },
   {
     id: '3',
+    title: 'PGA Tour Qualifying Tournament',
     date: '2025-06-10',
+    location: 'PGA Tour Qualifying Site',
+    description: 'PGA Tour qualifying tournament',
+    status: 'completed',
     name: 'PGA Tour Qualifying Tournament',
     result: 'T-12th',
     recap_text: 'Successfully advanced through PGA Tour Qualifying! This was a grueling 108-hole tournament that tested every aspect of my game.',
@@ -41,7 +53,11 @@ const sampleTournaments: Tournament[] = [
   },
   {
     id: '4',
+    title: 'Korn Ferry Tour Championship',
     date: '2025-05-18',
+    location: 'Korn Ferry Tour Venue',
+    description: 'Korn Ferry Tour championship event',
+    status: 'completed',
     name: 'Korn Ferry Tour Championship',
     result: 'T-8th',
     recap_text: 'Strong showing at the Korn Ferry Tour Championship! Despite being the youngest player in the field, I held my own and finished in a tie for 8th.',
@@ -52,7 +68,11 @@ const sampleTournaments: Tournament[] = [
   },
   {
     id: '5',
+    title: 'Spring Classic Invitational',
     date: '2025-04-05',
+    location: 'Spring Classic Golf Club',
+    description: 'Spring Classic Invitational tournament',
+    status: 'completed',
     name: 'Spring Classic Invitational',
     result: '1st Place',
     recap_text: 'VICTORY! My first professional win at the Spring Classic Invitational! This was an emotional moment that validated all the hard work.',
@@ -63,7 +83,11 @@ const sampleTournaments: Tournament[] = [
   },
   {
     id: '6',
+    title: 'Mini-Tour Championship',
     date: '2025-03-14',
+    location: 'Mini-Tour Venue',
+    description: 'Mini-Tour championship event',
+    status: 'completed',
     name: 'Mini-Tour Championship',
     result: 'T-3rd',
     recap_text: 'Consistent performance at the Mini-Tour Championship! I started the tournament with three straight rounds in the 60s.',
@@ -130,7 +154,7 @@ export default async function JourneyPage() {
                     {tournament.photo_urls && tournament.photo_urls.length > 0 ? (
                       <Image
                         src={tournament.photo_urls[0]}
-                        alt={tournament.name}
+                        alt={tournament.name || tournament.title}
                         fill
                         className="object-cover"
                       />

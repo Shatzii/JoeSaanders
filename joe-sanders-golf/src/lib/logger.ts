@@ -1,37 +1,37 @@
-import winston from 'winston'
-import path from 'path'
-
-const logFormat = winston.format.combine(
-  winston.format.timestamp(),
-  winston.format.errors({ stack: true }),
-  winston.format.json()
-)
-
-const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || 'info',
-  format: logFormat,
-  defaultMeta: { service: 'joe-sanders-golf' },
-  transports: [
-    // Write all logs with importance level of `error` or less to `error.log`
-    new winston.transports.File({
-      filename: path.join(process.cwd(), 'logs', 'error.log'),
-      level: 'error'
-    }),
-    // Write all logs with importance level of `info` or less to `combined.log`
-    new winston.transports.File({
-      filename: path.join(process.cwd(), 'logs', 'combined.log')
-    }),
-  ],
-})
-
-// If we're not in production then log to the console with a simple format
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.combine(
-      winston.format.colorize(),
-      winston.format.simple()
-    )
-  }))
+// Simple logger to avoid Winston fs module issues in browser
+interface LogEntry {
+  level: string
+  message: string
+  meta?: any
+  timestamp: string
 }
+
+class SimpleLogger {
+  private service = 'joe-sanders-golf'
+
+  private formatMessage(level: string, message: string, meta?: any): string {
+    const timestamp = new Date().toISOString()
+    const metaStr = meta ? ` ${JSON.stringify(meta)}` : ''
+    return `[${timestamp}] ${level.toUpperCase()}: ${message}${metaStr}`
+  }
+
+  info(message: string, meta?: any) {
+    console.log(this.formatMessage('info', message, meta))
+  }
+
+  error(message: string, meta?: any) {
+    console.error(this.formatMessage('error', message, meta))
+  }
+
+  warn(message: string, meta?: any) {
+    console.warn(this.formatMessage('warn', message, meta))
+  }
+
+  debug(message: string, meta?: any) {
+    console.debug(this.formatMessage('debug', message, meta))
+  }
+}
+
+const logger = new SimpleLogger()
 
 export default logger

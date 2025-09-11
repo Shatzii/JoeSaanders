@@ -10,15 +10,6 @@ if (SENTRY_DSN) {
     tracesSampleRate: SENTRY_ENVIRONMENT === 'production' ? 0.1 : 1.0,
     replaysOnErrorSampleRate: 1.0,
     replaysSessionSampleRate: SENTRY_ENVIRONMENT === 'production' ? 0.1 : 0.0,
-    integrations: [
-      new Sentry.Replay({
-        maskAllText: true,
-        blockAllMedia: true,
-      }),
-      new Sentry.BrowserTracing({
-        tracePropagationTargets: ['localhost', /^https:\/\/unclejoesgolf\.com/],
-      }),
-    ],
     // Performance monitoring
     tracesSampler: (samplingContext: any) => {
       // Skip health check endpoints

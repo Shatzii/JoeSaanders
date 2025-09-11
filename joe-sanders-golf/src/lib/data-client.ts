@@ -1,37 +1,14 @@
-import fs from 'fs'
-import path from 'path'
 import { supabase } from './supabase'
 import logger from './logger'
 
-const dataPath = path.join(process.cwd(), 'data', 'local-data.json')
-
-// Local data client for development fallback
+// Local data client for development fallback (browser-safe)
 class LocalDataClient {
-  private data: any = null
+  private data: any = { tournaments: [], sponsors: [], merch: [] }
 
   constructor() {
-    this.loadData()
-  }
-
-  private loadData() {
-    try {
-      if (fs.existsSync(dataPath)) {
-        const fileContents = fs.readFileSync(dataPath, 'utf8')
-        this.data = JSON.parse(fileContents)
-      } else {
-        this.data = { tournaments: [], sponsors: [], merch: [] }
-      }
-    } catch (error) {
-      logger.error('Error loading local data:', { error: error.message })
+    // In browser environment, use default data structure
+    if (typeof window !== 'undefined') {
       this.data = { tournaments: [], sponsors: [], merch: [] }
-    }
-  }
-
-  private saveData() {
-    try {
-      fs.writeFileSync(dataPath, JSON.stringify(this.data, null, 2))
-    } catch (error) {
-      logger.error('Error saving local data:', { error: error.message })
     }
   }
 

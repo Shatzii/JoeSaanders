@@ -3,6 +3,9 @@ import { Inter, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import CookieConsent from '@/components/CookieConsent'
+import PerformanceMonitor from '@/components/PerformanceMonitor'
+import ServiceWorkerRegister from '@/components/ServiceWorkerRegister'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const cormorant = Cormorant_Garamond({
@@ -36,6 +39,9 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        <CookieConsent />
+        <PerformanceMonitor />
+        <ServiceWorkerRegister />
       </body>
     </html>
   )

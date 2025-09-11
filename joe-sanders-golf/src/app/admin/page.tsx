@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react'
 import { dataClient } from '@/lib/data-client'
 import { Tournament, Sponsor, Merch } from '@/types'
-import { Plus, Edit, Trash2, Save, X, Eye, EyeOff } from 'lucide-react'
+import AdvancedAnalytics from '@/components/AdvancedAnalytics'
+import FanEngagement from '@/components/FanEngagement'
+import { Plus, Edit, Trash2, Save, X, Eye, EyeOff, BarChart3, Heart } from 'lucide-react'
 
 interface EditingItem {
   type: 'tournament' | 'sponsor' | 'merch'
@@ -12,7 +14,7 @@ interface EditingItem {
 }
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<'tournaments' | 'sponsors' | 'merch'>('tournaments')
+  const [activeTab, setActiveTab] = useState<'tournaments' | 'sponsors' | 'merch' | 'analytics' | 'engagement'>('tournaments')
   const [tournaments, setTournaments] = useState<Tournament[]>([])
   const [sponsors, setSponsors] = useState<Sponsor[]>([])
   const [merch, setMerch] = useState<Merch[]>([])
@@ -54,17 +56,23 @@ export default function AdminPage() {
   const handleSave = async () => {
     if (!editing) return
 
+    // Ensure we're using Supabase client for admin operations
+    if (!('updateTournament' in dataClient)) {
+      alert('Admin operations require Supabase connection. Please check your configuration.')
+      return
+    }
+
     try {
       let result
       switch (editing.type) {
         case 'tournament':
-          result = await dataClient.updateTournament(editing.id, editing.data)
+          result = await (dataClient as any).updateTournament(editing.id, editing.data)
           break
         case 'sponsor':
-          result = await dataClient.updateSponsor(editing.id, editing.data)
+          result = await (dataClient as any).updateSponsor(editing.id, editing.data)
           break
         case 'merch':
-          result = await dataClient.updateMerch(editing.id, editing.data)
+          result = await (dataClient as any).updateMerch(editing.id, editing.data)
           break
       }
 
@@ -88,18 +96,24 @@ export default function AdminPage() {
   const handleDelete = async (type: 'tournament' | 'sponsor' | 'merch', id: string) => {
     if (!confirm('Are you sure you want to delete this item? This action cannot be undone.')) return
 
+    // Ensure we're using Supabase client for admin operations
+    if (!('deleteTournament' in dataClient)) {
+      alert('Admin operations require Supabase connection. Please check your configuration.')
+      return
+    }
+
     try {
       switch (type) {
         case 'tournament':
-          await dataClient.deleteTournament(id)
+          await (dataClient as any).deleteTournament(id)
           setTournaments(tournaments.filter(t => t.id !== id))
           break
         case 'sponsor':
-          await dataClient.deleteSponsor(id)
+          await (dataClient as any).deleteSponsor(id)
           setSponsors(sponsors.filter(s => s.id !== id))
           break
         case 'merch':
-          await dataClient.deleteMerch(id)
+          await (dataClient as any).deleteMerch(id)
           setMerch(merch.filter(m => m.id !== id))
           break
       }
@@ -117,6 +131,12 @@ export default function AdminPage() {
       return
     }
 
+    // Ensure we're using Supabase client for admin operations
+    if (!('createTournament' in dataClient)) {
+      alert('Admin operations require Supabase connection. Please check your configuration.')
+      return
+    }
+
     try {
       let result
       const itemToCreate = {
@@ -127,15 +147,15 @@ export default function AdminPage() {
 
       switch (activeTab) {
         case 'tournaments':
-          result = await dataClient.createTournament(itemToCreate)
+          result = await (dataClient as any).createTournament(itemToCreate)
           setTournaments([result, ...tournaments])
           break
         case 'sponsors':
-          result = await dataClient.createSponsor(itemToCreate)
+          result = await (dataClient as any).createSponsor(itemToCreate)
           setSponsors([result, ...sponsors])
           break
         case 'merch':
-          result = await dataClient.createMerch(itemToCreate)
+          result = await (dataClient as any).createMerch(itemToCreate)
           setMerch([result, ...merch])
           break
       }
@@ -204,6 +224,28 @@ export default function AdminPage() {
             >
               Merch ({merch.length})
             </button>
+            <button
+              onClick={() => setActiveTab('analytics')}
+              className={`flex-1 py-2 px-4 rounded-md font-joe-accent font-medium transition-colors ${
+                activeTab === 'analytics'
+                  ? 'bg-joe-gold text-joe-black'
+                  : 'text-joe-white hover:bg-joe-black/50'
+              }`}
+            >
+              <BarChart3 className="w-4 h-4 inline mr-2" />
+              Analytics
+            </button>
+            <button
+              onClick={() => setActiveTab('engagement')}
+              className={`flex-1 py-2 px-4 rounded-md font-joe-accent font-medium transition-colors ${
+                activeTab === 'engagement'
+                  ? 'bg-joe-gold text-joe-black'
+                  : 'text-joe-white hover:bg-joe-black/50'
+              }`}
+            >
+              <Heart className="w-4 h-4 inline mr-2" />
+              Fan Engagement
+            </button>
           </div>
 
           {/* Content based on active tab */}
@@ -243,13 +285,13 @@ export default function AdminPage() {
                         ) : (
                           <div>
                             <h3 className="text-lg font-joe-heading font-semibold text-joe-gold mb-1">
-                              {tournament.name}
+                              {tournament.title}
                             </h3>
                             <p className="text-joe-stone text-sm font-joe-body mb-2">
-                              {new Date(tournament.date).toLocaleDateString()} • {tournament.result}
+                              {new Date(tournament.date).toLocaleDateString()} • {tournament.location}
                             </p>
                             <p className="text-joe-white text-sm font-joe-body line-clamp-2">
-                              {tournament.recap_text}
+                              {tournament.description}
                             </p>
                           </div>
                         )}
@@ -472,6 +514,38 @@ export default function AdminPage() {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {activeTab === 'analytics' && (
+            <div className="bg-joe-stone rounded-lg p-6">
+              <div className="mb-6">
+                <h2 className="text-2xl font-joe-heading font-semibold text-joe-gold mb-4 flex items-center">
+                  <BarChart3 className="h-6 w-6 mr-3" />
+                  Advanced Analytics Dashboard
+                </h2>
+                <p className="text-joe-white font-joe-body">
+                  Monitor website performance, user engagement, and track custom events with Google Analytics integration.
+                </p>
+              </div>
+
+              <AdvancedAnalytics />
+            </div>
+          )}
+
+          {activeTab === 'engagement' && (
+            <div className="bg-joe-stone rounded-lg p-6">
+              <div className="mb-6">
+                <h2 className="text-2xl font-joe-heading font-semibold text-joe-gold mb-4 flex items-center">
+                  <Heart className="h-6 w-6 mr-3" />
+                  Fan Engagement Hub
+                </h2>
+                <p className="text-joe-white font-joe-body">
+                  Interactive features for fan engagement including tournament predictions, leaderboards, and community activities.
+                </p>
+              </div>
+
+              <FanEngagement />
             </div>
           )}
         </div>
