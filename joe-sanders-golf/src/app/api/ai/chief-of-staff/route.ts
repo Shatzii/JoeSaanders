@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
 
-const openai = new OpenAI({
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
-});
+}) : null;
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -13,6 +13,17 @@ const supabase = createClient(
 
 export async function POST(req: NextRequest) {
   try {
+    // Check if OpenAI is available
+    if (!openai) {
+      return NextResponse.json({
+        response: "AI features are currently unavailable. Please configure OpenAI API key for full functionality.",
+        suggestions: [
+          "Set up OPENAI_API_KEY environment variable",
+          "Contact administrator for API key configuration"
+        ]
+      });
+    }
+
     const { message, context, taskType = 'general' } = await req.json();
 
     if (!message) {

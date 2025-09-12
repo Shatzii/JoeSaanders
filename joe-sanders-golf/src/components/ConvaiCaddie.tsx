@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Mic, MicOff, MessageCircle, Volume2, VolumeX } from 'lucide-react';
 
 interface ConvaiCaddieProps {
@@ -13,6 +13,26 @@ export function ConvaiCaddie({ agentId = "your-convai-agent-id", isOpen, onClose
   const [isLoaded, setIsLoaded] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+
+  const initializeConvai = useCallback(() => {
+    if (!convaiRef.current) return;
+
+    // Create the Convai widget
+    const convaiWidget = document.createElement('elevenlabs-convai');
+    convaiWidget.setAttribute('agent-id', agentId);
+
+    // Configure widget settings
+    convaiWidget.style.width = '100%';
+    convaiWidget.style.height = '400px';
+    convaiWidget.style.border = 'none';
+    convaiWidget.style.borderRadius = '8px';
+
+    convaiRef.current.appendChild(convaiWidget);
+
+    // Listen for convai events
+    convaiWidget.addEventListener('convai-start', () => setIsListening(true));
+    convaiWidget.addEventListener('convai-end', () => setIsListening(false));
+  }, [agentId]);
 
   useEffect(() => {
     if (!isOpen || isLoaded) return;
@@ -34,27 +54,7 @@ export function ConvaiCaddie({ agentId = "your-convai-agent-id", isOpen, onClose
         document.head.removeChild(existingScript);
       }
     };
-  }, [isOpen, isLoaded]);
-
-  const initializeConvai = () => {
-    if (!convaiRef.current) return;
-
-    // Create the Convai widget
-    const convaiWidget = document.createElement('elevenlabs-convai');
-    convaiWidget.setAttribute('agent-id', agentId);
-
-    // Configure widget settings
-    convaiWidget.style.width = '100%';
-    convaiWidget.style.height = '400px';
-    convaiWidget.style.border = 'none';
-    convaiWidget.style.borderRadius = '8px';
-
-    convaiRef.current.appendChild(convaiWidget);
-
-    // Listen for convai events
-    convaiWidget.addEventListener('convai-start', () => setIsListening(true));
-    convaiWidget.addEventListener('convai-end', () => setIsListening(false));
-  };
+  }, [isOpen, isLoaded, initializeConvai]);
 
   const toggleMute = () => {
     setIsMuted(!isMuted);

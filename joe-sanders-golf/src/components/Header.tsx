@@ -34,9 +34,6 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/coolstones" className="nav-link">
-              CoolStones
-            </Link>
             <Link href="/journey" className="nav-link">
               The Journey
             </Link>
@@ -76,13 +73,6 @@ export default function Header() {
         {isMenuOpen && (
           <div className="md:hidden border-t border-joe-gold/20">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-joe-black/95 backdrop-blur-md">
-              <Link
-                href="/coolstones"
-                className="block px-3 py-3 text-joe-white hover:text-joe-gold hover:bg-joe-gold/10 transition-all duration-300 rounded-lg font-joe-accent font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                CoolStones
-              </Link>
               <Link
                 href="/journey"
                 className="block px-3 py-3 text-joe-white hover:text-joe-gold hover:bg-joe-gold/10 transition-all duration-300 rounded-lg font-joe-accent font-medium"

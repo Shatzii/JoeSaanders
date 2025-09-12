@@ -1,8 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Target, TrendingUp, Settings, RotateCcw, Share2, Volume2, VolumeX } from 'lucide-react'
-import { generateCoachingTip, speakCoachingTip, CoachingTip } from '../lib/elevenlabs'
+import { Target, TrendingUp, Settings, RotateCcw, Share2 } from 'lucide-react'
 
 interface SwingMetrics {
   clubSpeed: number
@@ -39,8 +38,6 @@ export default function GolfSimulator() {
   ])
   const [isAnimating, setIsAnimating] = useState(false)
   const [showAnalytics, setShowAnalytics] = useState(false)
-  const [voiceCoachingEnabled, setVoiceCoachingEnabled] = useState(true)
-  const [currentCoachingTip, setCurrentCoachingTip] = useState<CoachingTip | null>(null)
   const courseRef = useRef<HTMLDivElement>(null)
 
   const clubs = [
@@ -134,20 +131,6 @@ export default function GolfSimulator() {
 
     setShotHistory(prev => [newShot, ...prev.slice(0, 9)]) // Keep only last 10 shots
 
-    // Generate coaching tip
-    const coachingTip = generateCoachingTip({
-      ...metrics,
-      club: clubName.toLowerCase()
-    })
-    setCurrentCoachingTip(coachingTip)
-
-    // Speak coaching tip if enabled
-    if (voiceCoachingEnabled) {
-      setTimeout(() => {
-        speakCoachingTip(coachingTip)
-      }, 2500) // Wait for animation to finish
-    }
-
     // Show analytics after animation
     setTimeout(() => {
       setShowAnalytics(true)
@@ -212,7 +195,6 @@ export default function GolfSimulator() {
       shotShape: 'Straight'
     })
     setShowAnalytics(false)
-    setCurrentCoachingTip(null)
   }
 
   const shareResults = () => {
@@ -238,7 +220,7 @@ export default function GolfSimulator() {
             <Target className="h-8 w-8 text-yellow-400" />
             <h1 className="text-3xl font-bold text-white">ProSwing Simulator</h1>
           </div>
-          <p className="text-green-200">Professional Golf Simulation with Uncle Joe&apos;s Voice Coaching</p>
+          <p className="text-green-200">Professional Golf Simulation Experience</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -317,17 +299,6 @@ export default function GolfSimulator() {
               </button>
 
               <div className="flex gap-2">
-                <button
-                  onClick={() => setVoiceCoachingEnabled(!voiceCoachingEnabled)}
-                  className={`flex-1 py-2 px-4 rounded-lg transition-all flex items-center justify-center gap-2 ${
-                    voiceCoachingEnabled
-                      ? 'bg-green-600 text-white hover:bg-green-700'
-                      : 'bg-white/10 text-white hover:bg-white/20'
-                  }`}
-                >
-                  {voiceCoachingEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-                  {voiceCoachingEnabled ? 'Voice On' : 'Voice Off'}
-                </button>
                 <button
                   onClick={resetSimulator}
                   className="flex-1 bg-white/10 text-white py-2 px-4 rounded-lg hover:bg-white/20 transition-all flex items-center justify-center gap-2"
@@ -445,51 +416,6 @@ export default function GolfSimulator() {
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
-
-            {/* Uncle Joe Coaching Panel */}
-            {currentCoachingTip && (
-              <div className="bg-black/30 backdrop-blur-sm rounded-xl p-4 border-l-4 border-yellow-400">
-                <div className="flex justify-between items-center mb-3">
-                  <h3 className="text-white font-semibold flex items-center gap-2">
-                    <Volume2 className="h-4 w-4 text-yellow-400" />
-                    Uncle Joe&apos;s Coaching
-                  </h3>
-                  <button
-                    onClick={() => setCurrentCoachingTip(null)}
-                    className="text-white/70 hover:text-white"
-                  >
-                    ✕
-                  </button>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center text-black font-bold text-lg">
-                    👴
-                  </div>
-                  <div className="flex-1">
-                    <div className={`inline-block px-3 py-2 rounded-lg text-white ${
-                      currentCoachingTip.category === 'setup' ? 'bg-blue-600' :
-                      currentCoachingTip.category === 'swing' ? 'bg-green-600' :
-                      currentCoachingTip.category === 'follow-through' ? 'bg-purple-600' :
-                      'bg-orange-600'
-                    }`}>
-                      {currentCoachingTip.text}
-                    </div>
-                    <div className="mt-2 text-xs text-green-200 capitalize">
-                      Focus: {currentCoachingTip.category.replace('-', ' ')}
-                    </div>
-                  </div>
-                </div>
-                {voiceCoachingEnabled && (
-                  <button
-                    onClick={() => speakCoachingTip(currentCoachingTip)}
-                    className="mt-3 flex items-center gap-2 text-yellow-400 hover:text-yellow-300 text-sm"
-                  >
-                    <Volume2 className="h-4 w-4" />
-                    Replay Coaching
-                  </button>
-                )}
               </div>
             )}
           </div>

@@ -97,6 +97,13 @@ class GolfGame extends Phaser.Scene {
   }
 
   startAim(pointer: Phaser.Input.Pointer) {
+    if (!this.isAiming) {
+      this.isAiming = true;
+      this.power = 0;
+      this.powerIncreasing = true;
+    }
+  }
+
   takeShot(pointer: Phaser.Input.Pointer) {
     if (this.isAiming) {
       this.isAiming = false;
@@ -145,13 +152,6 @@ class GolfGame extends Phaser.Scene {
 
       // Also dispatch to window for other components
       window.dispatchEvent(new CustomEvent('shotTaken', { detail: this.shotData }));
-    }
-  }
-
-    if (!this.isAiming) {
-      this.isAiming = true;
-      this.power = 0;
-      this.powerIncreasing = true;
     }
   }
 

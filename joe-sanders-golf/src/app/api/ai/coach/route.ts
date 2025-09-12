@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
-});
+}) : null;
 
 // Define the function schema for the AI coach
 const functions = [
@@ -34,6 +34,17 @@ const functions = [
 
 export async function POST(req: NextRequest) {
   try {
+    // Check if OpenAI is available
+    if (!openai) {
+      return NextResponse.json({
+        response: "AI coaching features are currently unavailable. Please configure OpenAI API key for full functionality.",
+        suggestions: [
+          "Set up OPENAI_API_KEY environment variable",
+          "Contact administrator for API key configuration"
+        ]
+      });
+    }
+
     const { shotData, chatHistory = [] } = await req.json();
 
     const response = await openai.chat.completions.create({
