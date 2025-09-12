@@ -40,11 +40,15 @@ export async function POST(request: NextRequest) {
         if (session.mode === 'subscription' && session.metadata?.user_id) {
           const userId = session.metadata.user_id
           const subscriptionId = session.subscription as string
+          const tier = session.metadata.tier || 'pro'
 
-          // Update user profile to mark as fan club member
+          // Update user profile to mark as fan club member and set subscription tier
           await supabaseServer
             .from('profiles')
-            .update({ is_fan_club_member: true })
+            .update({
+              is_fan_club_member: true,
+              subscription_tier: tier
+            })
             .eq('id', userId)
 
           // Create subscription record
