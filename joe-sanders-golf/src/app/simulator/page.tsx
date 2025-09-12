@@ -8,6 +8,7 @@ import { ShotHistory } from '@/components/ShotHistory';
 import { PerformanceMetrics } from '@/components/PerformanceMetrics';
 import { AchievementSystem } from '@/components/AchievementSystem';
 import { PersonalizedCoaching } from '@/components/PersonalizedCoaching';
+import { MobileOptimization } from '@/components/MobileOptimization';
 import {
   Target,
   MessageCircle,
@@ -540,7 +541,4 @@ export default function SimulatorPage() {
   );
 }
 
-export const metadata = {
-  title: 'AI Golf Simulator | Uncle Joe\'s Challenge',
-  description: 'Experience professional golf simulation with Uncle Joe\'s AI coaching, voice caddie, and advanced analytics.',
-};
+// Note: metadata export removed since this is a client component
