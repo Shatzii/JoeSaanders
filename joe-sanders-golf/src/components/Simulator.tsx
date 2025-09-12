@@ -216,16 +216,33 @@ export default function GolfSimulator() {
   }
 
   const shareResults = () => {
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') return
+    
     const text = `Just hit a ${metrics.carryDistance} yard ${metrics.shotShape.toLowerCase()} with my ${clubs.find(c => c.id === selectedClub)?.name}! 🏌️‍♂️ #GolfSimulator`
+    
     if (navigator.share) {
       navigator.share({
         title: 'Golf Simulator Results',
         text: text,
         url: window.location.href
+      }).catch(() => {
+        // Fallback to clipboard if share fails
+        fallbackToClipboard(text)
       })
     } else {
-      navigator.clipboard.writeText(text)
-      alert('Results copied to clipboard!')
+      fallbackToClipboard(text)
+    }
+  }
+
+  const fallbackToClipboard = (text: string) => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Results copied to clipboard!')
+      }).catch(() => {
+        alert('Could not copy to clipboard')
+      })
+    } else {
+      alert('Sharing not supported in this browser')
     }
   }
 

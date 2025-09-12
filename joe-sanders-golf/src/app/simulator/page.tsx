@@ -202,7 +202,9 @@ export default function SimulatorPage() {
   const handleUpgrade = async (tier: 'pro' | 'elite') => {
     if (!user) {
       // Redirect to auth
-      window.location.href = '/auth';
+      if (typeof window !== 'undefined') {
+        window.location.href = '/auth';
+      }
       return;
     }
 
@@ -215,7 +217,9 @@ export default function SimulatorPage() {
 
       if (response.ok) {
         const { url } = await response.json();
-        window.location.href = url;
+        if (typeof window !== 'undefined') {
+          window.location.href = url;
+        }
       }
     } catch (error) {
       console.error('Upgrade failed:', error);
