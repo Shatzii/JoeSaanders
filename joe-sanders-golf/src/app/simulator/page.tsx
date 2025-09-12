@@ -9,6 +9,9 @@ import { PerformanceMetrics } from '@/components/PerformanceMetrics';
 import { AchievementSystem } from '@/components/AchievementSystem';
 import { PersonalizedCoaching } from '@/components/PersonalizedCoaching';
 import { MobileOptimization } from '@/components/MobileOptimization';
+
+// Force dynamic rendering to avoid SSR issues
+export const dynamic = 'force-dynamic';
 import {
   Target,
   MessageCircle,

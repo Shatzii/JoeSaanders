@@ -220,11 +220,11 @@ export default function GolfSimulator() {
     
     const text = `Just hit a ${metrics.carryDistance} yard ${metrics.shotShape.toLowerCase()} with my ${clubs.find(c => c.id === selectedClub)?.name}! 🏌️‍♂️ #GolfSimulator`
     
-    if (navigator.share) {
+    if (typeof navigator !== 'undefined' && navigator.share) {
       navigator.share({
         title: 'Golf Simulator Results',
         text: text,
-        url: window.location.href
+        url: typeof window !== 'undefined' ? window.location.href : ''
       }).catch(() => {
         // Fallback to clipboard if share fails
         fallbackToClipboard(text)
@@ -235,7 +235,7 @@ export default function GolfSimulator() {
   }
 
   const fallbackToClipboard = (text: string) => {
-    if (navigator.clipboard) {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
       navigator.clipboard.writeText(text).then(() => {
         alert('Results copied to clipboard!')
       }).catch(() => {
