@@ -111,10 +111,13 @@ export function AICoachWidget({ sessionId, isOpen, onClose, onAnalysisComplete }
       }
     };
 
-    window.addEventListener('shotTaken', handleShotTaken as EventListener);
-    return () => {
-      window.removeEventListener('shotTaken', handleShotTaken as EventListener);
-    };
+    // Only add event listener on client side
+    if (typeof window !== 'undefined') {
+      window.addEventListener('shotTaken', handleShotTaken as EventListener);
+      return () => {
+        window.removeEventListener('shotTaken', handleShotTaken as EventListener);
+      };
+    }
   }, [sessionId]);
 
   // Auto-analyze when a new shot is taken

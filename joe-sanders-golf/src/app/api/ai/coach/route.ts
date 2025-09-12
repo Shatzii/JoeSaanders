@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
+// Create OpenAI client only if API key is available
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
+  apiKey: process.env.OPENAI_API_KEY,
 }) : null;
 
 // Define the function schema for the AI coach
@@ -46,6 +47,13 @@ export async function POST(req: NextRequest) {
     }
 
     const { shotData, chatHistory = [] } = await req.json();
+
+    if (!openai) {
+      return NextResponse.json({ 
+        error: 'OpenAI API not configured',
+        fallback: "Play bold! Keep practicing those fundamentals and remember - it's all about grip, stance, and follow-through. Say Uncle!"
+      }, { status: 503 });
+    }
 
     const response = await openai.chat.completions.create({
       model: "gpt-4",

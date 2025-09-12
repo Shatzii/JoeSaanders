@@ -3,10 +3,16 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { Send, MessageSquare, TrendingUp, Users, DollarSign, Calendar } from 'lucide-react';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+// Create Supabase client only when needed
+const getSupabaseClient = () => {
+  if (typeof window === 'undefined') return null;
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return null;
+  
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
+};
 
 interface CoSMessage {
   id: string;
@@ -36,6 +42,12 @@ export default function ChiefOfStaffPage() {
 
   const loadMessageHistory = async () => {
     try {
+      const supabase = getSupabaseClient();
+      if (!supabase) {
+        console.log('Supabase client not available');
+        return;
+      }
+
       const { data } = await supabase
         .from('cos_logs')
         .select('*')
@@ -52,13 +64,19 @@ export default function ChiefOfStaffPage() {
 
   const loadStats = async () => {
     try {
+      const supabase = getSupabaseClient();
+      if (!supabase) {
+        console.log('Supabase client not available');
+        return;
+      }
+
       const { data } = await supabase
         .from('cos_logs')
         .select('created_at');
 
       if (data) {
         const total = data.length;
-        const today = data.filter(log => {
+        const today = data.filter((log: any) => {
           const logDate = new Date(log.created_at);
           const today = new Date();
           return logDate.toDateString() === today.toDateString();

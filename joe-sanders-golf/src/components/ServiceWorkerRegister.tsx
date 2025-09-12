@@ -24,8 +24,15 @@ export default function ServiceWorkerRegister() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [notificationsEnabled, setNotificationsEnabled] = useState(false)
   const [serviceWorkerRegistered, setServiceWorkerRegistered] = useState(false)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    // Set client-side flag
+    setIsClient(true)
+
+    // Only proceed if we're in the browser
+    if (typeof window === 'undefined') return
+
     // Register service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
@@ -69,10 +76,12 @@ export default function ServiceWorkerRegister() {
     window.addEventListener('offline', handleOffline)
 
     // Check initial online status
-    setIsOnline(navigator.onLine)
+    if (typeof navigator !== 'undefined') {
+      setIsOnline(navigator.onLine)
+    }
 
     // Check notification permission
-    if ('Notification' in window) {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
       setNotificationsEnabled(Notification.permission === 'granted')
     }
 
@@ -194,8 +203,8 @@ export default function ServiceWorkerRegister() {
     }
   }
 
-  // Don't render anything if PWA features aren't supported
-  if (!('serviceWorker' in navigator)) {
+  // Don't render anything during SSR or if PWA features aren't supported
+  if (!isClient || typeof window === 'undefined' || !('serviceWorker' in navigator)) {
     return null
   }
 

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { Inter, Cormorant_Garamond } from 'next/font/google'
+// Using local fonts to avoid external dependency issues
+// import { Inter, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -7,12 +8,12 @@ import CookieConsent from '@/components/CookieConsent'
 import PerformanceMonitor from '@/components/PerformanceMonitor'
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister'
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['400', '600', '700'],
-  variable: '--font-cormorant'
-})
+// const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
+// const cormorant = Cormorant_Garamond({
+//   subsets: ['latin'],
+//   weight: ['400', '600', '700'],
+//   variable: '--font-cormorant'
+// })
 
 export const metadata: Metadata = {
   title: 'Uncle Joes Golf - Professional Golf Career',
@@ -32,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${cormorant.variable}`}>
+    <html lang="en">
       <body className="min-h-screen flex flex-col bg-joe-black text-joe-white font-joe-body flower-of-life-bg">
         <Header />
         <main className="flex-grow">

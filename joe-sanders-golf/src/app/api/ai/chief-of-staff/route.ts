@@ -2,14 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
 
+// Create OpenAI client only if API key is available
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
+  apiKey: process.env.OPENAI_API_KEY,
 }) : null;
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Create Supabase client only if credentials are available
+const supabase = (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) 
+  ? createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    )
+  : null;
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,6 +32,13 @@ export async function POST(req: NextRequest) {
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
+    }
+
+    if (!openai) {
+      return NextResponse.json({ 
+        error: 'OpenAI API not configured',
+        fallback: "I appreciate your message! The AI assistant is currently not available, but I'd be happy to help you through other channels."
+      }, { status: 503 });
     }
 
     // Get user context if available
@@ -77,11 +88,13 @@ User status: ${userContext || 'Anonymous user'}`;
 
     // Log the interaction (optional)
     try {
-      await supabase.from('cos_logs').insert({
-        task_type: taskType,
-        user_input: message,
-        gpt_output: reply
-      });
+      if (supabase) {
+        await supabase.from('cos_logs').insert({
+          task_type: taskType,
+          user_input: message,
+          gpt_output: reply
+        });
+      }
     } catch (logError) {
       console.warn('Failed to log CoS interaction:', logError);
     }
