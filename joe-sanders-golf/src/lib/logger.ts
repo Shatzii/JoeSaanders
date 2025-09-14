@@ -1,37 +1,44 @@
-import winston from 'winston'
-import path from 'path'
+// Simple logger that works in both client and server environments
+class SimpleLogger {
+  private level: string
 
-const logFormat = winston.format.combine(
-  winston.format.timestamp(),
-  winston.format.errors({ stack: true }),
-  winston.format.json()
-)
+  constructor() {
+    this.level = process.env.LOG_LEVEL || 'info'
+  }
 
-const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || 'info',
-  format: logFormat,
-  defaultMeta: { service: 'joe-sanders-golf' },
-  transports: [
-    // Write all logs with importance level of `error` or less to `error.log`
-    new winston.transports.File({
-      filename: path.join(process.cwd(), 'logs', 'error.log'),
-      level: 'error'
-    }),
-    // Write all logs with importance level of `info` or less to `combined.log`
-    new winston.transports.File({
-      filename: path.join(process.cwd(), 'logs', 'combined.log')
-    }),
-  ],
-})
+  private shouldLog(level: string): boolean {
+    const levels = ['error', 'warn', 'info', 'debug']
+    const currentLevelIndex = levels.indexOf(this.level)
+    const messageLevelIndex = levels.indexOf(level)
+    return messageLevelIndex <= currentLevelIndex
+  }
 
-// If we're not in production then log to the console with a simple format
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.combine(
-      winston.format.colorize(),
-      winston.format.simple()
-    )
-  }))
+  error(message: string, meta?: any) {
+    if (this.shouldLog('error')) {
+      console.error(`[ERROR] ${message}`, meta || '')
+    }
+  }
+
+  warn(message: string, meta?: any) {
+    if (this.shouldLog('warn')) {
+      console.warn(`[WARN] ${message}`, meta || '')
+    }
+  }
+
+  info(message: string, meta?: any) {
+    if (this.shouldLog('info')) {
+      console.info(`[INFO] ${message}`, meta || '')
+    }
+  }
+
+  debug(message: string, meta?: any) {
+    if (this.shouldLog('debug')) {
+      console.debug(`[DEBUG] ${message}`, meta || '')
+    }
+  }
 }
+
+// Create logger instance
+const logger = new SimpleLogger()
 
 export default logger

@@ -50,6 +50,8 @@ export async function POST(request: NextRequest) {
         console.error('Email sending failed:', emailError)
         // Don't fail the subscription if email fails
       }
+    } else {
+      console.log('Resend not configured - skipping welcome email (development mode)')
     }
 
     return NextResponse.json(
