@@ -1,7 +1,7 @@
 'use client';
 import { useRef, useEffect, useState, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Sphere, Box, Plane, Html } from '@react-three/drei';
+import { OrbitControls, Sphere, Box, Plane, Text, Html } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface GolfBallProps {
@@ -365,12 +365,12 @@ function GameScene({ onShotTaken, disabled = false }: GameSceneProps) {
   );
 }
 
-interface GolfSimulatorProps {
+interface GolfSimulator3DProps {
   onShotTaken?: (shotData: any) => void;
   disabled?: boolean;
 }
 
-export default function GolfSimulator({ onShotTaken, disabled = false }: GolfSimulatorProps) {
+export default function GolfSimulator3D({ onShotTaken, disabled = false }: GolfSimulator3DProps) {
   return (
     <div className="flex flex-col items-center">
       <div
