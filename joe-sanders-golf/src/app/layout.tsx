@@ -7,6 +7,8 @@ import Footer from '@/components/Footer'
 import CookieConsent from '@/components/CookieConsent'
 import PerformanceMonitor from '@/components/PerformanceMonitor'
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister'
+import AnalyticsProvider from '@/components/AnalyticsProvider'
+import { MobileAppBridge } from '@/components/MobileAppBridge'
 
 // const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 // const cormorant = Cormorant_Garamond({
@@ -35,6 +37,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col bg-joe-black text-joe-white font-joe-body flower-of-life-bg">
+        <AnalyticsProvider enable={true} />
+        <MobileAppBridge enabled={true} />
         <Header />
         <main className="flex-grow">
           {children}
