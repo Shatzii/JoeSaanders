@@ -1,12 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { Mic, MicOff, Volume2, VolumeX, MessageCircle, X } from 'lucide-react';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 interface AICoachWidgetProps {
   sessionId: string | null;
@@ -72,12 +67,14 @@ export function AICoachWidget({ sessionId, isOpen, onClose, onAnalysisComplete }
       setAnalysis(analysisData);
 
       // 3. Save to chat history
-      await supabase.from('coach_chats').insert({
+      if (supabase) {
+        await supabase.from('coach_chats').insert({
         session_id: sessionId,
         user_message: `Analyze my shot: ${dataToAnalyze.club_used || dataToAnalyze.club}, ${dataToAnalyze.outcome}, ${dataToAnalyze.distance}yd`,
         ai_response: `${analysisData.analysis} ${analysisData.tip}`,
         audio_url: audioUrl // This would be a permanent URL in production
       });
+      }
 
       // Update chat history
       setChatHistory(prev => [...prev, {

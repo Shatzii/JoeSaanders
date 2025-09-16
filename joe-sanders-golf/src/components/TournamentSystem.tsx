@@ -37,7 +37,7 @@ interface TournamentRound {
   name: string;
   holes: number;
   par: number;
-  status: 'upcoming' | 'active' | 'completed';
+  status: 'registration' | 'active' | 'completed' | 'cancelled';
   startTime: number;
   endTime?: number;
   leaderboard: TournamentPlayer[];
@@ -82,7 +82,7 @@ export default function TournamentSystem({
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [isCreating, setIsCreating] = useState(false);
-  const [filter, setFilter] = useState<'all' | 'active' | 'upcoming' | 'completed'>('all');
+  const [filter, setFilter] = useState<'all' | 'active' | 'registration' | 'completed'>('all');
 
   // Mock data for demonstration
   useEffect(() => {
@@ -135,7 +135,7 @@ export default function TournamentSystem({
         description: 'Elite tournament for serious players',
         type: 'match-play',
         format: 'single-elimination',
-        status: 'upcoming',
+        status: 'registration',
         maxPlayers: 32,
         currentPlayers: 28,
         entryFee: 100,
@@ -184,8 +184,8 @@ export default function TournamentSystem({
       switch (filter) {
         case 'active':
           return tournament.status === 'active';
-        case 'upcoming':
-          return tournament.status === 'registration' || tournament.status === 'upcoming';
+        case 'registration':
+          return tournament.status === 'registration';
         case 'completed':
           return tournament.status === 'completed';
         default:
@@ -257,7 +257,7 @@ export default function TournamentSystem({
         return 'text-green-400 bg-green-900/20';
       case 'registration':
         return 'text-blue-400 bg-blue-900/20';
-      case 'upcoming':
+      case 'registration':
         return 'text-yellow-400 bg-yellow-900/20';
       case 'completed':
         return 'text-gray-400 bg-gray-900/20';
@@ -335,7 +335,7 @@ export default function TournamentSystem({
             {[
               { id: 'all', label: 'All' },
               { id: 'active', label: 'Active' },
-              { id: 'upcoming', label: 'Upcoming' },
+              { id: 'registration', label: 'Registration' },
               { id: 'completed', label: 'Completed' }
             ].map((filterOption) => (
               <button

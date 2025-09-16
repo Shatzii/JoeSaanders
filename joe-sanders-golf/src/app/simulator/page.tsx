@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { AICoachWidget } from '@/components/AICoachWidget';
 import { ConvaiCaddie } from '@/components/ConvaiCaddie';
 import { ShotHistory } from '@/components/ShotHistory';
@@ -24,11 +24,6 @@ import {
   CheckCircle,
   X
 } from 'lucide-react';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 // Pricing tiers for AI Simulator
 const simulatorTiers = {
@@ -111,10 +106,10 @@ export default function SimulatorPage() {
   useEffect(() => {
     const initializeUser = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
         setUser(user);
 
-        if (user) {
+        if (user && supabase) {
           // Check user's subscription tier
           const { data: profile } = await supabase
             .from('profiles')
@@ -166,7 +161,8 @@ export default function SimulatorPage() {
 
     try {
       // Save shot to database
-      await supabase.from('shots').insert({
+      if (supabase && user) {
+        await supabase.from('shots').insert({
         session_id: currentSessionId,
         hole_number: 1,
         shot_number: sessionStats.totalShots + 1,
@@ -176,6 +172,7 @@ export default function SimulatorPage() {
         accuracy: shotData.accuracy || 0,
         notes: `AI Coach will analyze this shot`
       });
+      }
 
       // Update session stats
       setSessionStats(prev => ({
