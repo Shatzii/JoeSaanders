@@ -1,14 +1,14 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
-import GolfSimulator from '@/components/GolfSimulator';
 import { AICoachWidget } from '@/components/AICoachWidget';
 import { ConvaiCaddie } from '@/components/ConvaiCaddie';
 import { ShotHistory } from '@/components/ShotHistory';
 import { PerformanceMetrics } from '@/components/PerformanceMetrics';
-import { AchievementSystem } from '@/components/AchievementSystem';
 import { PersonalizedCoaching } from '@/components/PersonalizedCoaching';
 import { MobileOptimization } from '@/components/MobileOptimization';
+import { BroadcastUI } from '@/components/BroadcastUI';
+import { ChallengeLeaderboard } from '@/components/ChallengeLeaderboard';
 
 // Force dynamic rendering to avoid SSR issues
 export const dynamic = 'force-dynamic';
@@ -232,15 +232,15 @@ export default function SimulatorPage() {
   const currentTier = simulatorTiers[userTier];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a1a] to-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a1a] to-[#0a0a0a] text-white" role="application" aria-label="Golf Simulator Application">
       {/* Header */}
-      <header className="p-6 border-b border-[#d4af3740]">
+      <header className="p-6 border-b border-[#d4af3740]" role="banner">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-[#d4af37] to-[#f4e87c] bg-clip-text text-transparent">
               Uncle Joe&apos;s AI Golf Simulator
             </h1>
-            <p className="text-gray-400 mt-1">
+            <p className="text-gray-400 mt-1" aria-live="polite">
               {currentTier.name} Plan • {userTier === 'free' ? `${simulatorTiers.free.maxShots - sessionStats.totalShots} shots remaining` : 'Unlimited'}
             </p>
           </div>
@@ -390,30 +390,40 @@ export default function SimulatorPage() {
       <div className="max-w-7xl mx-auto p-6">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Game Area */}
-          <div className="lg:col-span-3">
+          <section className="lg:col-span-3" aria-labelledby="game-area-heading">
             <div className="bg-[#1a1a1a] rounded-lg p-6 border border-[#d4af3740]">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-xl font-semibold text-[#d4af37] mb-1">Course: {selectedCourse}</h2>
+                  <h2 id="game-area-heading" className="text-xl font-semibold text-[#d4af37] mb-1">Course: {selectedCourse}</h2>
                   <p className="text-sm text-gray-400">Mode: {gameMode === 'practice' ? 'Practice' : 'Tournament'}</p>
                 </div>
 
                 {userTier === 'free' && sessionStats.totalShots >= simulatorTiers.free.maxShots && (
-                  <div className="bg-red-900/20 border border-red-500 rounded-lg p-3">
+                  <div className="bg-red-900/20 border border-red-500 rounded-lg p-3" role="alert" aria-live="assertive">
                     <p className="text-red-400 text-sm flex items-center gap-2">
-                      <Lock size={16} />
+                      <Lock size={16} aria-hidden="true" />
                       Shot limit reached! Upgrade for unlimited access.
                     </p>
                   </div>
                 )}
               </div>
 
-              <GolfSimulator
-                onShotTaken={handleShotTaken}
-                disabled={userTier === 'free' && sessionStats.totalShots >= simulatorTiers.free.maxShots}
-              />
+              <div className="relative">
+                {/* Broadcast-Style Overlay */}
+                <BroadcastUI score={sessionStats.totalShots} />
+
+                {/* 3D Game Canvas */}
+                <div className="w-full h-[600px] bg-blue-300 flex items-center justify-center" role="img" aria-label="3D Golf Course Simulation">
+                  <div className="text-center">
+                    <h3 className="text-2xl font-bold text-white mb-4">3D Golf Simulator</h3>
+                    <p className="text-gray-300">Loading advanced 3D experience...</p>
+                    {/* TODO: Replace with AdvancedGame component */}
+                    {/* <AdvancedGame /> */}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+          </section>
 
           {/* Sidebar */}
           <div className="space-y-6">
@@ -451,7 +461,8 @@ export default function SimulatorPage() {
               }}
             />
 
-            {/* Course Selection */}
+            {/* Challenge Leaderboard */}
+            <ChallengeLeaderboard />
             <div className="bg-[#1a1a1a] rounded-lg p-4 border border-[#d4af3740]">
               <h3 className="text-lg font-semibold text-[#d4af37] mb-4 flex items-center gap-2">
                 <Settings size={20} />

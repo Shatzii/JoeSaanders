@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
-import { Brain, TrendingUp, Target, Zap, Award, AlertTriangle, CheckCircle, Lightbulb } from 'lucide-react';
+import { Cpu, TrendingUp, Target, Zap, Award, AlertTriangle, CheckCircle, Lightbulb } from 'lucide-react';
 
 interface SwingAnalysis {
   timestamp: number;
@@ -227,7 +227,7 @@ export default function PredictivePerformanceAI({
   if (!playerStats) {
     return (
       <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-700 rounded-lg p-6 text-center">
-        <Brain className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+        <Cpu className="w-12 h-12 text-gray-600 mx-auto mb-3" />
         <p className="text-gray-400">Not enough data for AI predictions</p>
         <p className="text-sm text-gray-500">Play some shots and analyze swings to unlock AI insights</p>
       </div>
@@ -237,7 +237,7 @@ export default function PredictivePerformanceAI({
   return (
     <div className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 border border-purple-500/20 rounded-lg p-6">
       <div className="flex items-center gap-3 mb-6">
-        <Brain className="w-6 h-6 text-purple-500" />
+        <Cpu className="w-6 h-6 text-purple-500" />
         <h3 className="text-xl font-semibold text-white">AI Performance Predictor</h3>
         <div className="ml-auto flex items-center gap-2">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>

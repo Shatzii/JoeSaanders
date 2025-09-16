@@ -109,13 +109,14 @@ async function getTournament(id: string): Promise<Tournament | null> {
 }
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function TournamentPage({ params }: PageProps) {
-  const tournament = await getTournament(params.id)
+  const { id } = await params
+  const tournament = await getTournament(id)
 
   if (!tournament) {
     notFound()
