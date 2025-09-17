@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { MapPin, Wind, Thermometer, CloudRain, Sun, Cloud } from 'lucide-react';
+import { MapPin, Wind, CloudRain, Sun, Cloud } from 'lucide-react';
 
 interface Course {
   id: string;

@@ -356,7 +356,7 @@ export default function VideoSwingAnalysis({ onAnalysisComplete, disabled = fals
         <h5 className="text-sm font-semibold text-blue-400 mb-2">How to Use:</h5>
         <div className="text-sm text-gray-300 space-y-1">
           <p>• Position yourself so your full swing is visible in the frame</p>
-          <p>• Click "Start Analysis" and get ready for the 3-second countdown</p>
+          <p>• Click &quot;Start Analysis&quot; and get ready for the 3-second countdown</p>
           <p>• Take your normal swing when recording begins</p>
           <p>• Get instant AI feedback on your technique, speed, and consistency</p>
         </div>

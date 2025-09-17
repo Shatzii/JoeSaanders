@@ -1,8 +1,9 @@
 'use client';
 import { useRef, useEffect, useState, Suspense } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber';
 import { OrbitControls, Sphere, Box, Plane, Html } from '@react-three/drei';
 import * as THREE from 'three';
+import { ShotData } from '@/types';
 
 interface GolfBallProps {
   position: [number, number, number];
@@ -11,20 +12,12 @@ interface GolfBallProps {
 
 function GolfBall({ position, onPositionChange }: GolfBallProps) {
   const meshRef = useRef<THREE.Mesh>(null);
-  const [isMoving, setIsMoving] = useState(false);
 
   useFrame(() => {
     if (meshRef.current) {
       const currentPos = meshRef.current.position;
       if (onPositionChange) {
         onPositionChange(currentPos);
-      }
-
-      // Check if ball is moving (simple velocity check)
-      if (isMoving) {
-        // Add some physics-like behavior
-        meshRef.current.rotation.x += 0.01;
-        meshRef.current.rotation.z += 0.01;
       }
     }
   });
@@ -71,7 +64,7 @@ interface GolfCourseProps {
 function GolfCourse({ onHoleClick }: GolfCourseProps) {
   const holeRef = useRef<THREE.Mesh>(null);
 
-  const handleHoleClick = (event: any) => {
+  const handleHoleClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
     if (onHoleClick && holeRef.current) {
       onHoleClick(holeRef.current.position);
@@ -159,7 +152,7 @@ function AimLine({ start, end, visible }: AimLineProps) {
 }
 
 interface GameSceneProps {
-  onShotTaken?: (shotData: any) => void;
+  onShotTaken?: (shotData: ShotData) => void;
   disabled?: boolean;
 }
 
@@ -172,7 +165,7 @@ function GameScene({ onShotTaken, disabled = false }: GameSceneProps) {
   const [powerIncreasing, setPowerIncreasing] = useState(true);
   const [aimStart, setAimStart] = useState(new THREE.Vector3(-8, 0, 0));
   const [aimEnd, setAimEnd] = useState(new THREE.Vector3(-6, 0, 0));
-  const [shotHistory, setShotHistory] = useState<any[]>([]);
+  const [shotHistory, setShotHistory] = useState<ShotData[]>([]);
 
   // Set up camera
   useEffect(() => {
@@ -184,7 +177,7 @@ function GameScene({ onShotTaken, disabled = false }: GameSceneProps) {
   useEffect(() => {
     if (disabled) return;
 
-    const handleMouseDown = (event: MouseEvent) => {
+    const handleMouseDown = (_event: MouseEvent) => {
       if (!isAiming) {
         setIsAiming(true);
         setPower(0);
@@ -193,7 +186,7 @@ function GameScene({ onShotTaken, disabled = false }: GameSceneProps) {
       }
     };
 
-    const handleMouseUp = (event: MouseEvent) => {
+    const handleMouseUp = (_event: MouseEvent) => {
       if (isAiming) {
         setIsAiming(false);
         setClubVisible(false);
@@ -225,18 +218,14 @@ function GameScene({ onShotTaken, disabled = false }: GameSceneProps) {
         if (random < 0.1) outcome = 'Hook';
         else if (random < 0.2) outcome = 'Slice';
 
-        const shotData = {
-          club: 'Driver',
-          outcome,
+        console.log(`Shot outcome: ${outcome}`); // For debugging
+
+        const shotData: ShotData = {
+          id: `shot-${Date.now()}`,
           distance: Math.floor(force * 10),
-          club_used: 'Driver',
-          hole_number: 1,
-          shot_number: shotHistory.length + 1,
-          timestamp: Date.now(),
-          startPosition: { x: ballPosition[0], y: ballPosition[1], z: ballPosition[2] },
-          endPosition: { x: newPosition[0], y: newPosition[1], z: newPosition[2] },
-          angle,
-          force
+          accuracy: Math.min(95, Math.max(5, 100 - (Math.abs(angle) * 10))),
+          club: 'Driver',
+          timestamp: new Date().toISOString()
         };
 
         setShotHistory(prev => [...prev, shotData]);
@@ -366,7 +355,7 @@ function GameScene({ onShotTaken, disabled = false }: GameSceneProps) {
 }
 
 interface GolfSimulatorProps {
-  onShotTaken?: (shotData: any) => void;
+  onShotTaken?: (shotData: ShotData) => void;
   disabled?: boolean;
 }
 

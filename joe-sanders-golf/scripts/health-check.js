@@ -111,9 +111,12 @@ const checks = [
     name: 'Build Process',
     check: () => {
       try {
-        execSync('npm run build', { stdio: 'pipe' })
+        const cmd = process.env.NETLIFY === 'true' || process.env.STATIC_EXPORT === 'true'
+          ? 'npm run build:static'
+          : 'npm run build'
+        execSync(cmd, { stdio: 'pipe' })
         return '✅ Production build successful'
-      } catch (error) {
+      } catch {
         throw new Error('Production build failed')
       }
     }
@@ -124,7 +127,7 @@ const checks = [
       try {
         execSync('npm run security-audit', { stdio: 'pipe' })
         return '✅ Security audit passed'
-      } catch (error) {
+      } catch {
         console.warn('⚠️  Security vulnerabilities found - review npm audit output')
         return '⚠️  Security audit completed with warnings'
       }
