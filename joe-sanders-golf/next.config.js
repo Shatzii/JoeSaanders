@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Netlify deployment optimizations
+  output: 'export',
+  trailingSlash: true,
+  
   // Performance optimizations
   compress: true,
   poweredByHeader: false,
@@ -9,8 +13,9 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
 
-  // Image optimization
+  // Image optimization for static export
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
