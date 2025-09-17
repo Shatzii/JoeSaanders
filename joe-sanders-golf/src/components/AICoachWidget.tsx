@@ -57,11 +57,13 @@ export function AICoachWidget({ sessionId, isOpen, onClose, onAnalysisComplete }
         })
       });
 
-      if (speechResponse.ok) {
-        // 4. Handle the audio response
+      if (speechResponse.ok && speechResponse.status !== 204) {
+        // 4. Handle the audio response (only if we got actual audio)
         const audioBlob = await speechResponse.blob();
-        const url = URL.createObjectURL(audioBlob);
-        setAudioUrl(url);
+        if (audioBlob.size > 0) {
+          const url = URL.createObjectURL(audioBlob);
+          setAudioUrl(url);
+        }
       }
 
       setAnalysis(analysisData);

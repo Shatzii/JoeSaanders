@@ -2,22 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
-    // Check if ElevenLabs API key is available
-    if (!process.env.ELEVENLABS_API_KEY || !process.env.ELEVENLABS_VOICE_ID) {
-      return NextResponse.json({
-        response: "Voice features are currently unavailable. Please configure ElevenLabs API credentials for full functionality.",
-        suggestions: [
-          "Set up ELEVENLABS_API_KEY environment variable",
-          "Set up ELEVENLABS_VOICE_ID environment variable",
-          "Contact administrator for API key configuration"
-        ]
-      });
-    }
-
     const { text } = await req.json();
 
     if (!text) {
       return NextResponse.json({ error: 'Text is required' }, { status: 400 });
+    }
+
+    // Check if ElevenLabs API key is available
+    if (!process.env.ELEVENLABS_API_KEY || !process.env.ELEVENLABS_VOICE_ID) {
+      // Return a 204 No Content response indicating voice is not available
+      return new NextResponse(null, { 
+        status: 204,
+        headers: {
+          'Content-Type': 'audio/mpeg'
+        }
+      });
     }
 
     const response = await fetch(
