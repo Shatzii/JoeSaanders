@@ -2,13 +2,12 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { AICoachWidget } from '@/components/AICoachWidget';
-import { ConvaiCaddie } from '@/components/ConvaiCaddie';
 import { ShotHistory } from '@/components/ShotHistory';
 import { PerformanceMetrics } from '@/components/PerformanceMetrics';
-import { PersonalizedCoaching } from '@/components/PersonalizedCoaching';
 import { MobileOptimization } from '@/components/MobileOptimization';
 import { BroadcastUI } from '@/components/BroadcastUI';
 import { ChallengeLeaderboard } from '@/components/ChallengeLeaderboard';
+import { ShotData } from '@/types';
 
 // Force dynamic rendering to avoid SSR issues
 export const dynamic = 'force-dynamic';
@@ -19,7 +18,6 @@ import {
   Trophy,
   Crown,
   Zap,
-  Star,
   Lock,
   CheckCircle,
   X
@@ -85,9 +83,15 @@ const simulatorTiers = {
   }
 };
 
+interface User {
+  id: string;
+  email?: string;
+  user_metadata?: Record<string, unknown>;
+}
+
 export default function SimulatorPage() {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [userTier, setUserTier] = useState<'free' | 'pro' | 'elite'>('free');
   const [showCoach, setShowCoach] = useState(false);
   const [showCaddie, setShowCaddie] = useState(false);
@@ -99,7 +103,7 @@ export default function SimulatorPage() {
     bestShot: 0,
     accuracy: 0
   });
-  const [shotHistory, setShotHistory] = useState<any[]>([]);
+  const [shotHistory, setShotHistory] = useState<ShotData[]>([]);
   const [selectedCourse, setSelectedCourse] = useState('Practice Range');
   const [gameMode, setGameMode] = useState<'practice' | 'tournament'>('practice');
 
@@ -197,11 +201,15 @@ export default function SimulatorPage() {
       }));
 
       // Add to shot history (works for both authenticated and guest users)
-      setShotHistory(prev => [...prev, {
-        ...shotData,
-        shot_number: sessionStats.totalShots + 1,
-        timestamp: Date.now()
-      }]);
+      const formattedShotData: ShotData = {
+        id: `shot-${Date.now()}`,
+        distance: shotData.distance || 0,
+        accuracy: shotData.accuracy || 0,
+        club: shotData.club || shotData.club_used || 'Driver',
+        timestamp: new Date().toISOString()
+      };
+
+      setShotHistory(prev => [...prev, formattedShotData]);
 
       // Auto-show AI coach for Pro/Elite users, or for demo users to showcase the feature
       if (userTier !== 'free' || isGuestMode) {

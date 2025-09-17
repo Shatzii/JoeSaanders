@@ -1,8 +1,9 @@
 'use client';
 import { useRef, useEffect, useState, Suspense } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber';
 import { OrbitControls, Sphere, Box, Plane, Html } from '@react-three/drei';
 import * as THREE from 'three';
+import { ShotData } from '@/types';
 
 interface GolfBallProps {
   position: [number, number, number];
@@ -63,7 +64,7 @@ interface GolfCourseProps {
 function GolfCourse({ onHoleClick }: GolfCourseProps) {
   const holeRef = useRef<THREE.Mesh>(null);
 
-  const handleHoleClick = (event: any) => {
+  const handleHoleClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
     if (onHoleClick && holeRef.current) {
       onHoleClick(holeRef.current.position);
@@ -150,8 +151,13 @@ function AimLine({ start, end, visible }: AimLineProps) {
   );
 }
 
+interface AimLine {
+  start: THREE.Vector3;
+  end: THREE.Vector3;
+}
+
 interface GameSceneProps {
-  onShotTaken?: (shotData: any) => void;
+  onShotTaken?: (shotData: ShotData) => void;
   disabled?: boolean;
 }
 
@@ -164,7 +170,7 @@ function GameScene({ onShotTaken, disabled = false }: GameSceneProps) {
   const [powerIncreasing, setPowerIncreasing] = useState(true);
   const [aimStart, setAimStart] = useState(new THREE.Vector3(-8, 0, 0));
   const [aimEnd, setAimEnd] = useState(new THREE.Vector3(-6, 0, 0));
-  const [shotHistory, setShotHistory] = useState<any[]>([]);
+  const [shotHistory, setShotHistory] = useState<ShotData[]>([]);
 
   // Set up camera
   useEffect(() => {
@@ -207,28 +213,24 @@ function GameScene({ onShotTaken, disabled = false }: GameSceneProps) {
         // Determine shot outcome
         let outcome = 'Straight';
         const angle = Math.atan2(direction.z, direction.x);
-
+        const random = Math.random();
+        
         if (Math.abs(angle) < 0.1) outcome = 'Straight';
         else if (angle < 0) outcome = 'Draw';
         else outcome = 'Fade';
 
         // Randomize outcome slightly
-        const random = Math.random();
         if (random < 0.1) outcome = 'Hook';
         else if (random < 0.2) outcome = 'Slice';
 
-        const shotData = {
+        console.log(`Shot outcome: ${outcome}`); // For debugging
+
+        const shotData: ShotData = {
+          id: `shot-${Date.now()}`,
           club: 'Driver',
-          outcome,
           distance: Math.floor(force * 10),
-          club_used: 'Driver',
-          hole_number: 1,
-          shot_number: shotHistory.length + 1,
-          timestamp: Date.now(),
-          startPosition: { x: ballPosition[0], y: ballPosition[1], z: ballPosition[2] },
-          endPosition: { x: newPosition[0], y: newPosition[1], z: newPosition[2] },
-          angle,
-          force
+          accuracy: Math.min(95, Math.max(5, 100 - (Math.abs(angle) * 10))),
+          timestamp: new Date().toISOString()
         };
 
         setShotHistory(prev => [...prev, shotData]);
@@ -358,7 +360,7 @@ function GameScene({ onShotTaken, disabled = false }: GameSceneProps) {
 }
 
 interface GolfSimulator3DProps {
-  onShotTaken?: (shotData: any) => void;
+  onShotTaken?: (shotData: ShotData) => void;
   disabled?: boolean;
 }
 

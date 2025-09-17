@@ -6,16 +6,7 @@ import {
   Calendar,
   Target,
   Award,
-  Clock,
-  Play,
-  Pause,
-  RotateCcw,
   Crown,
-  Medal,
-  Star,
-  Zap,
-  TrendingUp,
-  UserPlus,
   Settings
 } from 'lucide-react';
 
@@ -76,12 +67,11 @@ interface TournamentSystemProps {
 export default function TournamentSystem({
   currentUser,
   onTournamentJoin,
-  onTournamentLeave
+  onTournamentLeave: _onTournamentLeave
 }: TournamentSystemProps) {
   const [activeTab, setActiveTab] = useState<'browse' | 'my-tournaments' | 'create' | 'leaderboard'>('browse');
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
   const [filter, setFilter] = useState<'all' | 'active' | 'registration' | 'completed'>('all');
 
   // Mock data for demonstration
@@ -215,7 +205,6 @@ export default function TournamentSystem({
     };
 
     setTournaments(prev => [...prev, newTournament]);
-    setIsCreating(false);
     setActiveTab('browse');
   };
 
@@ -312,7 +301,7 @@ export default function TournamentSystem({
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => setActiveTab(tab.id as 'browse' | 'my-tournaments' | 'create' | 'leaderboard')}
                   className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all ${
                     activeTab === tab.id
                       ? 'bg-emerald-500 text-black font-semibold shadow-lg'
@@ -340,7 +329,7 @@ export default function TournamentSystem({
             ].map((filterOption) => (
               <button
                 key={filterOption.id}
-                onClick={() => setFilter(filterOption.id as any)}
+                onClick={() => setFilter(filterOption.id as 'all' | 'active' | 'registration' | 'completed')}
                 className={`px-4 py-2 rounded-md transition-all ${
                   filter === filterOption.id
                     ? 'bg-emerald-500 text-black font-semibold'
