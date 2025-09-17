@@ -4,6 +4,18 @@ import Link from 'next/link'
 import { dataClient } from '@/lib/data-client'
 import { Tournament } from '@/types'
 
+// Generate static params for known tournament IDs
+export async function generateStaticParams() {
+  // Pre-generate pages for the sample tournaments
+  return [
+    { id: '1' },
+    { id: '2' },
+    { id: '3' },
+    { id: '4' },
+    { id: '5' },
+  ]
+}
+
 // Sample tournament data for development
 const sampleTournaments: Tournament[] = [
   {

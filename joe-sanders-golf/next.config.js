@@ -133,31 +133,8 @@ const nextConfig = {
     ]
   },
 
-  // Redirects for SEO and user experience
-  async redirects() {
-    return [
-      {
-        source: '/home',
-        destination: '/',
-        permanent: true,
-      },
-      {
-        source: '/golf-simulator',
-        destination: '/simulator',
-        permanent: true,
-      },
-    ]
-  },
-
-  // Rewrites for API routes
-  async rewrites() {
-    return [
-      {
-        source: '/api/v1/:path*',
-        destination: '/api/:path*',
-      },
-    ]
-  },
+  // Static export configuration
+  distDir: 'out',
 }
 
 module.exports = nextConfig
