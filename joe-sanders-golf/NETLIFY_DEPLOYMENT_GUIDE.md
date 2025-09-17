@@ -13,7 +13,7 @@ Before starting, ensure you have:
 - ✅ Netlify account (free tier available)
 - ✅ OpenAI API key (for AI Golf Tutor)
 - ✅ ElevenLabs API key (optional, for voice features)
-- ✅ Supabase project (optional, for data storage)
+- ✅ Supabase project setup (database configured - see Step 1.3)
 
 ---
 
@@ -31,7 +31,19 @@ git commit -m "Prepare for Netlify deployment"
 git push origin copilot/vscode1758026245338
 ```
 
-### 1.2 Create Netlify Configuration
+### 1.2 Set Up Supabase Database
+Your project is configured to use the Supabase database at:
+- **URL**: `https://rblvnbzwriqosoboasow.supabase.co`
+- **Anon Key**: Already configured in environment variables
+
+To set up the database tables:
+1. Go to [Supabase Dashboard](https://supabase.com/dashboard)
+2. Open your project: `rblvnbzwriqosoboasow`
+3. Navigate to **SQL Editor**
+4. Copy and run the contents of `scripts/supabase-setup.sql`
+5. Verify tables are created: tournaments, sponsors, merch, newsletter_emails, contact_messages
+
+### 1.3 Create Netlify Configuration
 Create a `netlify.toml` file in your project root:
 
 ```toml
