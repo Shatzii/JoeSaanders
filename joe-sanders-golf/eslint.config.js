@@ -30,6 +30,7 @@ const eslintConfig = [
       "dist/",
       ".swc/",
       "coverage/",
+      "mobile/**",
       "*.config.js",
       "*.config.mjs",
     ],

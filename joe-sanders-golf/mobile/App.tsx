@@ -12,8 +12,8 @@ import CameraScreen from './src/screens/CameraScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 
 // Services
-import { AnalyticsBridge } from './src/services/AnalyticsBridge';
-import { NotificationManager } from './src/services/NotificationManager';
+import { analyticsBridge } from './src/services/AnalyticsBridge';
+import { notificationManager } from './src/services/NotificationManager';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -91,8 +91,8 @@ function MainTabs() {
 export default function App() {
   React.useEffect(() => {
     // Initialize services
-    AnalyticsBridge.initialize();
-    NotificationManager.initialize();
+    analyticsBridge; // Already initialized as singleton
+    notificationManager.initialize();
   }, []);
 
   return (

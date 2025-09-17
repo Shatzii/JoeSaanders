@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -10,13 +10,26 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { notificationManager } from '../services/NotificationManager';
+import { analyticsBridge } from '../services/AnalyticsBridge';
 
 const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const navigation = useNavigation();
 
+  useEffect(() => {
+    // Initialize notifications
+    notificationManager.initialize().then(() => {
+      notificationManager.requestPermissions();
+    });
+
+    // Track page view
+    analyticsBridge.trackPageView('mobile_home');
+  }, []);
+
   const navigateToWebView = (path: string = '') => {
+    analyticsBridge.trackUserAction('navigate_to_webview', { path });
     navigation.navigate('WebView' as never, { path } as never);
   };
 

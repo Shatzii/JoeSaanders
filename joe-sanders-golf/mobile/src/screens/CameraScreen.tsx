@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { Camera, CameraType } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
-import { AnalyticsBridge } from '../services/AnalyticsBridge';
+import { analyticsBridge } from '../services/AnalyticsBridge';
 
 export default function CameraScreen() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -34,7 +34,7 @@ export default function CameraScreen() {
 
     try {
       setIsRecording(true);
-      AnalyticsBridge.trackEvent('swing_recording_started', {
+      analyticsBridge.trackEvent('swing_recording_started', {
         camera_type: type,
         timestamp: new Date().toISOString(),
       });
@@ -65,7 +65,7 @@ export default function CameraScreen() {
     
     try {
       // Track analysis start
-      AnalyticsBridge.trackEvent('swing_analysis_started', {
+      analyticsBridge.trackEvent('swing_analysis_started', {
         video_duration: 10, // placeholder
         timestamp: new Date().toISOString(),
       });
@@ -88,7 +88,7 @@ export default function CameraScreen() {
       setIsAnalyzing(false);
 
       // Track successful analysis
-      AnalyticsBridge.trackEvent('swing_analysis_completed', {
+      analyticsBridge.trackEvent('swing_analysis_completed', {
         swing_speed: analysisResults.swing_speed,
         accuracy: analysisResults.accuracy,
         tempo: analysisResults.tempo,
@@ -116,7 +116,7 @@ export default function CameraScreen() {
 
   const navigateToResults = () => {
     // In a real app, this would navigate to the web platform results page
-    AnalyticsBridge.trackEvent('swing_results_viewed', {
+    analyticsBridge.trackEvent('swing_results_viewed', {
       source: 'mobile_camera',
       timestamp: new Date().toISOString(),
     });

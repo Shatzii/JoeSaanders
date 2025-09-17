@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { View, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useRoute, RouteProp } from '@react-navigation/native';
-import { AnalyticsBridge } from '../services/AnalyticsBridge';
+import { analyticsBridge } from '../services/AnalyticsBridge';
 
 type WebViewScreenRouteProp = RouteProp<{ params: { path?: string } }, 'params'>;
 
@@ -19,8 +19,11 @@ export default function WebViewScreen() {
   const fullUrl = `${baseUrl}${path}`;
 
   useEffect(() => {
+    // Set WebView ref for analytics bridge
+    analyticsBridge.setWebViewRef(webViewRef);
+
     // Track WebView navigation in analytics
-    AnalyticsBridge.trackEvent('webview_opened', {
+    analyticsBridge.trackEvent('webview_opened', {
       path,
       url: fullUrl,
       timestamp: new Date().toISOString(),
@@ -33,7 +36,7 @@ export default function WebViewScreen() {
       
       switch (message.type) {
         case 'analytics_event':
-          AnalyticsBridge.trackEvent(message.event_name, message.properties);
+          analyticsBridge.trackEvent(message.event_name, message.properties);
           break;
           
         case 'navigation':
@@ -45,7 +48,8 @@ export default function WebViewScreen() {
           break;
           
         case 'share_data':
-          AnalyticsBridge.handleSharedData(message.payload);
+          // Note: handleSharedData not implemented yet
+          console.log('Shared data:', message.payload);
           break;
           
         default:
@@ -58,7 +62,7 @@ export default function WebViewScreen() {
 
   const handleNavigationStateChange = (navState: any) => {
     // Track page navigation
-    AnalyticsBridge.trackEvent('webview_navigation', {
+    analyticsBridge.trackEvent('webview_navigation', {
       url: navState.url,
       canGoBack: navState.canGoBack,
       canGoForward: navState.canGoForward,
@@ -98,7 +102,7 @@ export default function WebViewScreen() {
     }, 1000);
     
     // Override console.log to send logs to React Native (for debugging)
-    if (${__DEV__}) {
+    if (${__DEV__ ? 'true' : 'false'}) {
       const originalLog = console.log;
       console.log = function(...args) {
         originalLog.apply(console, args);

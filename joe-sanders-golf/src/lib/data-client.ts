@@ -50,7 +50,10 @@ class SupabaseDataClient {
         logger.error('Error fetching tournaments from Supabase', { error })
         return []
       }
-      return data || []
+      if (!data) {
+        throw new Error('Supabase returned null data')
+      }
+      return data
     } catch (error) {
       logger.error('Error fetching tournaments from Supabase', { error })
       return []
@@ -129,6 +132,69 @@ class SupabaseDataClient {
 
   async sendContactMessage(data: any) {
     logger.info('Contact message processing', { data })
+    return { success: true }
+  }
+
+  async createTournament(values: Record<string, unknown>) {
+    if (!supabase) throw new Error('Database not configured')
+    const { data, error } = await supabase.from('tournaments').insert(values).select().single()
+    if (error) throw new Error(error.message)
+    return data as any
+  }
+
+  async updateTournament(id: string, updates: Record<string, unknown>) {
+    if (!supabase) throw new Error('Database not configured')
+    const { data, error } = await supabase.from('tournaments').update(updates).eq('id', id).select().single()
+    if (error) throw new Error(error.message)
+    return data as any
+  }
+
+  async deleteTournament(id: string) {
+    if (!supabase) throw new Error('Database not configured')
+    const { error } = await supabase.from('tournaments').delete().eq('id', id)
+    if (error) throw new Error(error.message)
+    return { success: true }
+  }
+
+  async createSponsor(values: Record<string, unknown>) {
+    if (!supabase) throw new Error('Database not configured')
+    const { data, error } = await supabase.from('sponsors').insert(values).select().single()
+    if (error) throw new Error(error.message)
+    return data as any
+  }
+
+  async updateSponsor(id: string, updates: Record<string, unknown>) {
+    if (!supabase) throw new Error('Database not configured')
+    const { data, error } = await supabase.from('sponsors').update(updates).eq('id', id).select().single()
+    if (error) throw new Error(error.message)
+    return data as any
+  }
+
+  async deleteSponsor(id: string) {
+    if (!supabase) throw new Error('Database not configured')
+    const { error } = await supabase.from('sponsors').delete().eq('id', id)
+    if (error) throw new Error(error.message)
+    return { success: true }
+  }
+
+  async createMerch(values: Record<string, unknown>) {
+    if (!supabase) throw new Error('Database not configured')
+    const { data, error } = await supabase.from('merch').insert(values).select().single()
+    if (error) throw new Error(error.message)
+    return data as any
+  }
+
+  async updateMerch(id: string, updates: Record<string, unknown>) {
+    if (!supabase) throw new Error('Database not configured')
+    const { data, error } = await supabase.from('merch').update(updates).eq('id', id).select().single()
+    if (error) throw new Error(error.message)
+    return data as any
+  }
+
+  async deleteMerch(id: string) {
+    if (!supabase) throw new Error('Database not configured')
+    const { error } = await supabase.from('merch').delete().eq('id', id)
+    if (error) throw new Error(error.message)
     return { success: true }
   }
 }
