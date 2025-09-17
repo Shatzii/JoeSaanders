@@ -11,20 +11,12 @@ interface GolfBallProps {
 
 function GolfBall({ position, onPositionChange }: GolfBallProps) {
   const meshRef = useRef<THREE.Mesh>(null);
-  const [isMoving, setIsMoving] = useState(false);
 
   useFrame(() => {
     if (meshRef.current) {
       const currentPos = meshRef.current.position;
       if (onPositionChange) {
         onPositionChange(currentPos);
-      }
-
-      // Check if ball is moving (simple velocity check)
-      if (isMoving) {
-        // Add some physics-like behavior
-        meshRef.current.rotation.x += 0.01;
-        meshRef.current.rotation.z += 0.01;
       }
     }
   });
@@ -184,7 +176,7 @@ function GameScene({ onShotTaken, disabled = false }: GameSceneProps) {
   useEffect(() => {
     if (disabled) return;
 
-    const handleMouseDown = (event: MouseEvent) => {
+    const handleMouseDown = (_event: MouseEvent) => {
       if (!isAiming) {
         setIsAiming(true);
         setPower(0);
@@ -193,7 +185,7 @@ function GameScene({ onShotTaken, disabled = false }: GameSceneProps) {
       }
     };
 
-    const handleMouseUp = (event: MouseEvent) => {
+    const handleMouseUp = (_event: MouseEvent) => {
       if (isAiming) {
         setIsAiming(false);
         setClubVisible(false);

@@ -1,6 +1,6 @@
 'use client';
-import { useState, useEffect, useMemo } from 'react';
-import { Cpu, TrendingUp, Target, Zap, Award, AlertTriangle, CheckCircle, Lightbulb } from 'lucide-react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { Cpu, TrendingUp, Target, AlertTriangle, Lightbulb } from 'lucide-react';
 
 interface SwingAnalysis {
   timestamp: number;
@@ -104,7 +104,7 @@ export default function PredictivePerformanceAI({
   }, [swingHistory, shotHistory]);
 
   // Generate AI prediction
-  const generatePrediction = async () => {
+  const generatePrediction = useCallback(async () => {
     setIsAnalyzing(true);
 
     // Simulate AI processing time
@@ -167,7 +167,7 @@ export default function PredictivePerformanceAI({
     });
 
     setIsAnalyzing(false);
-  };
+  }, [selectedClub, playerStats, currentConditions, targetDistance]);
 
   // Helper functions
   const getClubDistance = (club: string, swingSpeed: number): number => {
@@ -206,7 +206,7 @@ export default function PredictivePerformanceAI({
     return tempEffect + humidityEffect;
   };
 
-  const recommendClub = (targetDistance: number, avgDistance: number, consistency: number): string => {
+  const recommendClub = (targetDistance: number, avgDistance: number, _consistency: number): string => {
     const distanceRatio = targetDistance / avgDistance;
     const clubs = ['Driver', '3-Wood', '5-Wood', '3-Iron', '4-Iron', '5-Iron', '6-Iron', '7-Iron', '8-Iron', '9-Iron', 'PW'];
 
@@ -222,7 +222,7 @@ export default function PredictivePerformanceAI({
     if (playerStats && playerStats.totalShots > 0) {
       generatePrediction();
     }
-  }, [selectedClub, targetDistance, playerStats]);
+  }, [selectedClub, targetDistance, playerStats, generatePrediction]);
 
   if (!playerStats) {
     return (
