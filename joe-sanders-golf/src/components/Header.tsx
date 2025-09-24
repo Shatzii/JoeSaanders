@@ -43,14 +43,17 @@ export default function Header() {
             <Link href="/shop" className="nav-link">
               Pro Shop
             </Link>
+            <Link href="/ai-golf-tutor" className="nav-link">
+              AI Golf Tutor
+            </Link>
+            <Link href="/simulator" className="nav-link">
+              Golf Simulator
+            </Link>
             <Link href="/contact" className="nav-link">
               Contact
             </Link>
             <Link href="/fan-club" className="nav-link">
               Fan Club
-            </Link>
-            <Link href="/simulator" className="nav-link">
-              Golf Simulator
             </Link>
           </div>
 
@@ -95,6 +98,20 @@ export default function Header() {
                 Pro Shop
               </Link>
               <Link
+                href="/ai-golf-tutor"
+                className="block px-3 py-3 text-joe-white hover:text-joe-gold hover:bg-joe-gold/10 transition-all duration-300 rounded-lg font-joe-accent font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                AI Golf Tutor
+              </Link>
+              <Link
+                href="/simulator"
+                className="block px-3 py-3 text-joe-white hover:text-joe-gold hover:bg-joe-gold/10 transition-all duration-300 rounded-lg font-joe-accent font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Golf Simulator
+              </Link>
+              <Link
                 href="/contact"
                 className="block px-3 py-3 text-joe-white hover:text-joe-gold hover:bg-joe-gold/10 transition-all duration-300 rounded-lg font-joe-accent font-medium"
                 onClick={() => setIsMenuOpen(false)}
@@ -107,13 +124,6 @@ export default function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Fan Club
-              </Link>
-              <Link
-                href="/simulator"
-                className="block px-3 py-3 text-joe-white hover:text-joe-gold hover:bg-joe-gold/10 transition-all duration-300 rounded-lg font-joe-accent font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Golf Simulator
               </Link>
             </div>
           </div>

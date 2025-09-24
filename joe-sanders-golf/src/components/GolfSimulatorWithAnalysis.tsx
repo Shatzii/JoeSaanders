@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Camera, Gamepad2, BarChart3, Brain, Zap, BookOpen, Trophy, Users, TrendingUp, Smartphone } from 'lucide-react';
+import { Camera, Gamepad2, BarChart3, Cpu, Zap, BookOpen, Trophy, Users, TrendingUp, Smartphone } from 'lucide-react';
 import GolfSimulator3D from './GolfSimulator3D';
 import VideoSwingAnalysis from './VideoSwingAnalysis';
 import PredictivePerformanceAI from './PredictivePerformanceAI';
@@ -55,7 +55,7 @@ export default function GolfSimulatorWithAnalysis({ disabled = false }: GolfSimu
     {
       id: 'predictive' as const,
       label: 'AI Predictor',
-      icon: Brain,
+      icon: Cpu,
       description: 'Predict shot outcomes'
     },
     {

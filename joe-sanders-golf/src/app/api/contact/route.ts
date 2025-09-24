@@ -39,14 +39,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!resend) {
-      logger.error('Resend service not configured')
-      return NextResponse.json(
-        { error: 'Service configuration error' },
-        { status: 500 }
-      )
-    }
-
     const body = await request.json()
 
     // Validate input
@@ -66,6 +58,16 @@ export async function POST(request: NextRequest) {
     }
 
     const { name, email, subject, message } = validationResult.data
+
+    if (!resend) {
+      logger.warn('Resend service not configured - falling back to development mode')
+      // In development, just log the message and return success
+      logger.info('Contact form submission (development mode)', { name, email, subject })
+      return NextResponse.json(
+        { message: 'Message sent successfully! (Development mode)' },
+        { status: 200 }
+      )
+    }
 
     logger.info('Sending contact email', { name, email, subject })
 

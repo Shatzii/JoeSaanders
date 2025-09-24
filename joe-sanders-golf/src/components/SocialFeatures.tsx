@@ -18,6 +18,7 @@ import {
   Filter,
   Calendar,
   MapPin,
+  CheckCircle,
   Clock
 } from 'lucide-react';
 

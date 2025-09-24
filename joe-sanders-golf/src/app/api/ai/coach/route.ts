@@ -35,24 +35,24 @@ const functions = [
 
 export async function POST(req: NextRequest) {
   try {
+    const { shotData, chatHistory = [] } = await req.json();
+
     // Check if OpenAI is available
     if (!openai) {
+      // Return fallback response in expected format
       return NextResponse.json({
-        response: "AI coaching features are currently unavailable. Please configure OpenAI API key for full functionality.",
-        suggestions: [
-          "Set up OPENAI_API_KEY environment variable",
-          "Contact administrator for API key configuration"
-        ]
+        analysis: "AI coaching features are currently unavailable. Please configure OpenAI API key for full functionality.",
+        tip: "For now, focus on your fundamentals: grip, stance, alignment, and follow-through. Keep practicing and stay consistent!",
+        confidence: "Medium"
       });
     }
 
-    const { shotData, chatHistory = [] } = await req.json();
-
     if (!openai) {
       return NextResponse.json({ 
-        error: 'OpenAI API not configured',
-        fallback: "Play bold! Keep practicing those fundamentals and remember - it's all about grip, stance, and follow-through. Say Uncle!"
-      }, { status: 503 });
+        analysis: 'OpenAI API not configured. Using fallback coaching.',
+        tip: "Play bold! Keep practicing those fundamentals and remember - it's all about grip, stance, and follow-through. Say Uncle!",
+        confidence: "Medium"
+      }, { status: 200 });
     }
 
     const response = await openai.chat.completions.create({

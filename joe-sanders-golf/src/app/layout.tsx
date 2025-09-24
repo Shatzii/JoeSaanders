@@ -1,14 +1,32 @@
-import type { Metadata } from 'next'
+'use client'
+
+import dynamic from 'next/dynamic'
 // Using local fonts to avoid external dependency issues
 // import { Inter, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import CookieConsent from '@/components/CookieConsent'
-import PerformanceMonitor from '@/components/PerformanceMonitor'
-import ServiceWorkerRegister from '@/components/ServiceWorkerRegister'
-import AnalyticsProvider from '@/components/AnalyticsProvider'
-import { MobileAppBridge } from '@/components/MobileAppBridge'
+
+// Lazy load heavy components
+const CookieConsent = dynamic(() => import('@/components/CookieConsent'), {
+  loading: () => null,
+  ssr: false
+})
+const PerformanceMonitor = dynamic(() => import('@/components/PerformanceMonitor'), {
+  loading: () => null,
+  ssr: false
+})
+const ServiceWorkerRegister = dynamic(() => import('@/components/ServiceWorkerRegister'), {
+  loading: () => null,
+  ssr: false
+})
+const AnalyticsProvider = dynamic(() => import('@/components/AnalyticsProvider'), {
+  loading: () => null
+})
+const MobileAppBridge = dynamic(() => import('@/components/MobileAppBridge').then(mod => ({ default: mod.MobileAppBridge })), {
+  loading: () => null,
+  ssr: false
+})
 
 // const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 // const cormorant = Cormorant_Garamond({
@@ -17,17 +35,17 @@ import { MobileAppBridge } from '@/components/MobileAppBridge'
 //   variable: '--font-cormorant'
 // })
 
-export const metadata: Metadata = {
-  title: 'Uncle Joes Golf - Professional Golf Career',
-  description: 'Experience the raw athleticism and spiritual symbolism of Uncle Joe Sanders. PGA Tour journey, tournament highlights, exclusive fan content, and Stones Golf integration.',
-  keywords: 'Uncle Joe, Joe Sanders, PGA Tour, professional golf, Stones Golf, tournament highlights, fan club, Uncle Joes Golf',
-  authors: [{ name: 'Uncle Joe Sanders' }],
-  openGraph: {
-    title: 'Uncle Joes Golf - Professional Golf Career',
-    description: 'Follow Uncle Joe\'s journey from amateur to PGA Tour professional. Exclusive content, tournament highlights, and fan experiences.',
-    type: 'website',
-  },
-}
+// export const metadata: Metadata = {
+//   title: 'Uncle Joes Golf - Professional Golf Career',
+//   description: 'Experience the raw athleticism and spiritual symbolism of Uncle Joe Sanders. PGA Tour journey, tournament highlights, exclusive fan content, and Stones Golf integration.',
+//   keywords: 'Uncle Joe, Joe Sanders, PGA Tour, professional golf, Stones Golf, tournament highlights, fan club, Uncle Joes Golf',
+//   authors: [{ name: 'Uncle Joe Sanders' }],
+//   openGraph: {
+//     title: 'Uncle Joes Golf - Professional Golf Career',
+//     description: 'Follow Uncle Joe\'s journey from amateur to PGA Tour professional. Exclusive content, tournament highlights, and fan experiences.',
+//     type: 'website',
+//   },
+// }
 
 export default function RootLayout({
   children,
@@ -36,14 +54,27 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#d4af37" />
+      </head>
       <body className="min-h-screen flex flex-col bg-joe-black text-joe-white font-joe-body flower-of-life-bg">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-[#d4af37] text-[#0a0a0a] px-4 py-2 rounded font-semibold z-50"
+        >
+          Skip to main content
+        </a>
+
         <AnalyticsProvider enable={true} />
         <MobileAppBridge enabled={true} />
+
         <Header />
-        <main className="flex-grow">
+        <main id="main-content" className="flex-grow" role="main" tabIndex={-1}>
           {children}
         </main>
         <Footer />
+
         <CookieConsent />
         <PerformanceMonitor />
         <ServiceWorkerRegister />

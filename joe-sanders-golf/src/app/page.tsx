@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { dataClient } from '@/lib/data-client'
 import { Sponsor } from '@/types'
-import { Check, Zap, Heart, Users } from 'lucide-react'
+import { Check, Zap, Heart, Users, Target, Volume2, TrendingUp } from 'lucide-react'
 
 async function getSponsors(): Promise<Sponsor[]> {
   try {
@@ -151,6 +151,104 @@ export default async function Home() {
             <div>
               <div className="text-4xl font-joe-heading font-bold mb-2">72.3</div>
               <div className="text-joe-black/80 font-joe-body">Scoring Average</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* AI Golf Tutor Section */}
+      <section className="py-16 bg-gradient-to-br from-joe-black via-joe-stone to-joe-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-joe-heading font-bold text-joe-gold mb-4">
+              🤖 Meet Uncle Joe&apos;s AI Golf Tutor
+            </h2>
+            <p className="text-xl text-joe-white font-joe-body max-w-3xl mx-auto mb-8">
+              Experience the future of golf coaching with AI-powered swing analysis, voice feedback, and personalized tips from Uncle Joe himself.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Features List */}
+            <div className="space-y-6">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-joe-gold/20 rounded-lg flex items-center justify-center mt-1">
+                  <Target className="w-6 h-6 text-joe-gold" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-joe-heading font-semibold text-joe-gold mb-2">AI Swing Analysis</h3>
+                  <p className="text-joe-white font-joe-body">
+                    Get instant feedback on your shots with GPT-4 powered analysis. Every swing is evaluated for club selection, distance, and technique.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-joe-gold/20 rounded-lg flex items-center justify-center mt-1">
+                  <Volume2 className="w-6 h-6 text-joe-gold" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-joe-heading font-semibold text-joe-gold mb-2">Voice Coaching</h3>
+                  <p className="text-joe-white font-joe-body">
+                    Hear Uncle Joe&apos;s coaching tips in his authentic voice using ElevenLabs AI. Get personalized advice that feels like having a pro on the course.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-joe-gold/20 rounded-lg flex items-center justify-center mt-1">
+                  <TrendingUp className="w-6 h-6 text-joe-gold" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-joe-heading font-semibold text-joe-gold mb-2">Performance Tracking</h3>
+                  <p className="text-joe-white font-joe-body">
+                    Track your progress over time with detailed analytics, shot history, and improvement recommendations tailored to your game.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Call to Action */}
+            <div className="bg-gradient-to-br from-joe-gold/10 to-joe-gold/5 rounded-2xl p-8 border border-joe-gold/20">
+              <div className="text-center">
+                <div className="text-6xl mb-6">🏌️‍♂️</div>
+                <h3 className="text-2xl font-joe-heading font-bold text-joe-gold mb-4">
+                  Try It FREE Right Now!
+                </h3>
+                <p className="text-joe-white font-joe-body mb-6">
+                  No sign-up required. Take 5 demo shots and experience the AI coaching that&apos;s helping golfers improve their game.
+                </p>
+                <div className="space-y-3">
+                  <Link
+                    href="/simulator"
+                    className="inline-block w-full bg-gradient-to-r from-joe-gold to-amber-400 text-joe-black px-8 py-4 rounded-lg font-joe-heading font-bold text-lg hover:from-amber-400 hover:to-joe-gold transition-all duration-300 transform hover:scale-105"
+                  >
+                    🚀 Launch AI Golf Tutor Demo
+                  </Link>
+                  <p className="text-sm text-joe-white/80">
+                    ✅ Instant access &nbsp;•&nbsp; ✅ No credit card needed &nbsp;•&nbsp; ✅ 5 free shots
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Demo Features Preview */}
+          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-joe-black/50 rounded-lg p-6 border border-joe-gold/20 text-center">
+              <div className="text-3xl mb-3">🎯</div>
+              <h4 className="text-lg font-joe-heading font-semibold text-joe-gold mb-2">Smart Shot Analysis</h4>
+              <p className="text-sm text-joe-white/80">AI evaluates every shot for accuracy, distance, and technique</p>
+            </div>
+            <div className="bg-joe-black/50 rounded-lg p-6 border border-joe-gold/20 text-center">
+              <div className="text-3xl mb-3">🗣️</div>
+              <h4 className="text-lg font-joe-heading font-semibold text-joe-gold mb-2">Voice Feedback</h4>
+              <p className="text-sm text-joe-white/80">Hear coaching tips in Uncle Joe&apos;s authentic voice</p>
+            </div>
+            <div className="bg-joe-black/50 rounded-lg p-6 border border-joe-gold/20 text-center">
+              <div className="text-3xl mb-3">📊</div>
+              <h4 className="text-lg font-joe-heading font-semibold text-joe-gold mb-2">Instant Improvement</h4>
+              <p className="text-sm text-joe-white/80">Get specific tips to improve your next shot immediately</p>
             </div>
           </div>
         </div>
