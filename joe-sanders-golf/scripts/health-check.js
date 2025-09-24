@@ -5,6 +5,9 @@
  * Validates all critical services are working before deployment
  */
 
+// Load environment variables from .env.local
+require('dotenv').config({ path: '.env.local' })
+
 const https = require('https')
 const { execSync } = require('child_process')
 
