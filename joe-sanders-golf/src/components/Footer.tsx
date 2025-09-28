@@ -30,7 +30,7 @@ export default function Footer() {
       } else {
         setMessage('Something went wrong. Please try again.')
       }
-    } catch (error) {
+    } catch {
       setMessage('Something went wrong. Please try again.')
     } finally {
       setIsSubmitting(false)
@@ -85,6 +85,8 @@ export default function Footer() {
               <li><Link href="/shop" className="text-joe-stone hover:text-joe-gold transition-all duration-300 font-joe-accent">Pro Shop</Link></li>
               <li><Link href="/contact" className="text-joe-stone hover:text-joe-gold transition-all duration-300 font-joe-accent">Contact</Link></li>
               <li><Link href="/fan-club" className="text-joe-stone hover:text-joe-gold transition-all duration-300 font-joe-accent">Fan Club</Link></li>
+              <li><Link href="/privacy-policy" className="text-joe-stone hover:text-joe-gold transition-all duration-300 font-joe-accent">Privacy Policy</Link></li>
+              <li><Link href="/terms-of-service" className="text-joe-stone hover:text-joe-gold transition-all duration-300 font-joe-accent">Terms of Service</Link></li>
             </ul>
           </div>
 

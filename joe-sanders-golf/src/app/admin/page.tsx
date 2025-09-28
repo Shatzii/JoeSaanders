@@ -5,7 +5,7 @@ import { dataClient } from '@/lib/data-client'
 import { Tournament, Sponsor, Merch } from '@/types'
 import AdvancedAnalytics from '@/components/AdvancedAnalytics'
 import FanEngagement from '@/components/FanEngagement'
-import { Plus, Edit, Trash2, Save, X, Eye, EyeOff, BarChart3, Heart } from 'lucide-react'
+import { Plus, Edit, Trash2, Save, X, BarChart3, Heart } from 'lucide-react'
 
 interface EditingItem {
   type: 'tournament' | 'sponsor' | 'merch'

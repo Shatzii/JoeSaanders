@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import logger from '@/lib/logger'
 
+// Required for static export
+export const dynamic = 'force-static'
+export const revalidate = false
+
 export async function GET() {
   const startTime = Date.now()
 

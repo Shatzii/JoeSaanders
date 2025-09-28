@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
-import { BookOpen, Play, CheckCircle, Clock, Target, TrendingUp, Award, Star } from 'lucide-react';
+import { BookOpen, Play, CheckCircle, Clock, Target, TrendingUp, Award, Star, Cpu } from 'lucide-react';
 
 interface SwingAnalysis {
   timestamp: number;
@@ -332,7 +332,7 @@ export default function PersonalizedLearningPaths({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="bg-indigo-900/20 rounded p-4">
-                <Brain className="w-8 h-8 text-indigo-400 mx-auto mb-2" />
+                <Cpu className="w-8 h-8 text-indigo-400 mx-auto mb-2" />
                 <h5 className="text-sm font-semibold text-white">AI Analysis</h5>
                 <p className="text-xs text-gray-400">Analyzes your performance data</p>
               </div>

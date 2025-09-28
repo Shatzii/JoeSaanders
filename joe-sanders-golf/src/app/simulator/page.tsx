@@ -1,14 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import GolfSimulator from '@/components/GolfSimulator';
+import { supabase } from '@/lib/supabase';
 import { AICoachWidget } from '@/components/AICoachWidget';
-import { ConvaiCaddie } from '@/components/ConvaiCaddie';
 import { ShotHistory } from '@/components/ShotHistory';
 import { PerformanceMetrics } from '@/components/PerformanceMetrics';
-import { AchievementSystem } from '@/components/AchievementSystem';
-import { PersonalizedCoaching } from '@/components/PersonalizedCoaching';
 import { MobileOptimization } from '@/components/MobileOptimization';
+import { BroadcastUI } from '@/components/BroadcastUI';
+import { ChallengeLeaderboard } from '@/components/ChallengeLeaderboard';
+import { ShotData } from '@/types';
 
 // Force dynamic rendering to avoid SSR issues
 export const dynamic = 'force-dynamic';
@@ -19,16 +18,10 @@ import {
   Trophy,
   Crown,
   Zap,
-  Star,
   Lock,
   CheckCircle,
   X
 } from 'lucide-react';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 // Pricing tiers for AI Simulator
 const simulatorTiers = {
@@ -90,32 +83,53 @@ const simulatorTiers = {
   }
 };
 
+interface User {
+  id: string;
+  email?: string;
+  user_metadata?: Record<string, unknown>;
+}
+
 export default function SimulatorPage() {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [userTier, setUserTier] = useState<'free' | 'pro' | 'elite'>('free');
   const [showCoach, setShowCoach] = useState(false);
   const [showCaddie, setShowCaddie] = useState(false);
   const [showPricing, setShowPricing] = useState(false);
+  const [isGuestMode, setIsGuestMode] = useState(false);
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const [sessionStats, setSessionStats] = useState({
     totalShots: 0,
     averageDistance: 0,
     bestShot: 0,
     accuracy: 0
   });
-  const [shotHistory, setShotHistory] = useState<any[]>([]);
+  const [shotHistory, setShotHistory] = useState<ShotData[]>([]);
   const [selectedCourse, setSelectedCourse] = useState('Practice Range');
   const [gameMode, setGameMode] = useState<'practice' | 'tournament'>('practice');
 
   // Initialize user and session
   useEffect(() => {
+    // Check for demo parameter
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isDemo = urlParams.get('demo') === 'true';
+      setIsDemoMode(isDemo);
+      if (isDemo) {
+        setIsGuestMode(true);
+        setUserTier('free');
+        setCurrentSessionId('demo-session-' + Date.now());
+        return; // Skip authentication check for demo mode
+      }
+    }
+
     const initializeUser = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
         setUser(user);
 
-        if (user) {
-          // Check user's subscription tier
+        if (user && supabase) {
+          // Authenticated user - check subscription tier
           const { data: profile } = await supabase
             .from('profiles')
             .select('subscription_tier, is_fan_club_member')
@@ -131,7 +145,7 @@ export default function SimulatorPage() {
             setUserTier('free');
           }
 
-          // Initialize game session
+          // Initialize game session for authenticated users
           const { data: session } = await supabase
             .from('game_sessions')
             .insert({
@@ -146,38 +160,53 @@ export default function SimulatorPage() {
           if (session) {
             setCurrentSessionId(session.id);
           }
+        } else {
+          // Guest user - set demo mode
+          setIsGuestMode(true);
+          setUserTier('free'); // Demo users get free tier experience
+          setCurrentSessionId('demo-session-' + Date.now()); // Create a demo session ID
         }
       } catch (error) {
         console.error('Failed to initialize:', error);
+        // Fallback to guest mode on error
+        setIsGuestMode(true);
+        setUserTier('free');
+        setCurrentSessionId('demo-session-' + Date.now());
       }
     };
 
     initializeUser();
   }, [selectedCourse, gameMode]);
 
-  const handleShotTaken = async (shotData: any) => {
+    const handleShotTaken = async (shotData: { club_used?: string; club?: string; outcome: string; distance: number; accuracy?: number }) => {
     if (!currentSessionId) return;
 
-    // Check shot limits for free tier
+    // Check shot limits for free tier (including demo users)
     if (userTier === 'free' && sessionStats.totalShots >= simulatorTiers.free.maxShots) {
-      alert('Free tier limit reached! Upgrade to Pro for unlimited shots.');
+      if (isGuestMode) {
+        alert('Demo limit reached! Sign up for a free account to continue, or upgrade to Pro for unlimited shots.');
+      } else {
+        alert('Free tier limit reached! Upgrade to Pro for unlimited shots.');
+      }
       return;
     }
 
     try {
-      // Save shot to database
-      await supabase.from('shots').insert({
-        session_id: currentSessionId,
-        hole_number: 1,
-        shot_number: sessionStats.totalShots + 1,
-        club_used: shotData.club_used,
-        outcome: shotData.outcome,
-        distance: shotData.distance,
-        accuracy: shotData.accuracy || 0,
-        notes: `AI Coach will analyze this shot`
-      });
+      // Save shot to database only for authenticated users
+      if (supabase && user && !isGuestMode) {
+        await supabase.from('shots').insert({
+          session_id: currentSessionId,
+          hole_number: 1,
+          shot_number: sessionStats.totalShots + 1,
+          club_used: shotData.club_used || shotData.club,
+          outcome: shotData.outcome,
+          distance: shotData.distance,
+          accuracy: shotData.accuracy || 0,
+          notes: `AI Coach will analyze this shot`
+        });
+      }
 
-      // Update session stats
+      // Update session stats (works for both authenticated and guest users)
       setSessionStats(prev => ({
         totalShots: prev.totalShots + 1,
         averageDistance: Math.round((prev.averageDistance * prev.totalShots + shotData.distance) / (prev.totalShots + 1)),
@@ -185,15 +214,19 @@ export default function SimulatorPage() {
         accuracy: Math.round((prev.accuracy * prev.totalShots + (shotData.accuracy || 75)) / (prev.totalShots + 1))
       }));
 
-      // Add to shot history
-      setShotHistory(prev => [...prev, {
-        ...shotData,
-        shot_number: sessionStats.totalShots + 1,
-        timestamp: Date.now()
-      }]);
+      // Add to shot history (works for both authenticated and guest users)
+      const formattedShotData: ShotData = {
+        id: `shot-${Date.now()}`,
+        distance: shotData.distance || 0,
+        accuracy: shotData.accuracy || 0,
+        club: shotData.club || shotData.club_used || 'Driver',
+        timestamp: new Date().toISOString()
+      };
 
-      // Auto-show AI coach for Pro/Elite users
-      if (userTier !== 'free') {
+      setShotHistory(prev => [...prev, formattedShotData]);
+
+      // Auto-show AI coach for Pro/Elite users, or for demo users to showcase the feature
+      if (userTier !== 'free' || isGuestMode) {
         setShowCoach(true);
       }
 
@@ -232,16 +265,35 @@ export default function SimulatorPage() {
   const currentTier = simulatorTiers[userTier];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a1a] to-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a1a] to-[#0a0a0a] text-white" role="application" aria-label="Golf Simulator Application">
+      {/* Demo Banner for Guest Users */}
+      {isGuestMode && (
+        <div className="bg-gradient-to-r from-[#d4af37] to-[#f4e87c] text-[#0a0a0a] p-4 text-center border-b border-[#d4af3740]">
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-lg font-bold mb-2">
+              {isDemoMode ? '🤖 Try Uncle Joe\'s AI Golf Tutor - FREE Demo!' : 'Welcome to Uncle Joe\'s Golf Simulator'}
+            </h2>
+            <p className="text-sm">
+              {isDemoMode ? (
+                <>Take up to {simulatorTiers.free.maxShots} shots and experience AI-powered swing analysis and voice coaching. <a href="/auth" className="underline font-semibold hover:no-underline">Sign up for free</a> to continue playing!</>
+              ) : (
+                <>Experience the future of golf with AI-powered coaching. <a href="/auth" className="underline font-semibold hover:no-underline">Sign up</a> to unlock all features!</>
+              )}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
-      <header className="p-6 border-b border-[#d4af3740]">
+      <header className="p-6 border-b border-[#d4af3740]" role="banner">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-[#d4af37] to-[#f4e87c] bg-clip-text text-transparent">
               Uncle Joe&apos;s AI Golf Simulator
             </h1>
-            <p className="text-gray-400 mt-1">
-              {currentTier.name} Plan • {userTier === 'free' ? `${simulatorTiers.free.maxShots - sessionStats.totalShots} shots remaining` : 'Unlimited'}
+            <p className="text-gray-400 mt-1" aria-live="polite">
+              {isGuestMode ? `Demo Mode • ${simulatorTiers.free.maxShots - sessionStats.totalShots} shots remaining` :
+               currentTier.name + " Plan • " + (userTier === 'free' ? `${simulatorTiers.free.maxShots - sessionStats.totalShots} shots remaining` : 'Unlimited')}
             </p>
           </div>
 
@@ -266,7 +318,7 @@ export default function SimulatorPage() {
             </div>
 
             <div className="flex gap-2">
-              {userTier !== 'free' && (
+              {(userTier !== 'free' || isGuestMode) && (
                 <button
                   onClick={() => setShowCoach(!showCoach)}
                   className={`p-3 rounded-full transition-colors ${
@@ -274,7 +326,7 @@ export default function SimulatorPage() {
                       ? 'bg-[#d4af37] text-[#0a0a0a]'
                       : 'bg-[#2a2a2a] text-[#d4af37] hover:bg-[#3a3a3a]'
                   }`}
-                  title="AI Golf Coach"
+                  title={isGuestMode ? "Try AI Golf Coach (Demo)" : "AI Golf Coach"}
                 >
                   <Target size={20} />
                 </button>
@@ -390,35 +442,45 @@ export default function SimulatorPage() {
       <div className="max-w-7xl mx-auto p-6">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Game Area */}
-          <div className="lg:col-span-3">
+          <section className="lg:col-span-3" aria-labelledby="game-area-heading">
             <div className="bg-[#1a1a1a] rounded-lg p-6 border border-[#d4af3740]">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-xl font-semibold text-[#d4af37] mb-1">Course: {selectedCourse}</h2>
+                  <h2 id="game-area-heading" className="text-xl font-semibold text-[#d4af37] mb-1">Course: {selectedCourse}</h2>
                   <p className="text-sm text-gray-400">Mode: {gameMode === 'practice' ? 'Practice' : 'Tournament'}</p>
                 </div>
 
                 {userTier === 'free' && sessionStats.totalShots >= simulatorTiers.free.maxShots && (
-                  <div className="bg-red-900/20 border border-red-500 rounded-lg p-3">
+                  <div className="bg-red-900/20 border border-red-500 rounded-lg p-3" role="alert" aria-live="assertive">
                     <p className="text-red-400 text-sm flex items-center gap-2">
-                      <Lock size={16} />
+                      <Lock size={16} aria-hidden="true" />
                       Shot limit reached! Upgrade for unlimited access.
                     </p>
                   </div>
                 )}
               </div>
 
-              <GolfSimulator
-                onShotTaken={handleShotTaken}
-                disabled={userTier === 'free' && sessionStats.totalShots >= simulatorTiers.free.maxShots}
-              />
+              <div className="relative">
+                {/* Broadcast-Style Overlay */}
+                <BroadcastUI score={sessionStats.totalShots} />
+
+                {/* 3D Game Canvas */}
+                <div className="w-full h-[600px] bg-blue-300 flex items-center justify-center" role="img" aria-label="3D Golf Course Simulation">
+                  <div className="text-center">
+                    <h3 className="text-2xl font-bold text-white mb-4">3D Golf Simulator</h3>
+                    <p className="text-gray-300">Loading advanced 3D experience...</p>
+                    {/* TODO: Replace with AdvancedGame component */}
+                    {/* <AdvancedGame /> */}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+          </section>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* AI Coach Widget - Only for Pro/Elite */}
-            {userTier !== 'free' && (
+            {/* AI Coach Widget - For Pro/Elite and Demo Users */}
+            {(userTier !== 'free' || isGuestMode) && (
               <AICoachWidget
                 sessionId={currentSessionId}
                 isOpen={showCoach}
@@ -451,7 +513,8 @@ export default function SimulatorPage() {
               }}
             />
 
-            {/* Course Selection */}
+            {/* Challenge Leaderboard */}
+            <ChallengeLeaderboard />
             <div className="bg-[#1a1a1a] rounded-lg p-4 border border-[#d4af3740]">
               <h3 className="text-lg font-semibold text-[#d4af37] mb-4 flex items-center gap-2">
                 <Settings size={20} />
@@ -522,6 +585,64 @@ export default function SimulatorPage() {
             <MobileOptimization
               isMobile={typeof window !== 'undefined' && window.innerWidth <= 1024}
             />
+
+            {/* Simple Golf Simulator Interface */}
+            <div className="bg-[#1a1a1a] rounded-lg p-6 border border-[#d4af3740]">
+              <h3 className="text-lg font-semibold text-[#d4af37] mb-4">Golf Simulator</h3>
+              <div className="text-center">
+                <div className="bg-green-900 rounded-lg p-8 mb-4 relative">
+                  <div className="text-4xl mb-4">🏌️‍♂️</div>
+                  <p className="text-gray-300 mb-4">Take your shot at {selectedCourse}</p>
+                  
+                  {/* Simple shot interface */}
+                  <div className="space-y-4">
+                    <select 
+                      className="bg-[#2a2a2a] text-white px-4 py-2 rounded w-full"
+                      onChange={(e) => {
+                        const club = e.target.value;
+                        // Simulate a shot with random outcome
+                        const outcomes = ['Perfect', 'Good', 'Fair', 'Poor'];
+                        const distances = {
+                          'Driver': { min: 200, max: 280 },
+                          '7 Iron': { min: 130, max: 160 },
+                          'Pitching Wedge': { min: 80, max: 110 },
+                          'Putter': { min: 5, max: 20 }
+                        };
+                        
+                        if (club && club !== 'Select Club') {
+                          const clubData = distances[club as keyof typeof distances];
+                          const distance = Math.floor(Math.random() * (clubData.max - clubData.min + 1)) + clubData.min;
+                          const outcome = outcomes[Math.floor(Math.random() * outcomes.length)];
+                          const accuracy = Math.floor(Math.random() * 41) + 60; // 60-100%
+                          
+                          handleShotTaken({
+                            club_used: club,
+                            outcome,
+                            distance,
+                            accuracy
+                          });
+                        }
+                      }}
+                    >
+                      <option>Select Club</option>
+                      <option>Driver</option>
+                      <option>7 Iron</option>
+                      <option>Pitching Wedge</option>
+                      <option>Putter</option>
+                    </select>
+                    
+                    <p className="text-sm text-gray-400">
+                      {isGuestMode ? 
+                        `Demo shots remaining: ${simulatorTiers.free.maxShots - sessionStats.totalShots}` :
+                        userTier === 'free' ? 
+                          `Shots remaining: ${simulatorTiers.free.maxShots - sessionStats.totalShots}` :
+                          'Unlimited shots available'
+                      }
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Upgrade Prompt for Free Users */}
             {userTier === 'free' && (

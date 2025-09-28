@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { auth0: string } }
+  { params }: { params: Promise<{ auth0: string }> }
 ) {
-  const action = params.auth0
+  const { auth0: action } = await params
 
   switch (action) {
     case 'login':

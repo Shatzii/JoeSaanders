@@ -1,24 +1,36 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { Mic, MicOff, Volume2, VolumeX, MessageCircle, X } from 'lucide-react';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+interface AnalysisResult {
+  analysis: string;
+  tip: string;
+  confidence: number;
+  suggestions: string[];
+}
+
+interface ShotData {
+  id: string;
+  distance: number;
+  accuracy: number;
+  club: string;
+  timestamp: string;
+  power?: number;
+}
+
+interface ChatMessage {
+  id: string;
+  type: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+}
 
 interface AICoachWidgetProps {
   sessionId: string | null;
   isOpen: boolean;
   onClose: () => void;
-  onAnalysisComplete?: (analysis: any) => void;
-}
-
-interface AnalysisResult {
-  analysis: string;
-  tip: string;
-  confidence: string;
+  onAnalysisComplete?: (analysis: AnalysisResult) => void;
 }
 
 export function AICoachWidget({ sessionId, isOpen, onClose, onAnalysisComplete }: AICoachWidgetProps) {
@@ -26,11 +38,11 @@ export function AICoachWidget({ sessionId, isOpen, onClose, onAnalysisComplete }
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [chatHistory, setChatHistory] = useState<any[]>([]);
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [isRecording, setIsRecording] = useState(false);
-  const [lastShot, setLastShot] = useState<any>(null);
+  const [lastShot, setLastShot] = useState<ShotData | null>(null);
 
-  const handleAnalyzeShot = useCallback(async (shotData?: any) => {
+  const handleAnalyzeShot = useCallback(async (shotData?: ShotData) => {
     const dataToAnalyze = shotData || lastShot;
     if (!dataToAnalyze || !sessionId) return;
 
@@ -62,30 +74,38 @@ export function AICoachWidget({ sessionId, isOpen, onClose, onAnalysisComplete }
         })
       });
 
-      if (speechResponse.ok) {
-        // 4. Handle the audio response
+      if (speechResponse.ok && speechResponse.status !== 204) {
+        // 4. Handle the audio response (only if we got actual audio)
         const audioBlob = await speechResponse.blob();
-        const url = URL.createObjectURL(audioBlob);
-        setAudioUrl(url);
+        if (audioBlob.size > 0) {
+          const url = URL.createObjectURL(audioBlob);
+          setAudioUrl(url);
+        }
       }
 
       setAnalysis(analysisData);
 
       // 3. Save to chat history
-      await supabase.from('coach_chats').insert({
+      if (supabase) {
+        await supabase.from('coach_chats').insert({
         session_id: sessionId,
-        user_message: `Analyze my shot: ${dataToAnalyze.club_used || dataToAnalyze.club}, ${dataToAnalyze.outcome}, ${dataToAnalyze.distance}yd`,
+        user_message: `Analyze my shot: ${dataToAnalyze.club}, distance: ${dataToAnalyze.distance}yd, accuracy: ${dataToAnalyze.accuracy}%`,
         ai_response: `${analysisData.analysis} ${analysisData.tip}`,
         audio_url: audioUrl // This would be a permanent URL in production
       });
+      }
 
       // Update chat history
       setChatHistory(prev => [...prev, {
-        role: 'user',
-        content: `Shot analysis: ${dataToAnalyze.club_used || dataToAnalyze.club}, ${dataToAnalyze.outcome}, ${dataToAnalyze.distance}yd`
+        id: `user-${Date.now()}`,
+        type: 'user',
+        content: `Shot analysis: ${dataToAnalyze.club}, distance: ${dataToAnalyze.distance}yd, accuracy: ${dataToAnalyze.accuracy}%`,
+        timestamp: new Date().toISOString()
       }, {
-        role: 'assistant',
-        content: `${analysisData.analysis} ${analysisData.tip}`
+        id: `assistant-${Date.now()}`,
+        type: 'assistant',
+        content: `${analysisData.analysis} ${analysisData.tip}`,
+        timestamp: new Date().toISOString()
       }]);
 
       // Notify parent component

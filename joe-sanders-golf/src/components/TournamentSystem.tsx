@@ -6,16 +6,7 @@ import {
   Calendar,
   Target,
   Award,
-  Clock,
-  Play,
-  Pause,
-  RotateCcw,
   Crown,
-  Medal,
-  Star,
-  Zap,
-  TrendingUp,
-  UserPlus,
   Settings
 } from 'lucide-react';
 
@@ -37,7 +28,7 @@ interface TournamentRound {
   name: string;
   holes: number;
   par: number;
-  status: 'upcoming' | 'active' | 'completed';
+  status: 'registration' | 'active' | 'completed' | 'cancelled';
   startTime: number;
   endTime?: number;
   leaderboard: TournamentPlayer[];
@@ -76,13 +67,12 @@ interface TournamentSystemProps {
 export default function TournamentSystem({
   currentUser,
   onTournamentJoin,
-  onTournamentLeave
+  onTournamentLeave: _onTournamentLeave
 }: TournamentSystemProps) {
   const [activeTab, setActiveTab] = useState<'browse' | 'my-tournaments' | 'create' | 'leaderboard'>('browse');
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
-  const [filter, setFilter] = useState<'all' | 'active' | 'upcoming' | 'completed'>('all');
+  const [filter, setFilter] = useState<'all' | 'active' | 'registration' | 'completed'>('all');
 
   // Mock data for demonstration
   useEffect(() => {
@@ -135,7 +125,7 @@ export default function TournamentSystem({
         description: 'Elite tournament for serious players',
         type: 'match-play',
         format: 'single-elimination',
-        status: 'upcoming',
+        status: 'registration',
         maxPlayers: 32,
         currentPlayers: 28,
         entryFee: 100,
@@ -184,8 +174,8 @@ export default function TournamentSystem({
       switch (filter) {
         case 'active':
           return tournament.status === 'active';
-        case 'upcoming':
-          return tournament.status === 'registration' || tournament.status === 'upcoming';
+        case 'registration':
+          return tournament.status === 'registration';
         case 'completed':
           return tournament.status === 'completed';
         default:
@@ -215,7 +205,6 @@ export default function TournamentSystem({
     };
 
     setTournaments(prev => [...prev, newTournament]);
-    setIsCreating(false);
     setActiveTab('browse');
   };
 
@@ -257,7 +246,7 @@ export default function TournamentSystem({
         return 'text-green-400 bg-green-900/20';
       case 'registration':
         return 'text-blue-400 bg-blue-900/20';
-      case 'upcoming':
+      case 'registration':
         return 'text-yellow-400 bg-yellow-900/20';
       case 'completed':
         return 'text-gray-400 bg-gray-900/20';
@@ -312,7 +301,7 @@ export default function TournamentSystem({
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => setActiveTab(tab.id as 'browse' | 'my-tournaments' | 'create' | 'leaderboard')}
                   className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all ${
                     activeTab === tab.id
                       ? 'bg-emerald-500 text-black font-semibold shadow-lg'
@@ -335,12 +324,12 @@ export default function TournamentSystem({
             {[
               { id: 'all', label: 'All' },
               { id: 'active', label: 'Active' },
-              { id: 'upcoming', label: 'Upcoming' },
+              { id: 'registration', label: 'Registration' },
               { id: 'completed', label: 'Completed' }
             ].map((filterOption) => (
               <button
                 key={filterOption.id}
-                onClick={() => setFilter(filterOption.id as any)}
+                onClick={() => setFilter(filterOption.id as 'all' | 'active' | 'registration' | 'completed')}
                 className={`px-4 py-2 rounded-md transition-all ${
                   filter === filterOption.id
                     ? 'bg-emerald-500 text-black font-semibold'
@@ -720,7 +709,7 @@ Prizes for top 3 finishers"
         <div className="text-center py-12">
           <Users className="w-16 h-16 text-gray-600 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-white mb-2">My Tournaments</h3>
-          <p className="text-gray-400">Tournaments you've joined will appear here</p>
+          <p className="text-gray-400">Tournaments you&apos;ve joined will appear here</p>
           <button
             onClick={() => setActiveTab('browse')}
             className="mt-4 bg-emerald-600 text-white px-6 py-2 rounded hover:bg-emerald-500 transition-colors"
