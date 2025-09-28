@@ -36,7 +36,7 @@ export default function AIGolfTutorPage() {
               
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <Link
-                  href="/simulator"
+                  href="/ai-golf-tutor/demo"
                   className="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-joe-gold to-amber-400 text-joe-black px-8 py-4 rounded-lg font-joe-heading font-bold text-lg hover:from-amber-400 hover:to-joe-gold transition-all duration-300 transform hover:scale-105"
                 >
                   <Play className="w-5 h-5" />
@@ -307,7 +307,7 @@ export default function AIGolfTutorPage() {
                 </li>
               </ul>
               <Link
-                href="/simulator"
+                href="/simulator?demo=true"
                 className="block w-full bg-gradient-to-r from-joe-gold to-amber-400 text-joe-black px-6 py-3 rounded-lg font-bold text-center hover:from-amber-400 hover:to-joe-gold transition-all duration-300"
               >
                 Try Free Demo

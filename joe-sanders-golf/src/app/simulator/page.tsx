@@ -97,6 +97,7 @@ export default function SimulatorPage() {
   const [showCaddie, setShowCaddie] = useState(false);
   const [showPricing, setShowPricing] = useState(false);
   const [isGuestMode, setIsGuestMode] = useState(false);
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const [sessionStats, setSessionStats] = useState({
     totalShots: 0,
     averageDistance: 0,
@@ -109,6 +110,19 @@ export default function SimulatorPage() {
 
   // Initialize user and session
   useEffect(() => {
+    // Check for demo parameter
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isDemo = urlParams.get('demo') === 'true';
+      setIsDemoMode(isDemo);
+      if (isDemo) {
+        setIsGuestMode(true);
+        setUserTier('free');
+        setCurrentSessionId('demo-session-' + Date.now());
+        return; // Skip authentication check for demo mode
+      }
+    }
+
     const initializeUser = async () => {
       try {
         const { data: { user } } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
@@ -256,15 +270,15 @@ export default function SimulatorPage() {
       {isGuestMode && (
         <div className="bg-gradient-to-r from-[#d4af37] to-[#f4e87c] text-[#0a0a0a] p-4 text-center border-b border-[#d4af3740]">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-lg font-bold mb-2">🤖 Try Uncle Joe&apos;s AI Golf Tutor - FREE Demo!</h2>
+            <h2 className="text-lg font-bold mb-2">
+              {isDemoMode ? '🤖 Try Uncle Joe\'s AI Golf Tutor - FREE Demo!' : 'Welcome to Uncle Joe\'s Golf Simulator'}
+            </h2>
             <p className="text-sm">
-              Take up to {simulatorTiers.free.maxShots} shots and experience AI-powered swing analysis and voice coaching.
-              <span className="ml-2">
-                <a href="/auth" className="underline font-semibold hover:no-underline">
-                  Sign up for free
-                </a>
-                {" "}to continue playing!
-              </span>
+              {isDemoMode ? (
+                <>Take up to {simulatorTiers.free.maxShots} shots and experience AI-powered swing analysis and voice coaching. <a href="/auth" className="underline font-semibold hover:no-underline">Sign up for free</a> to continue playing!</>
+              ) : (
+                <>Experience the future of golf with AI-powered coaching. <a href="/auth" className="underline font-semibold hover:no-underline">Sign up</a> to unlock all features!</>
+              )}
             </p>
           </div>
         </div>
