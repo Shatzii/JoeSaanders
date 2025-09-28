@@ -158,7 +158,7 @@ cp .env.local.example .env.local
 
 1. **Verify Domain in Resend:**
    - Go to Resend Dashboard → Domains
-   - Add your domain (unclejoesgolf.com)
+   - Add your domain (stonesgolf.com)
    - Follow DNS verification steps
 
 2. **Update Environment:**

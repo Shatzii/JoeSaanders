@@ -1,6 +1,6 @@
-# 🏌️ Uncle Joes Golf Pro Golf Career Launch Platform
+# 🏌️ Stones Golf Pro Golf Career Launch Platform
 
-Welcome to the Uncle Joes Golf Pro Golf Career Launch Platform! This project creates a dynamic digital hub for professional golfer Uncle Joe, designed to attract sponsors, build a fanbase, generate revenue, and document his professional journey.
+Welcome to the Stones Golf Pro Golf Career Launch Platform! This project creates a dynamic digital hub for professional golfer Uncle Joe, designed to attract sponsors, build a fanbase, generate revenue, and document his professional journey.
 
 ## 🏆 Enterprise Readiness Status: **90% Complete**
 
@@ -139,7 +139,7 @@ STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
 
 # Email
 RESEND_API_KEY=re_your_resend_api_key
-CONTACT_EMAIL=joe@unclejoesgolf.com
+CONTACT_EMAIL=joe@stonesgolf.com
 
 # Site
 NEXT_PUBLIC_SITE_URL=https://unclejoesgolf.com

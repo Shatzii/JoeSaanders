@@ -16,7 +16,7 @@
 **Tasks:**
 - [ ] Connect GitHub repo to Vercel
 - [ ] Configure production environment variables
-- [ ] Set up custom domain (unclejoesgolf.com)
+- [ ] Set up custom domain (stonesgolf.com)
 - [ ] Test all features on production
 - [ ] Configure monitoring alerts
 
