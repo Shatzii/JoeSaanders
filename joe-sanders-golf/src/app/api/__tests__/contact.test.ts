@@ -45,7 +45,17 @@ describe('/api/contact', () => {
           if (key === 'x-forwarded-for') return '127.0.0.1'
           if (key === 'x-real-ip') return '127.0.0.1'
           return null
-        })
+        }),
+        append: jest.fn(),
+        delete: jest.fn(),
+        getSetCookie: jest.fn(),
+        has: jest.fn(),
+        set: jest.fn(),
+        forEach: jest.fn(),
+        entries: jest.fn(),
+        keys: jest.fn(),
+        values: jest.fn(),
+        [Symbol.iterator]: jest.fn()
       }
     }
   })

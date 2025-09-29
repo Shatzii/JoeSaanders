@@ -1,6 +1,7 @@
 import { supabase } from './supabase'
 import logger from './logger'
 
+<<<<<<< HEAD
 // Conditionally import Node.js modules for server-side usage
 let fs: any = null
 let path: any = null
@@ -18,10 +19,14 @@ try {
 }
 
 // Local data client for development fallback
+=======
+// Local data client for development fallback (browser-safe)
+>>>>>>> origin/copilot/vscode1757631355561
 class LocalDataClient {
-  private data: any = null
+  private data: any = { tournaments: [], sponsors: [], merch: [] }
 
   constructor() {
+<<<<<<< HEAD
     this.loadData()
   }
 
@@ -35,10 +40,15 @@ class LocalDataClient {
       }
     } catch (error) {
       logger.error('Error loading local data:', { error: error instanceof Error ? error.message : 'Unknown error' })
+=======
+    // In browser environment, use default data structure
+    if (typeof window !== 'undefined') {
+>>>>>>> origin/copilot/vscode1757631355561
       this.data = { tournaments: [], sponsors: [], merch: [] }
     }
   }
 
+<<<<<<< HEAD
   private saveData() {
     try {
       if (fs && dataPath) {
@@ -49,6 +59,8 @@ class LocalDataClient {
     }
   }
 
+=======
+>>>>>>> origin/copilot/vscode1757631355561
   // Tournament methods
   async getTournaments() {
     logger.info('Fetching tournaments from local data')

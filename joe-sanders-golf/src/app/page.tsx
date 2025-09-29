@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { dataClient } from '@/lib/data-client'
 import { Sponsor } from '@/types'
 import { Check, Zap, Heart, Users } from 'lucide-react'
+import Hero from '@/components/Hero'
 
 // Force dynamic rendering to avoid build-time data fetching issues
 export const dynamic = 'force-dynamic'
@@ -22,70 +23,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="hero-container relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-joe-black via-joe-black/95 to-joe-black/90"></div>
-
-        {/* Stones Golf Integration */}
-        <div className="stones-logo-container absolute top-8 right-8 z-10">
-          <div className="stones-dot"></div>
-          <div className="stones-dot"></div>
-          <div className="stones-dot"></div>
-        </div>
-
-        <div className="relative z-10 text-center max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="hero-tagline mb-8">
-            <h1 className="text-5xl md:text-7xl font-joe-heading font-bold text-joe-gold mb-4">
-              Say Uncle
-            </h1>
-            <p className="text-xl md:text-2xl text-joe-stone font-joe-body mb-8">
-              Professional Golfer • PGA Tour Dreamer • Storyteller
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Link
-              href="/journey"
-              className="merch-button px-8 py-4 rounded-lg font-joe-accent font-bold text-lg"
-            >
-              <span>Follow The Journey</span>
-            </Link>
-            <Link
-              href="/shop"
-              className="btn-outline border-2 border-joe-gold text-joe-gold hover:bg-joe-gold hover:text-joe-black px-8 py-4 rounded-lg font-joe-accent font-bold text-lg"
-            >
-              Visit Pro Shop
-            </Link>
-          </div>
-
-          <div className="mt-12">
-            <p className="text-joe-stone font-joe-body text-lg mb-4">
-              Building a legacy one swing at a time
-            </p>
-            <div className="flex justify-center space-x-8">
-              <div className="text-center">
-                <div className="text-3xl font-joe-heading font-bold text-joe-gold">47</div>
-                <div className="text-sm text-joe-stone font-joe-accent">Tournaments</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-joe-heading font-bold text-joe-gold">12</div>
-                <div className="text-sm text-joe-stone font-joe-accent">Top 10s</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-joe-heading font-bold text-joe-gold">3</div>
-                <div className="text-sm text-joe-stone font-joe-accent">Wins</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Decorative Elements */}
-        <div className="absolute bottom-8 left-8 opacity-20">
-          <div className="w-32 h-32 border border-joe-gold rounded-full"></div>
-        </div>
-        <div className="absolute top-16 left-16 opacity-20">
-          <div className="w-24 h-24 border border-joe-gold rounded-full"></div>
-        </div>
-      </section>
+      <Hero />
 
       {/* Progress Bar Section */}
       <section className="py-16 bg-joe-stone">

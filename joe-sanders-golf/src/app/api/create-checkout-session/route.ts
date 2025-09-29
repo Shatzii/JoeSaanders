@@ -36,8 +36,40 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { priceId, quantity = 1 } = await request.json()
+    const { priceId, quantity = 1, amount, type } = await request.json()
 
+    // Handle premium unlock separately
+    if (type === 'premium_unlock') {
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: 'Uncle Joe Golf Simulator Premium',
+                description: 'Unlock full leaderboard access, historical challenges, and VS Joe mode',
+              },
+              unit_amount: amount || 500, // $5.00 default
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/simulator?premium=success`,
+        cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/simulator?premium=cancelled`,
+        metadata: {
+          type: 'premium_unlock',
+        },
+      })
+
+      return NextResponse.json({
+        sessionId: session.id,
+        url: session.url
+      })
+    }
+
+    // Handle regular merchandise
     if (!priceId) {
       return NextResponse.json(
         { error: 'Price ID is required' },
