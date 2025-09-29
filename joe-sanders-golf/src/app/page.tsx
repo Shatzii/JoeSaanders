@@ -4,6 +4,9 @@ import { dataClient } from '@/lib/data-client'
 import { Sponsor } from '@/types'
 import { Check, Zap, Heart, Users } from 'lucide-react'
 
+// Force dynamic rendering to avoid build-time data fetching issues
+export const dynamic = 'force-dynamic'
+
 async function getSponsors(): Promise<Sponsor[]> {
   try {
     return await dataClient.getSponsors()

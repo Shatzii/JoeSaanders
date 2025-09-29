@@ -4,6 +4,9 @@ import { dataClient } from '@/lib/data-client'
 import { Tournament } from '@/types'
 import { Plus, Image as ImageIcon, CheckCircle, TrendingUp, Users, Building } from 'lucide-react'
 
+// Force dynamic rendering to avoid build-time data fetching issues
+export const dynamic = 'force-dynamic'
+
 // Sample tournament data for development
 const sampleTournaments: Tournament[] = [
   {

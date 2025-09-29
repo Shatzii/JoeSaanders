@@ -4,6 +4,9 @@ import { dataClient } from '@/lib/data-client'
 import { Merch } from '@/types'
 import { ShoppingBag, Image as ImageIcon, CheckCircle, Heart, DollarSign } from 'lucide-react'
 
+// Force dynamic rendering to avoid build-time data fetching issues
+export const dynamic = 'force-dynamic'
+
 async function getMerch(): Promise<Merch[]> {
   try {
     return await dataClient.getMerch()
