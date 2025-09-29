@@ -8,8 +8,6 @@ if (SENTRY_DSN) {
     dsn: SENTRY_DSN,
     environment: SENTRY_ENVIRONMENT,
     tracesSampleRate: SENTRY_ENVIRONMENT === 'production' ? 0.1 : 1.0,
-<<<<<<< HEAD
-=======
     replaysOnErrorSampleRate: 1.0,
     replaysSessionSampleRate: SENTRY_ENVIRONMENT === 'production' ? 0.1 : 0.0,
     // Performance monitoring
@@ -36,7 +34,6 @@ if (SENTRY_DSN) {
       }
       return event
     },
->>>>>>> origin/copilot/vscode1757631355561
   })
 } else {
   // Mock Sentry for development

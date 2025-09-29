@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-// Mock auth for development - replace with real Auth0 when configured
-const mockAuth = {
-  getSession: async (request?: any) => ({ user: { sub: 'dev-user' } }),
-  withApiAuthRequired: (handler: any) => handler,
-  withPageAuthRequired: (handler: any) => handler,
-}
-
-export default mockAuth
-=======
 // Auth0 configuration for Next.js 14
 export const auth0Config = {
   secret: process.env.AUTH0_SECRET!,
@@ -72,4 +62,3 @@ export const authHandler = {
 }
 
 export default authHandler
->>>>>>> origin/copilot/vscode1757631355561
