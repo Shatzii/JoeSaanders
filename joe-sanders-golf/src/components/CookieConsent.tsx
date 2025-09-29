@@ -11,12 +11,14 @@ export default function CookieConsent() {
   })
 
   useEffect(() => {
-    const consent = localStorage.getItem('cookie-consent')
-    if (!consent) {
-      setShowBanner(true)
-    } else {
-      const savedPreferences = JSON.parse(consent)
-      setPreferences(savedPreferences)
+    if (typeof window !== 'undefined') {
+      const consent = localStorage.getItem('cookie-consent')
+      if (!consent) {
+        setShowBanner(true)
+      } else {
+        const savedPreferences = JSON.parse(consent)
+        setPreferences(savedPreferences)
+      }
     }
   }, [])
 
@@ -27,7 +29,9 @@ export default function CookieConsent() {
       marketing: true
     }
     setPreferences(allPreferences)
-    localStorage.setItem('cookie-consent', JSON.stringify(allPreferences))
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('cookie-consent', JSON.stringify(allPreferences))
+    }
     setShowBanner(false)
   }
 
@@ -38,12 +42,16 @@ export default function CookieConsent() {
       marketing: false
     }
     setPreferences(necessaryOnly)
-    localStorage.setItem('cookie-consent', JSON.stringify(necessaryOnly))
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('cookie-consent', JSON.stringify(necessaryOnly))
+    }
     setShowBanner(false)
   }
 
   const savePreferences = () => {
-    localStorage.setItem('cookie-consent', JSON.stringify(preferences))
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('cookie-consent', JSON.stringify(preferences))
+    }
     setShowBanner(false)
   }
 
