@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-import type { Metadata } from 'next'
-import Link from 'next/link'
-
-export const metadata: Metadata = {
-  title: 'Privacy Policy - Uncle Joes Golf',
-  description: 'Privacy policy for Uncle Joes Golf website and services.',
-=======
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { Shield, Mail, Database, Cookie, Users, FileText } from 'lucide-react'
@@ -13,7 +5,7 @@ import { Shield, Mail, Database, Cookie, Users, FileText } from 'lucide-react'
 export const metadata: Metadata = {
   title: 'Privacy Policy - Uncle Joes Golf',
   description: 'Privacy policy and data protection information for Uncle Joes Golf website and services.',
->>>>>>> origin/copilot/vscode1757631355561
+}
 }
 
 export default function PrivacyPolicy() {
