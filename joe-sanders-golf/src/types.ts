@@ -17,6 +17,16 @@ interface ConsentParams {
   ad_storage?: 'granted' | 'denied';
 }
 
+// Shot data structure for simulator
+export interface ShotData {
+  id: string;
+  distance: number;
+  accuracy: number;
+  club: string;
+  timestamp: string;
+  userId?: string;
+}
+
 // Tournament data structure
 export interface Tournament {
   id: string;

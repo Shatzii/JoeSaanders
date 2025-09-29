@@ -8,12 +8,19 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Uncle Joe Brand Colors - Stones Golf Integration
-        'joe-black': '#0a0a0a', // Primary black - rich, matte black
-        'joe-gold': '#d4af37', // Stones gold - warm, metallic gold
-        'joe-white': '#fafafa', // Cool white for text on dark backgrounds
-        'joe-stone': '#e7e3da', // Warm stone - off-white/beige for text on gold/black
-        'joe-crimson': '#dc2626', // Crimson accent for key CTAs
+        // CoolStones Brand Colors - Lifestyle Expansion of Stones Golf
+        'cool-black': '#000000', // Matte black - primary brand color
+        'cool-gold': '#FFD700', // 24K gold - premium metallic
+        'cool-white': '#FFFFFF', // Pure white
+        'cool-rose': '#B76E79', // Rose gold - Lady Stones accent
+        'cool-stone': '#e7e3da', // Warm stone for text
+
+        // Legacy Uncle Joe Colors (for backward compatibility)
+        'joe-black': '#0a0a0a',
+        'joe-gold': '#d4af37',
+        'joe-white': '#fafafa',
+        'joe-stone': '#e7e3da',
+        'joe-crimson': '#dc2626',
 
         // Golf-themed variations
         'golf-gold': '#d4af37',

@@ -3,7 +3,7 @@ import Stripe from 'stripe'
 import { supabaseServer } from '@/lib/supabase'
 
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-08-27.basil',
+  apiVersion: '2025-02-24.acacia',
 }) : null
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET
@@ -40,11 +40,15 @@ export async function POST(request: NextRequest) {
         if (session.mode === 'subscription' && session.metadata?.user_id) {
           const userId = session.metadata.user_id
           const subscriptionId = session.subscription as string
+          const tier = session.metadata.tier || 'pro'
 
-          // Update user profile to mark as fan club member
+          // Update user profile to mark as fan club member and set subscription tier
           await supabaseServer
             .from('profiles')
-            .update({ is_fan_club_member: true })
+            .update({
+              is_fan_club_member: true,
+              subscription_tier: tier
+            })
             .eq('id', userId)
 
           // Create subscription record

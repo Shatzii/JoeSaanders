@@ -35,9 +35,6 @@ if (SENTRY_DSN) {
       return event
     },
   })
-} else {
-  // Mock Sentry for development
-  console.log('Sentry not configured - skipping initialization')
 }
 
 export default Sentry

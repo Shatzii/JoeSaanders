@@ -9,6 +9,7 @@ CREATE TABLE profiles (
   avatar_url TEXT,
   stripe_customer_id TEXT,
   is_fan_club_member BOOLEAN DEFAULT FALSE,
+  subscription_tier TEXT DEFAULT 'free' CHECK (subscription_tier IN ('free', 'pro', 'elite')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
@@ -129,14 +130,111 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
--- Function to update updated_at timestamp
-CREATE OR REPLACE FUNCTION public.handle_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = TIMEZONE('utc'::text, NOW());
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+-- Create game_sessions table for AI golf simulator
+CREATE TABLE game_sessions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
+  course_name TEXT,
+  total_score INTEGER,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+-- Enable RLS on game_sessions
+ALTER TABLE game_sessions ENABLE ROW LEVEL SECURITY;
+
+-- Create policy for game_sessions
+CREATE POLICY "Users can view their own game sessions" ON game_sessions
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own game sessions" ON game_sessions
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own game sessions" ON game_sessions
+  FOR UPDATE USING (auth.uid() = user_id);
+
+-- Create shots table for tracking individual shots
+CREATE TABLE shots (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  session_id UUID REFERENCES game_sessions(id) ON DELETE CASCADE,
+  hole_number INTEGER,
+  shot_number INTEGER,
+  club_used TEXT,
+  outcome TEXT,
+  distance INTEGER,
+  notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
+);
+
+-- Enable RLS on shots
+ALTER TABLE shots ENABLE ROW LEVEL SECURITY;
+
+-- Create policy for shots
+CREATE POLICY "Users can view their own shots" ON shots
+  FOR SELECT USING (
+    auth.uid() IN (
+      SELECT user_id FROM game_sessions WHERE id = session_id
+    )
+  );
+
+CREATE POLICY "Users can insert their own shots" ON shots
+  FOR INSERT WITH CHECK (
+    auth.uid() IN (
+      SELECT user_id FROM game_sessions WHERE id = session_id
+    )
+  );
+
+-- Create coach_chats table for AI coach chat history
+CREATE TABLE coach_chats (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  session_id UUID REFERENCES game_sessions(id) ON DELETE CASCADE,
+  user_message TEXT,
+  ai_response TEXT,
+  audio_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
+);
+
+-- Enable RLS on coach_chats
+ALTER TABLE coach_chats ENABLE ROW LEVEL SECURITY;
+
+-- Create policy for coach_chats
+CREATE POLICY "Users can view their own coach chats" ON coach_chats
+  FOR SELECT USING (
+    auth.uid() IN (
+      SELECT user_id FROM game_sessions WHERE id = session_id
+    )
+  );
+
+CREATE POLICY "Users can insert their own coach chats" ON coach_chats
+  FOR INSERT WITH CHECK (
+    auth.uid() IN (
+      SELECT user_id FROM game_sessions WHERE id = session_id
+    )
+  );
+
+-- Create cos_logs table for Chief of Staff logs
+CREATE TABLE cos_logs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  task_type TEXT, -- e.g., 'email_draft', 'social_plan'
+  user_input TEXT,
+  gpt_output TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
+);
+
+-- Enable RLS on cos_logs
+ALTER TABLE cos_logs ENABLE ROW LEVEL SECURITY;
+
+-- Create policy for cos_logs (admin only - you might want to restrict this)
+CREATE POLICY "Users can view their own cos logs" ON cos_logs
+  FOR SELECT USING (auth.uid() = (SELECT id FROM profiles WHERE id = auth.uid() AND is_fan_club_member = true));
+
+CREATE POLICY "Users can insert their own cos logs" ON cos_logs
+  FOR INSERT WITH CHECK (auth.uid() = (SELECT id FROM profiles WHERE id = auth.uid() AND is_fan_club_member = true));
+
+-- Add trigger for game_sessions updated_at
+CREATE TRIGGER handle_updated_at_game_sessions
+  BEFORE UPDATE ON game_sessions
+  FOR EACH ROW EXECUTE PROCEDURE handle_updated_at();
 
 -- Triggers for updated_at
 CREATE TRIGGER handle_updated_at_profiles

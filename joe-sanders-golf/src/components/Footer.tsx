@@ -30,7 +30,7 @@ export default function Footer() {
       } else {
         setMessage('Something went wrong. Please try again.')
       }
-    } catch (error) {
+    } catch {
       setMessage('Something went wrong. Please try again.')
     } finally {
       setIsSubmitting(false)
