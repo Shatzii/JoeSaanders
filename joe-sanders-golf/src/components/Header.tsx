@@ -15,7 +15,7 @@ export default function Header() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-3 group">
               <Image
-                src="/UnkJoeLogo.png"
+                src="/images/UnkJoeLogo (2).png"
                 alt="Uncle Joe Golf Logo"
                 width={48}
                 height={48}

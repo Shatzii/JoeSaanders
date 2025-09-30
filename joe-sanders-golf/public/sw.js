@@ -13,7 +13,7 @@ const STATIC_ASSETS = [
   '/sponsorship',
   '/admin',
   '/manifest.json',
-  '/UnkJoeLogo.png',
+  '/images/UnkJoeLogo (2).png',
   '/favicon.ico'
 ]
 
@@ -129,8 +129,8 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body || 'New update from Uncle Joes Golf!',
-    icon: '/UnkJoeLogo.png',
-    badge: '/UnkJoeLogo.png',
+  icon: '/images/UnkJoeLogo (2).png',
+  badge: '/images/UnkJoeLogo (2).png',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),
@@ -140,12 +140,12 @@ self.addEventListener('push', (event) => {
       {
         action: 'explore',
         title: 'View Details',
-        icon: '/UnkJoeLogo.png'
+  icon: '/images/UnkJoeLogo (2).png'
       },
       {
         action: 'close',
         title: 'Close',
-        icon: '/UnkJoeLogo.png'
+  icon: '/images/UnkJoeLogo (2).png'
       }
     ]
   }
