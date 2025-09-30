@@ -197,8 +197,8 @@ export default function ServiceWorkerRegister() {
     if (notificationsEnabled && 'Notification' in window) {
       new Notification('Uncle Joes Golf', {
         body: 'Test notification - PWA features are working!',
-        icon: '/UnkJoeLogo.png',
-        badge: '/UnkJoeLogo.png'
+        icon: '/images/UnkJoeLogo%20(2).png',
+        badge: '/images/UnkJoeLogo%20(2).png'
       })
     }
   }

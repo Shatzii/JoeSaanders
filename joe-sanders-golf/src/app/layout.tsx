@@ -58,9 +58,9 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#d4af37" />
         {/* Favicons */}
-        <link rel="icon" href="/images/UnkJoeLogo (2).png" sizes="32x32" type="image/png" />
-        <link rel="icon" href="/images/UnkJoeLogo (2).png" sizes="16x16" type="image/png" />
-        <link rel="apple-touch-icon" href="/images/UnkJoeLogo (2).png" />
+  <link rel="icon" href="/images/UnkJoeLogo%20(2).png" sizes="32x32" type="image/png" />
+  <link rel="icon" href="/images/UnkJoeLogo%20(2).png" sizes="16x16" type="image/png" />
+  <link rel="apple-touch-icon" href="/images/UnkJoeLogo%20(2).png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="min-h-screen flex flex-col bg-joe-black text-joe-white font-joe-body flower-of-life-bg">
