@@ -5,11 +5,12 @@
 [build.environment]
   NEXT_TELEMETRY_DISABLED = "1"
   NODE_VERSION = "20"
+  # Silence Netlify secrets scanning for known non-secret placeholders and docs
+  SECRETS_SCAN_OMIT_PATHS = ".env.example,.env.local.example,STONESGOLF_DEPLOYMENT_GUIDE.md"
+  SECRETS_SCAN_OMIT_KEYS = "CONTACT_EMAIL"
 
   # Next.js handles routing; no SPA catch-all redirect required
 
-[functions]
-  directory = ".netlify/functions"
 
 # Security headers
 [[headers]]
