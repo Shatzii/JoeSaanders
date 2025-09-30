@@ -132,6 +132,16 @@
       "website_url": "https://callawaygolf.com",
       "created_at": "2025-01-01T00:00:00Z",
       "updated_at": "2025-01-01T00:00:00Z"
+    },
+    
+    {
+      "id": "4",
+      "name": "BAM Family Law",
+      "logo_url": "/images/BAM-FullLogo.png",
+      "tier": "Official",
+      "website_url": "https://bamfamilylaw.com",
+      "created_at": "2025-09-30T00:00:00Z",
+      "updated_at": "2025-09-30T00:00:00Z"
     }
   ],
   "merch": [

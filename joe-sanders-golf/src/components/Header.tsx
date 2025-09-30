@@ -37,6 +37,9 @@ export default function Header() {
             <Link href="/journey" className="nav-link">
               The Journey
             </Link>
+             <Link href="/sponsors" className="nav-link">
+               Sponsors
+             </Link>
             <Link href="/sponsorship" className="nav-link">
               Sponsorship
             </Link>
@@ -88,7 +91,14 @@ export default function Header() {
                 className="block px-3 py-3 text-joe-white hover:text-joe-gold hover:bg-joe-gold/10 transition-all duration-300 rounded-lg font-joe-accent font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Sponsorship
+                  Sponsorship
+                </Link>
+                <Link
+                  href="/sponsors"
+                  className="block px-3 py-3 text-joe-white hover:text-joe-gold hover:bg-joe-gold/10 transition-all duration-300 rounded-lg font-joe-accent font-medium"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Sponsors
               </Link>
               <Link
                 href="/shop"
