@@ -108,11 +108,9 @@ export async function middleware(request: NextRequest) {
 
   // Enhanced admin route protection
   if (pathname.startsWith('/admin')) {
-    // Check for authentication
-    const authToken = request.cookies.get('auth-token')?.value
-    const sessionToken = request.headers.get('authorization')
-
-    if (!authToken && !sessionToken) {
+    // Require admin role cookie set by Auth0 callback
+    const role = request.cookies.get('role')?.value
+    if (role !== 'admin') {
       return NextResponse.redirect(new URL('/auth', request.url))
     }
   }

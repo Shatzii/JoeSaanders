@@ -5,7 +5,7 @@ import { dataClient } from '@/lib/data-client'
 import { Tournament, Sponsor, Merch } from '@/types'
 import AdvancedAnalytics from '@/components/AdvancedAnalytics'
 import FanEngagement from '@/components/FanEngagement'
-import { Plus, Edit, Trash2, Save, X, BarChart3, Heart } from 'lucide-react'
+import { Plus, Edit, Trash2, Save, X, BarChart3, Heart, Image as ImageIcon } from 'lucide-react'
 
 interface EditingItem {
   type: 'tournament' | 'sponsor' | 'merch'
@@ -169,6 +169,23 @@ export default function AdminPage() {
     }
   }
 
+  const handleFileUpload = async (file: File, folder: string) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('folder', folder)
+
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData
+    })
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      throw new Error(err.error || 'Upload failed')
+    }
+    const json = await res.json()
+    return json.url as string
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-joe-black flex items-center justify-center">
@@ -262,6 +279,57 @@ export default function AdminPage() {
                 </button>
               </div>
 
+              {showCreateForm && (
+                <div className="bg-joe-black p-4 rounded-lg border border-joe-gold/20 mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      placeholder="Title"
+                      value={newItem.title || ''}
+                      onChange={(e) => setNewItem({ ...newItem, title: e.target.value })}
+                      className="w-full p-2 bg-joe-stone text-joe-white rounded"
+                    />
+                    <input
+                      type="date"
+                      value={newItem.date || ''}
+                      onChange={(e) => setNewItem({ ...newItem, date: e.target.value })}
+                      className="w-full p-2 bg-joe-stone text-joe-white rounded"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Location"
+                      value={newItem.location || ''}
+                      onChange={(e) => setNewItem({ ...newItem, location: e.target.value })}
+                      className="w-full p-2 bg-joe-stone text-joe-white rounded"
+                    />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                          try {
+                            const url = await handleFileUpload(file, 'tournaments')
+                            setNewItem({ ...newItem, image_url: url })
+                          } catch (err: any) {
+                            alert(err.message)
+                          }
+                        }
+                      }}
+                      className="w-full p-2 bg-joe-stone text-joe-white rounded"
+                    />
+                  </div>
+                  <div className="flex justify-end space-x-2 mt-4">
+                    <button onClick={handleCreate} className="p-2 text-green-400 hover:bg-green-400/20 rounded-lg transition-colors flex items-center">
+                      <Save className="w-4 h-4 mr-2" /> Create
+                    </button>
+                    <button onClick={() => setShowCreateForm(false)} className="p-2 text-red-400 hover:bg-red-400/20 rounded-lg transition-colors flex items-center">
+                      <X className="w-4 h-4 mr-2" /> Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-4">
                 {tournaments.map((tournament) => (
                   <div key={tournament.id} className="bg-joe-black p-4 rounded-lg border border-joe-gold/20">
@@ -281,6 +349,25 @@ export default function AdminPage() {
                               className="w-full p-2 bg-joe-stone text-joe-white rounded"
                               rows={3}
                             />
+                            <div className="flex items-center space-x-3">
+                              <label className="text-joe-stone text-sm flex items-center"><ImageIcon className="w-4 h-4 mr-2"/> Image</label>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={async (e) => {
+                                  const file = e.target.files?.[0]
+                                  if (file) {
+                                    try {
+                                      const url = await handleFileUpload(file, 'tournaments')
+                                      setEditing({ ...editing, data: { ...editing.data, image_url: url } })
+                                    } catch (err: any) {
+                                      alert(err.message)
+                                    }
+                                  }
+                                }}
+                                className="p-2 bg-joe-stone text-joe-white rounded"
+                              />
+                            </div>
                           </div>
                         ) : (
                           <div>
@@ -349,6 +436,53 @@ export default function AdminPage() {
                 </button>
               </div>
 
+              {showCreateForm && (
+                <div className="bg-joe-black p-4 rounded-lg border border-joe-gold/20 mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input
+                      type="text"
+                      placeholder="Name"
+                      value={newItem.name || ''}
+                      onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                      className="w-full p-2 bg-joe-stone text-joe-white rounded"
+                    />
+                    <select
+                      value={newItem.tier || 'Official'}
+                      onChange={(e) => setNewItem({ ...newItem, tier: e.target.value })}
+                      className="w-full p-2 bg-joe-stone text-joe-white rounded"
+                    >
+                      <option value="Title">Title</option>
+                      <option value="Presenting">Presenting</option>
+                      <option value="Official">Official</option>
+                    </select>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                          try {
+                            const url = await handleFileUpload(file, 'sponsors')
+                            setNewItem({ ...newItem, logo_url: url })
+                          } catch (err: any) {
+                            alert(err.message)
+                          }
+                        }
+                      }}
+                      className="w-full p-2 bg-joe-stone text-joe-white rounded"
+                    />
+                  </div>
+                  <div className="flex justify-end space-x-2 mt-4">
+                    <button onClick={handleCreate} className="p-2 text-green-400 hover:bg-green-400/20 rounded-lg transition-colors flex items-center">
+                      <Save className="w-4 h-4 mr-2" /> Create
+                    </button>
+                    <button onClick={() => setShowCreateForm(false)} className="p-2 text-red-400 hover:bg-red-400/20 rounded-lg transition-colors flex items-center">
+                      <X className="w-4 h-4 mr-2" /> Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-4">
                 {sponsors.map((sponsor) => (
                   <div key={sponsor.id} className="bg-joe-black p-4 rounded-lg border border-joe-gold/20">
@@ -371,6 +505,25 @@ export default function AdminPage() {
                               <option value="Presenting">Presenting</option>
                               <option value="Official">Official</option>
                             </select>
+                            <div className="flex items-center space-x-3">
+                              <label className="text-joe-stone text-sm flex items-center"><ImageIcon className="w-4 h-4 mr-2"/> Logo</label>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={async (e) => {
+                                  const file = e.target.files?.[0]
+                                  if (file) {
+                                    try {
+                                      const url = await handleFileUpload(file, 'sponsors')
+                                      setEditing({ ...editing, data: { ...editing.data, logo_url: url } })
+                                    } catch (err: any) {
+                                      alert(err.message)
+                                    }
+                                  }
+                                }}
+                                className="p-2 bg-joe-stone text-joe-white rounded"
+                              />
+                            </div>
                           </div>
                         ) : (
                           <div>
@@ -436,6 +589,59 @@ export default function AdminPage() {
                 </button>
               </div>
 
+              {showCreateForm && (
+                <div className="bg-joe-black p-4 rounded-lg border border-joe-gold/20 mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      placeholder="Name"
+                      value={newItem.name || ''}
+                      onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                      className="w-full p-2 bg-joe-stone text-joe-white rounded"
+                    />
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="Price"
+                      value={newItem.price || ''}
+                      onChange={(e) => setNewItem({ ...newItem, price: parseFloat(e.target.value || '0') })}
+                      className="w-full p-2 bg-joe-stone text-joe-white rounded"
+                    />
+                    <textarea
+                      placeholder="Description"
+                      value={newItem.description || ''}
+                      onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                      className="w-full p-2 bg-joe-stone text-joe-white rounded md:col-span-2"
+                      rows={3}
+                    />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                          try {
+                            const url = await handleFileUpload(file, 'merch')
+                            setNewItem({ ...newItem, image_url: url })
+                          } catch (err: any) {
+                            alert(err.message)
+                          }
+                        }
+                      }}
+                      className="w-full p-2 bg-joe-stone text-joe-white rounded"
+                    />
+                  </div>
+                  <div className="flex justify-end space-x-2 mt-4">
+                    <button onClick={handleCreate} className="p-2 text-green-400 hover:bg-green-400/20 rounded-lg transition-colors flex items-center">
+                      <Save className="w-4 h-4 mr-2" /> Create
+                    </button>
+                    <button onClick={() => setShowCreateForm(false)} className="p-2 text-red-400 hover:bg-red-400/20 rounded-lg transition-colors flex items-center">
+                      <X className="w-4 h-4 mr-2" /> Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-4">
                 {merch.map((item) => (
                   <div key={item.id} className="bg-joe-black p-4 rounded-lg border border-joe-gold/20">
@@ -462,6 +668,25 @@ export default function AdminPage() {
                               className="w-full p-2 bg-joe-stone text-joe-white rounded"
                               rows={3}
                             />
+                            <div className="flex items-center space-x-3">
+                              <label className="text-joe-stone text-sm flex items-center"><ImageIcon className="w-4 h-4 mr-2"/> Image</label>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={async (e) => {
+                                  const file = e.target.files?.[0]
+                                  if (file) {
+                                    try {
+                                      const url = await handleFileUpload(file, 'merch')
+                                      setEditing({ ...editing, data: { ...editing.data, image_url: url } })
+                                    } catch (err: any) {
+                                      alert(err.message)
+                                    }
+                                  }
+                                }}
+                                className="p-2 bg-joe-stone text-joe-white rounded"
+                              />
+                            </div>
                           </div>
                         ) : (
                           <div>

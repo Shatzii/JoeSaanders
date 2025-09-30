@@ -35,8 +35,23 @@ export async function GET(
 
     case 'callback':
       // Handle Auth0 callback - this would normally exchange code for tokens
-      // For now, just redirect to admin
-      return NextResponse.redirect('/admin')
+      // For now, set an admin cookie and redirect to admin
+      const response = NextResponse.redirect('/admin')
+      response.cookies.set('role', 'admin', {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: 60 * 60 * 8 // 8 hours
+      })
+      response.cookies.set('auth-token', 'stub', {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: 60 * 60 * 8
+      })
+      return response
 
     default:
       return NextResponse.json({ error: 'Invalid auth action' }, { status: 400 })
