@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
-const isStaticExport = process.env.STATIC_EXPORT === 'true' || process.env.NETLIFY === 'true'
+const path = require('path')
+// Only enable static export when explicitly requested. Do NOT force it on Netlify,
+// because API routes (e.g., /api/auth/[auth0]) require SSR and are unsupported in export mode.
+const isStaticExport = process.env.STATIC_EXPORT === 'true'
 
 const nextConfig = {
   // Deployment mode
@@ -76,6 +79,10 @@ const nextConfig = {
 
     return config
   },
+
+  // Silence monorepo root warning by explicitly setting the output file tracing root
+  // Our app lives in a subfolder (joe-sanders-golf) of the workspace repository
+  outputFileTracingRoot: path.join(__dirname, '..'),
 
   // Headers aren't supported automatically in export mode
   ...(isStaticExport

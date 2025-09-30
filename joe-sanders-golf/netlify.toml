@@ -1,15 +1,12 @@
 [build]
-  publish = "out"
-  command = "STATIC_EXPORT=true npm run build"
+  publish = ".next"
+  command = "npm run build"
 
 [build.environment]
   NEXT_TELEMETRY_DISABLED = "1"
   NODE_VERSION = "20"
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+  # Next.js handles routing; no SPA catch-all redirect required
 
 [functions]
   directory = ".netlify/functions"

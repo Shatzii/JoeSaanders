@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// This API route must never be statically optimized.
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ auth0: string }> }

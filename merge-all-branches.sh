@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 # Automate merging all branches into main

@@ -271,7 +271,7 @@ export default function SimulatorPage() {
         <div className="bg-gradient-to-r from-[#d4af37] to-[#f4e87c] text-[#0a0a0a] p-4 text-center border-b border-[#d4af3740]">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-lg font-bold mb-2">
-              {isDemoMode ? '🤖 Try Uncle Joe\'s AI Golf Tutor - FREE Demo!' : 'Welcome to Uncle Joe\'s Golf Simulator'}
+              {isDemoMode ? 'Uncle Joe Golf Pro - AI Golf Tutor FREE Demo!' : 'Welcome to Uncle Joe\'s Golf Simulator'}
             </h2>
             <p className="text-sm">
               {isDemoMode ? (

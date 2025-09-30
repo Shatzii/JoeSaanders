@@ -67,7 +67,7 @@ export default function AIGolfTutorPage() {
             <div className="relative">
               <div className="bg-gradient-to-br from-joe-gold/20 to-joe-gold/5 rounded-2xl p-8 border border-joe-gold/30">
                 <div className="text-center">
-                  <div className="text-8xl mb-4">🤖</div>
+                  <div className="text-4xl font-joe-heading font-bold text-joe-gold mb-4">Uncle Joe Golf Pro</div>
                   <h3 className="text-2xl font-joe-heading font-bold text-joe-gold mb-4">AI-Powered Coaching</h3>
                   <p className="text-joe-white/80 mb-6">
                     Advanced machine learning analyzes your swing and provides instant, personalized feedback

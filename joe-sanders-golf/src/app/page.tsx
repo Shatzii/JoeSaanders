@@ -161,7 +161,7 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-joe-heading font-bold text-joe-gold mb-4">
-              🤖 Meet Uncle Joe&apos;s AI Golf Tutor
+              Uncle Joe Golf Pro - AI Golf Tutor
             </h2>
             <p className="text-xl text-joe-white font-joe-body max-w-3xl mx-auto mb-8">
               Experience the future of golf coaching with AI-powered swing analysis, voice feedback, and personalized tips from Uncle Joe himself.
