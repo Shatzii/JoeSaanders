@@ -45,7 +45,7 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
               <Image
-                src="/images/UnkJoeLogo%20(2).png"
+                src="/UnkJoeLogo.png"
                 alt="Uncle Joe Golf Logo"
                 width={48}
                 height={48}
