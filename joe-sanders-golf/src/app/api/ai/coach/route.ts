@@ -1,91 +1,60 @@
-import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { NextRequest, NextResponse } from 'next/server'
 
-// Create OpenAI client only if API key is available
-const openai = process.env.OPENAI_API_KEY ? new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-}) : null;
-
-// Define the function schema for the AI coach
-const functions = [
-  {
-    name: 'analyze_swing',
-    description: 'Analyze a golf shot based on the outcome, club, and distance.',
-    parameters: {
-      type: 'object',
-      properties: {
-        analysis: {
-          type: 'string',
-          description: 'A concise technical analysis of the swing and ball flight.',
-        },
-        tip: {
-          type: 'string',
-          description: 'A helpful tip for the player to improve their next shot.',
-        },
-        confidence: {
-          type: 'string',
-          description: 'The confidence level of the analysis based on data provided.',
-          enum: ['Low', 'Medium', 'High']
-        }
-      },
-      required: ['analysis', 'tip', 'confidence'],
-    },
-  }
-];
-
+// Minimal, dependency-free AI coach plan generator
+// Input: { shots?: Array<{ outcome?: string; distance?: number }> }
+// Output: { days: { day: number; focus: string; drills: string[]; notes?: string }[]; checkpoints: string[] }
 export async function POST(req: NextRequest) {
   try {
-    const { shotData, chatHistory = [] } = await req.json();
-
-    // Check if OpenAI is available
-    if (!openai) {
-      // Return fallback response in expected format
-      return NextResponse.json({
-        analysis: "AI coaching features are currently unavailable. Please configure OpenAI API key for full functionality.",
-        tip: "For now, focus on your fundamentals: grip, stance, alignment, and follow-through. Keep practicing and stay consistent!",
-        confidence: "Medium"
-      });
+    // Be tolerant of missing or malformed JSON bodies
+    let payload: unknown = { shots: [] }
+    const text = await req.text()
+    if (text) {
+      try { payload = JSON.parse(text) } catch {}
     }
 
-    if (!openai) {
-      return NextResponse.json({ 
-        analysis: 'OpenAI API not configured. Using fallback coaching.',
-        tip: "Play bold! Keep practicing those fundamentals and remember - it's all about grip, stance, and follow-through. Say Uncle!",
-        confidence: "Medium"
-      }, { status: 200 });
+    const p = (payload as { shots?: Array<{ outcome?: string; distance?: number }> } | undefined)
+    const shots: Array<{ outcome?: string; distance?: number }> = Array.isArray(p?.shots)
+      ? p!.shots as Array<{ outcome?: string; distance?: number }>
+      : []
+
+    // Compute simple stats
+    const avg = shots.length
+      ? Math.round(shots.reduce((a, s) => a + (s.distance || 0), 0) / shots.length)
+      : 180
+
+    // Determine common miss pattern
+    const missCounts: Record<string, number> = {}
+    for (const s of shots) {
+      const outcome = (s.outcome || 'straight').toLowerCase()
+      missCounts[outcome] = (missCounts[outcome] || 0) + 1
+    }
+    let commonMiss: string = 'straight'
+    let max = -1
+    for (const [k, v] of Object.entries(missCounts)) {
+      if (v > max) { commonMiss = k; max = v }
     }
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [
-        {
-          role: "system",
-          content: `You are Uncle Joe Sanders, the neighborhood golf pro and Stones Golf legend. Your coaching is bold, authentic, and full of personality—think streetwise Augusta wisdom, family encouragement, and golf slang. Use phrases like "Play bold!", "Reverse time!", "Let that club dance!", "Say Uncle!" and reference Stones Golf culture. Give technical swing analysis, but always add a dose of Joe's humor, encouragement, and real talk. Assume the player is an amateur, but treat them like family. Focus on fundamentals: grip, stance, alignment, swing path, tempo, and follow-through. Be honest, but always uplifting. End every tip with a signature Joe-ism or motivational line.`
-        },
-        ...chatHistory,
-        {
-          role: "user",
-          content: `Analyze this shot: Club: ${shotData.club_used || shotData.club}, Outcome: ${shotData.outcome}, Distance: ${shotData.distance} yards.`
-        }
-      ],
-      functions: functions,
-      function_call: { name: 'analyze_swing' },
-      max_tokens: 300,
-    });
+    const focus = commonMiss === 'slice'
+      ? 'Fix the slice'
+      : commonMiss === 'hook'
+      ? 'Control the hook'
+      : 'Consistency and distance'
 
-    const functionCall = response.choices[0].message.function_call;
-    if (functionCall && functionCall.name === 'analyze_swing') {
-      const args = JSON.parse(functionCall.arguments);
-      return NextResponse.json(args);
-    }
+    const drillsBase = focus.includes('slice')
+      ? ['Strengthen grip slightly', 'Outside-in to neutral path drill', 'Alignment stick checkpoint']
+      : focus.includes('hook')
+      ? ['Weaken grip slightly', 'Neutral to inside path drill', 'Tempo 3:1 metronome']
+      : ['Centered strike ladder', 'Tempo 3:1 metronome', 'Distance gapping (7 balls)']
 
-    return NextResponse.json({ error: 'No analysis generated' }, { status: 500 });
+    const days = Array.from({ length: 14 }).map((_, i) => ({
+      day: i + 1,
+      focus,
+      drills: drillsBase,
+      notes: i % 3 === 0 ? `Target avg distance ${avg + Math.round(i / 3) * 2} yd` : undefined,
+    }))
 
-  } catch (error) {
-    console.error('AI Coach API Error:', error);
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ days, checkpoints: ['Day 7 check-in', 'Day 14 assessment'] })
+  } catch {
+    return NextResponse.json({ error: 'Failed to build plan' }, { status: 500 })
   }
 }

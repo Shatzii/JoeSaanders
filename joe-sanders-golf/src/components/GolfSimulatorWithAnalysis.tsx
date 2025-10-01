@@ -24,9 +24,10 @@ interface SwingAnalysis {
 
 interface GolfSimulatorWithAnalysisProps {
   disabled?: boolean;
+  onShotTakenExternal?: (shot: any) => void;
 }
 
-export default function GolfSimulatorWithAnalysis({ disabled = false }: GolfSimulatorWithAnalysisProps) {
+export default function GolfSimulatorWithAnalysis({ disabled = false, onShotTakenExternal }: GolfSimulatorWithAnalysisProps) {
   const [activeTab, setActiveTab] = useState<'simulator' | 'analysis' | 'performance' | 'predictive' | 'learning' | 'tournaments' | 'social' | 'multiplayer' | 'analytics' | 'mobile'>('simulator');
   const [swingHistory, setSwingHistory] = useState<SwingAnalysis[]>([]);
   const [shotHistory, setShotHistory] = useState<any[]>([]);
@@ -37,6 +38,9 @@ export default function GolfSimulatorWithAnalysis({ disabled = false }: GolfSimu
 
   const handleShotTaken = (shotData: any) => {
     setShotHistory(prev => [shotData, ...prev.slice(0, 19)]); // Keep last 20 shots
+    if (typeof onShotTakenExternal === 'function') {
+      try { onShotTakenExternal(shotData) } catch {}
+    }
   };
 
   const tabs = [

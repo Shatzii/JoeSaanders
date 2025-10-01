@@ -2,6 +2,7 @@ import Link from 'next/link'
 // Next/Image not needed here; using SponsorLogo abstraction
 import SponsorLogo from '@/components/SponsorLogo'
 import { Target, Volume2, TrendingUp, Users, Star, Play, CheckCircle } from 'lucide-react'
+import TutorInteractiveWrapper from '@/components/TutorInteractiveWrapper'
 
 export const metadata = {
   title: 'AI Golf Tutor - Uncle Joe\'s Revolutionary Golf Coaching',
@@ -418,6 +419,17 @@ export default function AIGolfTutorPage() {
               No sign-up required • 5 free shots • Instant feedback
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* Interactive Demo Section */}
+      <section className="py-16 bg-joe-black/60 border-t border-joe-gold/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-joe-heading font-bold text-joe-gold">Interactive Demo</h2>
+            <p className="text-joe-white/80 mt-2">Try the embedded simulator, capture swings, and generate your 2-week plan.</p>
+          </div>
+          <TutorInteractiveWrapper />
         </div>
       </section>
     </div>

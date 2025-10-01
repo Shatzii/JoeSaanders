@@ -9,7 +9,7 @@ interface PerformanceMetricsProps {
     bestShot: number;
     accuracy: number;
   };
-  shots: any[];
+  shots: { distance: number }[];
 }
 
 export function PerformanceMetrics({ stats, shots }: PerformanceMetricsProps) {

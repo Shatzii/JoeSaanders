@@ -49,6 +49,9 @@ export default function Header() {
             <Link href="/ai-golf-tutor" className="nav-link">
               AI Golf Tutor
             </Link>
+            <Link href="/lessons" className="nav-link">
+              Lessons
+            </Link>
             <Link href="/simulator" className="nav-link">
               Golf Simulator
             </Link>
@@ -113,6 +116,13 @@ export default function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 AI Golf Tutor
+              </Link>
+              <Link
+                href="/lessons"
+                className="block px-3 py-3 text-joe-white hover:text-joe-gold hover:bg-joe-gold/10 transition-all duration-300 rounded-lg font-joe-accent font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Lessons
               </Link>
               <Link
                 href="/simulator"
