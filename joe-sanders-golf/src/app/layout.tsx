@@ -60,7 +60,7 @@ export default function RootLayout({
         {/* Favicons */}
   <link rel="icon" href="/UnkJoeLogo.png" sizes="32x32" type="image/png" />
   <link rel="icon" href="/UnkJoeLogo.png" sizes="16x16" type="image/png" />
-  <link rel="apple-touch-icon" href="/UnkJoeLogo.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/UnkJoeLogo.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="min-h-screen flex flex-col bg-joe-black text-joe-white font-joe-body flower-of-life-bg">

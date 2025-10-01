@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Target, Volume2, TrendingUp, Users, Star, Play, CheckCircle } from 'lucide-react'
 
 export const metadata = {
@@ -65,23 +66,26 @@ export default function AIGolfTutorPage() {
             </div>
             
             <div className="relative">
-              <div className="bg-gradient-to-br from-joe-gold/20 to-joe-gold/5 rounded-2xl p-8 border border-joe-gold/30">
-                <div className="text-center">
-                  <div className="text-4xl font-joe-heading font-bold text-joe-gold mb-4">Uncle Joe Golf Pro</div>
-                  <h3 className="text-2xl font-joe-heading font-bold text-joe-gold mb-4">AI-Powered Coaching</h3>
-                  <p className="text-joe-white/80 mb-6">
-                    Advanced machine learning analyzes your swing and provides instant, personalized feedback
-                  </p>
-                  <div className="grid grid-cols-2 gap-4 text-center">
-                    <div className="bg-joe-black/50 rounded-lg p-4">
-                      <div className="text-2xl font-bold text-joe-gold">GPT-4</div>
-                      <div className="text-sm text-joe-white/70">AI Brain</div>
-                    </div>
-                    <div className="bg-joe-black/50 rounded-lg p-4">
-                      <div className="text-2xl font-bold text-joe-gold">Voice</div>
-                      <div className="text-sm text-joe-white/70">ElevenLabs</div>
-                    </div>
-                  </div>
+              <div className="bg-gradient-to-br from-joe-gold/20 to-joe-gold/5 rounded-2xl p-2 sm:p-4 border border-joe-gold/30 flex items-center justify-center">
+                <Image
+                  src="/images/uncle-joe-cartoon.png"
+                  alt="Uncle Joe Cartoon"
+                  width={768}
+                  height={1152}
+                  className="rounded-xl object-contain max-h-[520px] w-auto"
+                  priority
+                />
+              </div>
+
+              {/* Info overlay panel below the image for key tech labels */}
+              <div className="mt-4 grid grid-cols-2 gap-4 text-center">
+                <div className="bg-joe-black/50 rounded-lg p-4 border border-joe-gold/20">
+                  <div className="text-2xl font-bold text-joe-gold">GPT-4</div>
+                  <div className="text-sm text-joe-white/70">AI Brain</div>
+                </div>
+                <div className="bg-joe-black/50 rounded-lg p-4 border border-joe-gold/20">
+                  <div className="text-2xl font-bold text-joe-gold">Voice</div>
+                  <div className="text-sm text-joe-white/70">ElevenLabs</div>
                 </div>
               </div>
             </div>
