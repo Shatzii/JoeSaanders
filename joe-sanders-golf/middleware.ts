@@ -88,6 +88,9 @@ export async function middleware(request: NextRequest) {
              request.headers.get('cf-connecting-ip') ||
              'unknown'
 
+  // Allow auth bypass in local dev when explicitly enabled
+  const DEV_BYPASS = process.env.NODE_ENV !== 'production' && process.env.DEV_BYPASS_AUTH === 'true'
+
   // Rate limiting
   if (isRateLimited(ip)) {
     return new NextResponse('Too Many Requests', {
@@ -108,6 +111,11 @@ export async function middleware(request: NextRequest) {
 
   // Enhanced admin route protection
   if (pathname.startsWith('/admin')) {
+    if (DEV_BYPASS) {
+      // Skip admin auth entirely in local development when bypass flag is set
+      const resp = NextResponse.next()
+      return resp
+    }
     // Require admin role cookie set by Auth0 callback
     const role = request.cookies.get('role')?.value
     if (role !== 'admin') {

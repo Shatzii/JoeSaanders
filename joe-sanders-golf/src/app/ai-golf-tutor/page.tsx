@@ -68,7 +68,7 @@ export default function AIGolfTutorPage() {
             <div className="relative">
               <div className="bg-gradient-to-br from-joe-gold/20 to-joe-gold/5 rounded-2xl p-2 sm:p-4 border border-joe-gold/30 flex items-center justify-center">
                 <Image
-                  src="/images/uncle-joe-cartoon.png"
+                  src="/images/JoeCartoon.png"
                   alt="Uncle Joe Cartoon"
                   width={768}
                   height={1152}
