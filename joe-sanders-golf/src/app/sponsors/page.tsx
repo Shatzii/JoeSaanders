@@ -55,11 +55,23 @@ async function getSupabaseSponsors(): Promise<Sponsor[]> {
 function mergeSponsors(primary: Sponsor[], fallback: Sponsor[]): Sponsor[] {
   const byKey = new Map<string, Sponsor>()
   const key = (s: Sponsor) => (s.name || s.id).toLowerCase().trim()
-  primary.forEach(s => byKey.set(key(s), s))
-  fallback.forEach(s => {
+
+  // Start with fallback values
+  fallback.forEach(s => byKey.set(key(s), { ...s }))
+
+  // Overlay primary; if fields are missing in primary, keep fallback values
+  primary.forEach(s => {
     const k = key(s)
-    if (!byKey.has(k)) byKey.set(k, s)
+    const base = (byKey.get(k) || {}) as Partial<Sponsor>
+    byKey.set(k, {
+      id: s.id || base.id || s.name,
+      name: s.name || base.name || String(s.id || ''),
+      logo_url: s.logo_url || base.logo_url || '',
+      tier: s.tier || base.tier,
+      website_url: s.website_url || base.website_url,
+    })
   })
+
   return Array.from(byKey.values())
 }
 
