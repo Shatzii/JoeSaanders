@@ -1,4 +1,5 @@
-import Image from 'next/image'
+// Removed Image import; using SponsorLogo component instead
+import SponsorLogo from '@/components/SponsorLogo'
 import Link from 'next/link'
 import path from 'path'
 import fs from 'fs'
@@ -102,7 +103,14 @@ export default async function SponsorsPage() {
                   {s.website_url ? (
                     <a href={s.website_url} target="_blank" rel="noopener noreferrer" className="block text-center">
                       {s.logo_url ? (
-                        <Image src={s.logo_url} alt={`${s.name} Logo`} width={220} height={120} className="object-contain max-h-20 w-auto mx-auto" />
+                        <SponsorLogo
+                          src={s.logo_url}
+                          fallbackSrc={s.logo_url.endsWith('.png') ? s.logo_url.replace('.png', '.svg') : s.logo_url.replace('.svg', '.png')}
+                          alt={`${s.name} Logo`}
+                          width={220}
+                          height={120}
+                          className="object-contain max-h-20 w-auto mx-auto"
+                        />
                       ) : (
                         <div className="text-joe-white font-joe-accent">{s.name}</div>
                       )}
@@ -113,7 +121,14 @@ export default async function SponsorsPage() {
                   ) : (
                     <div className="text-center">
                       {s.logo_url ? (
-                        <Image src={s.logo_url} alt={`${s.name} Logo`} width={220} height={120} className="object-contain max-h-20 w-auto mx-auto" />
+                        <SponsorLogo
+                          src={s.logo_url}
+                          fallbackSrc={s.logo_url.endsWith('.png') ? s.logo_url.replace('.png', '.svg') : s.logo_url.replace('.svg', '.png')}
+                          alt={`${s.name} Logo`}
+                          width={220}
+                          height={120}
+                          className="object-contain max-h-20 w-auto mx-auto"
+                        />
                       ) : (
                         <div className="text-joe-white font-joe-accent">{s.name}</div>
                       )}

@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import Image from 'next/image'
+// Next/Image not needed here; using SponsorLogo abstraction
+import SponsorLogo from '@/components/SponsorLogo'
 import { Target, Volume2, TrendingUp, Users, Star, Play, CheckCircle } from 'lucide-react'
 
 export const metadata = {
@@ -67,13 +68,13 @@ export default function AIGolfTutorPage() {
             
             <div className="relative">
               <div className="bg-gradient-to-br from-joe-gold/20 to-joe-gold/5 rounded-2xl p-2 sm:p-4 border border-joe-gold/30 flex items-center justify-center">
-                <Image
-                  src="/images/JoeCartoon.png"
+                <SponsorLogo
+                  src="/images/uncle-joe-cartoon.png"
+                  fallbackSrc="/images/JoeCartoon.png"
                   alt="Uncle Joe Cartoon"
                   width={768}
                   height={1152}
                   className="rounded-xl object-contain max-h-[520px] w-auto"
-                  priority
                 />
               </div>
 
