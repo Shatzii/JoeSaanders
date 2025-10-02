@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 // Using local fonts to avoid external dependency issues
 // import { Inter, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
+import 'leaflet/dist/leaflet.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { SessionProvider } from 'next-auth/react'

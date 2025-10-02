@@ -1,5 +1,6 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { MapContainer, TileLayer, Circle, CircleMarker, Popup, useMap } from 'react-leaflet';
 
 interface GolfCourse {
   id: string;
@@ -26,7 +27,7 @@ export default function GPSCourseMapper() {
   const [watchId, setWatchId] = useState<number | null>(null);
 
   // Sample golf courses data (in real app, this would come from API)
-  const sampleCourses: GolfCourse[] = [
+  const sampleCourses: GolfCourse[] = useMemo(() => ([
     {
       id: '1',
       name: 'Pebble Beach Golf Links',
@@ -63,11 +64,20 @@ export default function GPSCourseMapper() {
       rating: 3.8,
       difficulty: 'Medium'
     }
-  ];
+  ]), []);
 
   useEffect(() => {
     setCourses(sampleCourses);
-  }, []);
+  }, [sampleCourses]);
+
+  // Helper component to imperatively change map center when selection changes
+  function ChangeView({ center }: { center: [number, number] }) {
+    const map = useMap();
+    useEffect(() => {
+      map.setView(center, map.getZoom(), { animate: true });
+    }, [center, map]);
+    return null;
+  }
 
   // Get current GPS location
   const getCurrentLocation = () => {
@@ -170,6 +180,12 @@ export default function GPSCourseMapper() {
 
   const nearestCourses = findNearestCourses();
 
+  const mapCenter: [number, number] = useMemo(() => {
+    if (selectedCourse) return selectedCourse.location;
+    if (userLocation) return [userLocation.latitude, userLocation.longitude];
+    return sampleCourses[0].location; // sensible default
+  }, [selectedCourse, userLocation, sampleCourses]);
+
   return (
     <div className="w-full h-screen bg-gradient-to-br from-blue-800 via-blue-600 to-blue-800 text-white">
       <div className="container mx-auto px-4 py-8">
@@ -222,14 +238,75 @@ export default function GPSCourseMapper() {
           {/* Interactive Map */}
           <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl">
             <h2 className="text-2xl font-bold mb-4">Course Map</h2>
-            <div className="h-96 bg-gray-800 rounded-lg flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-6xl mb-4">🗺️</div>
-                <p className="text-white/60">Interactive Golf Course Map</p>
-                <p className="text-sm text-white/40 mt-2">
-                  Map integration would go here with Leaflet
-                </p>
-              </div>
+            <div className="h-96 rounded-lg overflow-hidden">
+              <MapContainer
+                {...({ center: mapCenter } as any)}
+                {...({ zoom: 12 } as any)}
+                {...({ scrollWheelZoom: true } as any)}
+                style={{ height: '100%', width: '100%' }}
+              >
+                <ChangeView center={mapCenter} />
+                <TileLayer
+                  {...({ attribution: '© OpenStreetMap contributors' } as any)}
+                  {...({ url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' } as any)}
+                />
+
+                {/* User Location + accuracy circle */}
+                {userLocation && (
+                  <>
+                    <Circle
+                      {...({ center: [userLocation.latitude, userLocation.longitude] } as any)}
+                      {...({ radius: Math.max(10, userLocation.accuracy) } as any)}
+                      {...({ pathOptions: { color: '#60a5fa', fillColor: '#3b82f6', fillOpacity: 0.2 } } as any)}
+                    />
+                    <CircleMarker
+                      {...({ center: [userLocation.latitude, userLocation.longitude] } as any)}
+                      {...({ radius: 6 } as any)}
+                      {...({ pathOptions: { color: '#2563eb', fillColor: '#93c5fd', fillOpacity: 1 } } as any)}
+                    >
+                      <Popup>
+                        <div className="text-sm">
+                          <div className="font-semibold">You are here</div>
+                          <div>Accuracy: ±{userLocation.accuracy.toFixed(0)}m</div>
+                        </div>
+                      </Popup>
+                    </CircleMarker>
+                  </>
+                )}
+
+                {/* Course markers */}
+                {courses.map((course) => (
+                  <CircleMarker
+                    key={course.id}
+                    {...({ center: course.location } as any)}
+                    {...({ radius: 8 } as any)}
+                    {...({ eventHandlers: { click: () => setSelectedCourse(course) } } as any)}
+                    {...({ pathOptions: {
+                      color: selectedCourse?.id === course.id ? '#d97706' : '#d4af37',
+                      fillColor: selectedCourse?.id === course.id ? '#f59e0b' : '#eab308',
+                      fillOpacity: 0.8,
+                    } } as any)}
+                  >
+                    <Popup>
+                      <div className="text-sm">
+                        <div className="font-semibold">{course.name}</div>
+                        <div>Par {course.par} • {course.holes} holes</div>
+                        <div className="text-xs text-gray-600">{course.difficulty} • ⭐ {course.rating}</div>
+                        {userLocation && (
+                          <div className="mt-1 text-xs">
+                            {calculateDistance(
+                              userLocation.latitude,
+                              userLocation.longitude,
+                              course.location[0],
+                              course.location[1]
+                            ).toFixed(1)} km away
+                          </div>
+                        )}
+                      </div>
+                    </Popup>
+                  </CircleMarker>
+                ))}
+              </MapContainer>
             </div>
           </div>
 
