@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 
 export default function AuthPage() {
@@ -15,6 +17,8 @@ export default function AuthPage() {
     lastName: ''
   });
 
+  const router = useRouter();
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -22,11 +26,28 @@ export default function AuthPage() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // For now, just redirect to simulator with demo mode
-    // In a real app, this would handle authentication
-    window.location.href = '/simulator?demo=true';
+
+    try {
+      const result = await signIn('auth0', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        console.error('Authentication error:', result.error);
+        // Handle error (could add error state here)
+      } else if (result?.url) {
+        router.push(result.url);
+      } else {
+        // Successful sign in, redirect to home or intended page
+        router.push('/');
+      }
+    } catch (error) {
+      console.error('Sign in error:', error);
+    }
   };
 
   return (

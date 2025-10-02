@@ -1,47 +1,33 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useSession, signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { CheckCircle, AlertTriangle, Video, MessageCircle, DollarSign, Heart, TrendingUp } from 'lucide-react'
 
 export default function FanClubPage() {
-  const [user, setUser] = useState<any>(null)
+  const { data: session, status } = useSession()
   const [isFanClubMember, setIsFanClubMember] = useState(false)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
-    checkUser()
-  }, [])
+    if (status === 'loading') return
 
-  const checkUser = async () => {
-    if (!supabase) {
-      setLoading(false)
-      return
-    }
-
-    const { data: { user } } = await supabase.auth.getUser()
-    setUser(user)
-
-    if (user) {
-      // Check if user is a fan club member
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('is_fan_club_member')
-        .eq('id', user.id)
-        .single()
-
-      setIsFanClubMember(profile?.is_fan_club_member || false)
+    if (session?.user) {
+      // Check if user is a fan club member (you can implement this with your backend)
+      // For now, we'll check localStorage or a simple flag
+      const memberStatus = localStorage.getItem(`fanClub_${session.user.id}`)
+      setIsFanClubMember(memberStatus === 'true')
     }
 
     setLoading(false)
-  }
+  }, [session, status])
 
   const handleSubscribe = async () => {
-    if (!user) {
-      // Redirect to auth or show login modal
-      router.push('/auth')
+    if (!session?.user) {
+      // Redirect to auth
+      signIn('auth0')
       return
     }
 
@@ -51,7 +37,7 @@ export default function FanClubPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId: user.id }),
+        body: JSON.stringify({ userId: session.user.id }),
       })
 
       if (response.ok) {
@@ -89,7 +75,7 @@ export default function FanClubPage() {
       </section>
 
       {/* Membership Status */}
-      {user && (
+      {session?.user && (
         <section className="py-8 bg-joe-stone border-b border-joe-gold/20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
@@ -207,7 +193,7 @@ export default function FanClubPage() {
               <p className="text-joe-stone font-joe-body">Cancel anytime • No long-term commitment</p>
             </div>
 
-            {user ? (
+            {session?.user ? (
               isFanClubMember ? (
                 <div className="bg-joe-gold/10 border border-joe-gold/30 rounded-lg p-4">
                   <p className="text-joe-gold font-joe-accent font-medium">You&apos;re already a Fan Club member!</p>
@@ -243,7 +229,7 @@ export default function FanClubPage() {
           <p className="text-xl mb-8 text-joe-stone font-joe-body">
             Your support helps make PGA Tour dreams a reality. Join the community today.
           </p>
-          {!user && (
+          {!session?.user && (
             <button
               onClick={() => router.push('/auth')}
               className="merch-button px-8 py-3 rounded-lg font-joe-accent font-bold text-lg"

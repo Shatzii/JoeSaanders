@@ -117,7 +117,7 @@ export default async function SponsorsPage() {
                       {s.logo_url ? (
                         <SponsorLogo
                           src={s.logo_url}
-                          fallbackSrc={s.logo_url.endsWith('.png') ? s.logo_url.replace('.png', '.svg') : s.logo_url.replace('.svg', '.png')}
+                          fallbackSrc={s.logo_url.endsWith('.webp') ? s.logo_url.replace('.webp', '.svg') : s.logo_url.replace('.svg', '.webp')}
                           alt={`${s.name} Logo`}
                           width={220}
                           height={120}

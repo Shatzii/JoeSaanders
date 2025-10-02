@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic'
 import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { SessionProvider } from 'next-auth/react'
 
 // Lazy load heavy components
 const CookieConsent = dynamic(() => import('@/components/CookieConsent'), {
@@ -75,9 +76,11 @@ export default function RootLayout({
         <MobileAppBridge enabled={true} />
 
         <Header />
-        <main id="main-content" className="flex-grow" role="main" tabIndex={-1}>
-          {children}
-        </main>
+        <SessionProvider>
+          <main id="main-content" className="flex-grow" role="main" tabIndex={-1}>
+            {children}
+          </main>
+        </SessionProvider>
         <Footer />
 
         <CookieConsent />

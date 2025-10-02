@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { auth } from './auth'
 
 // Rate limiting store (in production, use Redis or similar)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>()
@@ -116,11 +117,15 @@ export async function middleware(request: NextRequest) {
       const resp = NextResponse.next()
       return resp
     }
-    // Require admin role cookie set by Auth0 callback
-    const role = request.cookies.get('role')?.value
-    if (role !== 'admin') {
+
+    // Use NextAuth to validate session
+    const session = await auth()
+    if (!session) {
       return NextResponse.redirect(new URL('/auth', request.url))
     }
+
+    // Optional: Add role-based checks here if needed
+    // For example: if (session.user.role !== 'admin') { ... }
   }
 
   // API route protection

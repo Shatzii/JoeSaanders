@@ -137,7 +137,7 @@
     {
       "id": "4",
       "name": "BAM Family Law",
-      "logo_url": "/images/BAM-FullLogo.png",
+      "logo_url": "/images/BAM-FullLogo.webp",
       "tier": "Official",
       "website_url": "https://bamfamilylaw.com",
       "created_at": "2025-09-30T00:00:00Z",
@@ -147,7 +147,7 @@
     {
       "id": "5",
       "name": "Sunshine Enterprises, LLC",
-  "logo_url": "/images/sponsor-sunshine.png",
+      "logo_url": "/images/Sunshine.webp",
       "tier": "Silver",
       "website_url": "https://example.com",
       "created_at": "2025-10-01T00:00:00Z",
