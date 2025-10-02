@@ -14,13 +14,19 @@ export default function Header() {
         <div className="flex justify-between h-20">
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-3 group">
-              <Image
-                src="/UnkJoeLogo.png"
-                alt="Uncle Joe Golf Logo"
-                width={48}
-                height={48}
-                className="logo"
-              />
+              {/* Prefer modern WebP asset with PNG fallback in the same path */}
+              <picture>
+                <source srcSet="/images/UnkJoeLogo.avif" type="image/avif" />
+                <source srcSet="/images/UnkJoeLogo.webp" type="image/webp" />
+                <Image
+                  src="/images/UnkJoeLogo.png"
+                  alt="Uncle Joe Golf Logo"
+                  width={48}
+                  height={48}
+                  className="logo"
+                  priority
+                />
+              </picture>
               <div className="flex flex-col">
                 <span className="text-2xl font-joe-heading font-semibold gradient-text group-hover:scale-105 transition-transform duration-300">
                   Uncle Joe
@@ -54,6 +60,21 @@ export default function Header() {
             </Link>
             <Link href="/simulator" className="nav-link">
               Golf Simulator
+            </Link>
+            <Link href="/puttquest" className="nav-link">
+              PuttQuest
+            </Link>
+            <Link href="/advanced-puttquest" className="nav-link">
+              Advanced PuttQuest
+            </Link>
+            <Link href="/gps-courses" className="nav-link">
+              GPS Courses
+            </Link>
+            <Link href="/live-streaming" className="nav-link">
+              Live Streaming
+            </Link>
+            <Link href="/progression" className="nav-link">
+              Progression
             </Link>
             <Link href="/contact" className="nav-link">
               Contact
@@ -130,6 +151,41 @@ export default function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Golf Simulator
+              </Link>
+              <Link
+                href="/puttquest"
+                className="block px-3 py-3 text-joe-white hover:text-joe-gold hover:bg-joe-gold/10 transition-all duration-300 rounded-lg font-joe-accent font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                PuttQuest
+              </Link>
+              <Link
+                href="/advanced-puttquest"
+                className="block px-3 py-3 text-joe-white hover:text-joe-gold hover:bg-joe-gold/10 transition-all duration-300 rounded-lg font-joe-accent font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Advanced PuttQuest
+              </Link>
+              <Link
+                href="/gps-courses"
+                className="block px-3 py-3 text-joe-white hover:text-joe-gold hover:bg-joe-gold/10 transition-all duration-300 rounded-lg font-joe-accent font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                GPS Courses
+              </Link>
+              <Link
+                href="/live-streaming"
+                className="block px-3 py-3 text-joe-white hover:text-joe-gold hover:bg-joe-gold/10 transition-all duration-300 rounded-lg font-joe-accent font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Live Streaming
+              </Link>
+              <Link
+                href="/progression"
+                className="block px-3 py-3 text-joe-white hover:text-joe-gold hover:bg-joe-gold/10 transition-all duration-300 rounded-lg font-joe-accent font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Progression
               </Link>
               <Link
                 href="/contact"

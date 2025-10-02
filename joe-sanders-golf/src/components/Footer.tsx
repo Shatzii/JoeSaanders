@@ -44,13 +44,17 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
-              <Image
-                src="/UnkJoeLogo.png"
-                alt="Uncle Joe Golf Logo"
-                width={48}
-                height={48}
-                className="brightness-0 invert opacity-90"
-              />
+              <picture>
+                <source srcSet="/images/UnkJoeLogo.avif" type="image/avif" />
+                <source srcSet="/images/UnkJoeLogo.webp" type="image/webp" />
+                <Image
+                  src="/images/UnkJoeLogo.png"
+                  alt="Uncle Joe Golf Logo"
+                  width={40}
+                  height={40}
+                  className="rounded"
+                />
+              </picture>
               <div>
                 <h3 className="text-2xl font-joe-heading font-semibold text-joe-gold">Uncle Joes Golf</h3>
                 <p className="text-sm text-joe-stone font-joe-accent">Stones Golf Professional</p>

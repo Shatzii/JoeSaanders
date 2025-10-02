@@ -11,7 +11,7 @@ export async function GET(_request: NextRequest) {
     id: 'user-123',
     name: 'Admin User',
     email: 'admin@unclejoesgolf.com',
-    picture: '/UnkJoeLogo.png'
+  picture: '/images/UnkJoeLogo.png'
   }
 
   return NextResponse.json({ user: mockUser })

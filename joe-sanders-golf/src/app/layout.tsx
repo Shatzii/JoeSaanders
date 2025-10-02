@@ -58,10 +58,18 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#d4af37" />
+        {/* Social previews */}
+        <meta property="og:image" content="/images/UnkJoeLogo.png" />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="512" />
+        <meta property="og:image:height" content="512" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content="/images/UnkJoeLogo.png" />
         {/* Favicons */}
-  <link rel="icon" href="/UnkJoeLogo.png" sizes="32x32" type="image/png" />
-  <link rel="icon" href="/UnkJoeLogo.png" sizes="16x16" type="image/png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/UnkJoeLogo.png" />
+  {/* Prefer webp where supported with PNG fallback via multiple link tags */}
+  <link rel="icon" href="/images/UnkJoeLogo.png" sizes="32x32" type="image/png" />
+  <link rel="icon" href="/images/UnkJoeLogo.png" sizes="16x16" type="image/png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/UnkJoeLogo.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="min-h-screen flex flex-col bg-joe-black text-joe-white font-joe-body flower-of-life-bg">
