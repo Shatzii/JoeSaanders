@@ -3,6 +3,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Circle, CircleMarker, Popup, useMap } from 'react-leaflet';
 import type { LatLngExpression } from 'leaflet';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface GolfCourse {
   id: string;
@@ -23,11 +25,15 @@ interface GPSData {
 
 export default function GPSCourseMapper() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [userLocation, setUserLocation] = useState<GPSData | null>(null);
   const [courses, setCourses] = useState<GolfCourse[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
   const [isTracking, setIsTracking] = useState(false);
   const [watchId, setWatchId] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [geoError, setGeoError] = useState<string | null>(null);
+  const [lastCenter, setLastCenter] = useState<[number, number] | null>(null);
 
   // Sample golf courses data (in real app, this would come from API)
   const sampleCourses: GolfCourse[] = useMemo(() => ([
@@ -97,7 +103,31 @@ export default function GPSCourseMapper() {
           difficulty: 'Easy'
         });
       }
+      return;
     }
+    // Restore last session if present
+    try {
+      const saved = typeof window !== 'undefined' ? window.localStorage.getItem('gps:lastSelection') : null;
+      if (saved) {
+        const parsed = JSON.parse(saved) as { id?: string; name?: string; location?: [number, number] };
+        if (parsed?.location) {
+          setSelectedCourse({
+            id: parsed.id || 'last',
+            name: parsed.name || 'Last Location',
+            location: parsed.location,
+            par: 0,
+            holes: 0,
+            rating: 0,
+            difficulty: 'Easy',
+          });
+        }
+      }
+      const savedCenter = typeof window !== 'undefined' ? window.localStorage.getItem('gps:lastCenter') : null;
+      if (savedCenter) {
+        const parsed = JSON.parse(savedCenter) as { center: [number, number] };
+        if (parsed?.center) setLastCenter(parsed.center);
+      }
+    } catch {}
   }, [searchParams, sampleCourses]);
 
   // Helper component to imperatively change map center when selection changes
@@ -112,7 +142,7 @@ export default function GPSCourseMapper() {
   // Get current GPS location
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by this browser');
+      setGeoError('Geolocation is not supported by this browser.');
       return;
     }
 
@@ -125,10 +155,19 @@ export default function GPSCourseMapper() {
           timestamp: position.timestamp
         };
         setUserLocation(gpsData);
+        setGeoError(null);
       },
       (error) => {
         console.error('Error getting location:', error);
-        alert('Unable to get your location. Please check permissions.');
+        if (error.code === error.PERMISSION_DENIED) {
+          setGeoError('Location permission denied. Enable it in your browser settings to find nearby courses.');
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          setGeoError('Location information is unavailable right now.');
+        } else if (error.code === error.TIMEOUT) {
+          setGeoError('Timed out getting your location. Try again.');
+        } else {
+          setGeoError('Unable to get your location.');
+        }
       },
       {
         enableHighAccuracy: true,
@@ -154,9 +193,11 @@ export default function GPSCourseMapper() {
           timestamp: position.timestamp
         };
         setUserLocation(gpsData);
+        setGeoError(null);
       },
       (error) => {
         console.error('GPS tracking error:', error);
+        setGeoError('GPS tracking error. You can retry or stop tracking.');
       },
       {
         enableHighAccuracy: true,
@@ -213,8 +254,62 @@ export default function GPSCourseMapper() {
   const mapCenter: LatLngExpression = useMemo(() => {
     if (selectedCourse) return selectedCourse.location;
     if (userLocation) return [userLocation.latitude, userLocation.longitude];
+    if (lastCenter) return lastCenter;
     return sampleCourses[0].location; // sensible default
-  }, [selectedCourse, userLocation, sampleCourses]);
+  }, [selectedCourse, userLocation, sampleCourses, lastCenter]);
+
+  // Filter courses by search query
+  const filteredCourses = useMemo(() => {
+    if (!searchQuery) return courses;
+    const q = searchQuery.toLowerCase();
+    return courses.filter(c => c.name.toLowerCase().includes(q));
+  }, [courses, searchQuery]);
+
+  // Persist selection and center
+  useEffect(() => {
+    try {
+      if (selectedCourse) {
+        const payload = { id: selectedCourse.id, name: selectedCourse.name, location: selectedCourse.location };
+        window.localStorage.setItem('gps:lastSelection', JSON.stringify(payload));
+      }
+      if (Array.isArray(mapCenter)) {
+        window.localStorage.setItem('gps:lastCenter', JSON.stringify({ center: mapCenter }));
+      }
+    } catch {}
+  }, [selectedCourse, mapCenter]);
+
+  // Share current selection/location via link
+  const handleShareLink = async () => {
+    let url = '/gps-courses';
+    if (selectedCourse) {
+      const known = courses.find(c => c.id === selectedCourse.id);
+      if (known) {
+        url += `?courseId=${encodeURIComponent(selectedCourse.id)}`;
+      } else if (selectedCourse.location) {
+        const [lat, lng] = selectedCourse.location;
+        url += `?lat=${lat}&lng=${lng}`;
+      }
+    } else if (userLocation) {
+      url += `?lat=${userLocation.latitude}&lng=${userLocation.longitude}`;
+    }
+    try {
+      const full = typeof window !== 'undefined' ? window.location.origin + url : url;
+      await navigator.clipboard.writeText(full);
+      alert('Link copied to clipboard!');
+    } catch {
+      // Fallback
+      const full = typeof window !== 'undefined' ? window.location.origin + url : url;
+      prompt('Copy this link:', full);
+    }
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (filteredCourses.length > 0) {
+      const first = filteredCourses[0];
+      setSelectedCourse(first);
+    }
+  };
 
   return (
     <div className="w-full h-screen bg-gradient-to-br from-blue-800 via-blue-600 to-blue-800 text-white">
@@ -230,6 +325,25 @@ export default function GPSCourseMapper() {
 
         {/* GPS Controls */}
         <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl max-w-2xl mx-auto mb-8">
+          {geoError && (
+            <div className="mb-4 p-3 rounded-md bg-red-600/20 border border-red-600/40 text-red-200 text-sm">
+              {geoError}
+            </div>
+          )}
+          <form onSubmit={handleSearchSubmit} className="flex flex-wrap gap-3 justify-center mb-4">
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search courses..."
+              className="min-w-[200px] flex-1 max-w-xs bg-white/20 text-white placeholder-white/70 px-3 py-2 rounded-md border border-white/20 focus:outline-none focus:border-white/40"
+            />
+            <button type="submit" className="bg-amber-500 hover:bg-amber-600 text-black font-semibold px-4 py-2 rounded-md">
+              Search
+            </button>
+            <button type="button" onClick={handleShareLink} className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold px-4 py-2 rounded-md">
+              Share Link
+            </button>
+          </form>
           <div className="flex flex-wrap gap-4 justify-center">
             <button
               onClick={getCurrentLocation}
@@ -305,7 +419,7 @@ export default function GPSCourseMapper() {
                 )}
 
                 {/* Course markers */}
-                {courses.map((course) => (
+                {filteredCourses.map((course) => (
                   <CircleMarker
                     key={course.id}
                     center={course.location as LatLngExpression}
@@ -349,7 +463,9 @@ export default function GPSCourseMapper() {
             {userLocation ? (
               <div className="space-y-4 max-h-96 overflow-y-auto">
                 {nearestCourses.length > 0 ? (
-                  nearestCourses.map(course => (
+                  nearestCourses
+                    .filter(c => !searchQuery || c.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                    .map(course => (
                     <div
                       key={course.id}
                       className={`p-4 rounded-lg cursor-pointer transition-colors ${
@@ -420,12 +536,33 @@ export default function GPSCourseMapper() {
               </div>
             </div>
 
-            <div className="mt-6 flex justify-center space-x-4">
-              <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300">
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <button
+                onClick={() => router.push(`https://www.google.com/maps?q=${selectedCourse.location[0]},${selectedCourse.location[1]}`)}
+                className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300"
+                title="Open in Google Maps"
+              >
                 🗺️ Navigate Here
               </button>
-              <button className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300">
+              <button
+                onClick={() => {
+                  const params = new URLSearchParams();
+                  params.set('courseId', selectedCourse.id);
+                  params.set('lat', String(selectedCourse.location[0]));
+                  params.set('lng', String(selectedCourse.location[1]));
+                  router.push(`/simulator?${params.toString()}`);
+                }}
+                className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300"
+                title="Open simulator with this course context"
+              >
                 🎮 Start Round
+              </button>
+              <button
+                onClick={handleShareLink}
+                className="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300"
+                title="Copy a shareable link to this course"
+              >
+                🔗 Share
               </button>
             </div>
           </div>

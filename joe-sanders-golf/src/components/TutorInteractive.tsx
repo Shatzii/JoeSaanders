@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Play, Video, MessageCircle, BookOpen, Calendar } from 'lucide-react'
 import SwingCapture from '@/components/SwingCapture'
 import { ShotHistory } from '@/components/ShotHistory'
@@ -31,6 +31,24 @@ export default function TutorInteractive() {
   const [showCaddie, setShowCaddie] = useState(false)
   const [loadingPlan, setLoadingPlan] = useState(false)
   const [plan, setPlan] = useState<PlanResponse | null>(null)
+  const [skill, setSkill] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner')
+  const [goal, setGoal] = useState<'distance' | 'accuracy' | 'consistency'>('consistency')
+
+  // Restore onboarding preferences
+  useEffect(() => {
+    try {
+      const s = window.localStorage.getItem('tutor:skill');
+      const g = window.localStorage.getItem('tutor:goal');
+      if (s === 'beginner' || s === 'intermediate' || s === 'advanced') setSkill(s)
+      if (g === 'distance' || g === 'accuracy' || g === 'consistency') setGoal(g)
+    } catch {}
+  }, [])
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('tutor:skill', skill)
+      window.localStorage.setItem('tutor:goal', goal)
+    } catch {}
+  }, [skill, goal])
 
   // Compute quick stats for PerformanceMetrics
   type Stats = { totalShots: number; averageDistance: number; bestShot: number; accuracy: number }
@@ -54,7 +72,7 @@ export default function TutorInteractive() {
   const fetchPlan = async () => {
     setLoadingPlan(true)
     try {
-      const res = await fetch('/api/ai/coach', { method: 'POST', body: JSON.stringify({ shots: shots.slice(0, 10) }) })
+      const res = await fetch('/api/ai/coach', { method: 'POST', body: JSON.stringify({ shots: shots.slice(0, 10), skill, goal }) })
       if (!res.ok) throw new Error('Failed to generate plan')
       const data: PlanResponse = await res.json()
       setPlan(data)
@@ -67,6 +85,38 @@ export default function TutorInteractive() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      {/* Onboarding Preferences */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-joe-black/30 border border-joe-gold/20 rounded-2xl p-4">
+        <div>
+          <label className="block text-sm text-joe-white/70 mb-1">Skill Level</label>
+          <select
+            value={skill}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSkill(e.target.value as 'beginner' | 'intermediate' | 'advanced')}
+            className="w-full bg-joe-stone border border-joe-gold/30 rounded-lg px-3 py-2 text-white"
+          >
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm text-joe-white/70 mb-1">Primary Goal</label>
+          <select
+            value={goal}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setGoal(e.target.value as 'distance' | 'accuracy' | 'consistency')}
+            className="w-full bg-joe-stone border border-joe-gold/30 rounded-lg px-3 py-2 text-white"
+          >
+            <option value="consistency">Consistency</option>
+            <option value="distance">Distance</option>
+            <option value="accuracy">Accuracy</option>
+          </select>
+        </div>
+        <div className="flex items-end">
+          <button onClick={fetchPlan} disabled={loadingPlan} className="w-full bg-joe-gold text-joe-black font-semibold rounded-lg px-4 py-2 hover:bg-amber-400 disabled:opacity-60">
+            {loadingPlan ? 'Generating…' : 'Update Plan'}
+          </button>
+        </div>
+      </div>
       {/* Quick actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <button
