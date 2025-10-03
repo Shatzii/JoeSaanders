@@ -1,6 +1,8 @@
 'use client';
 import React, { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Circle, CircleMarker, Popup, useMap } from 'react-leaflet';
+import type { LatLngExpression } from 'leaflet';
+import { useSearchParams } from 'next/navigation';
 
 interface GolfCourse {
   id: string;
@@ -20,6 +22,7 @@ interface GPSData {
 }
 
 export default function GPSCourseMapper() {
+  const searchParams = useSearchParams();
   const [userLocation, setUserLocation] = useState<GPSData | null>(null);
   const [courses, setCourses] = useState<GolfCourse[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
@@ -70,8 +73,35 @@ export default function GPSCourseMapper() {
     setCourses(sampleCourses);
   }, [sampleCourses]);
 
+  // Preselect course by query param (e.g., ?courseId=2) or custom lat/lng
+  useEffect(() => {
+    const id = searchParams.get('courseId');
+    const latStr = searchParams.get('lat');
+    const lngStr = searchParams.get('lng');
+    if (id) {
+      const found = sampleCourses.find(c => c.id === id);
+      if (found) setSelectedCourse(found);
+      return;
+    }
+    if (latStr && lngStr) {
+      const lat = Number(latStr);
+      const lng = Number(lngStr);
+      if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
+        setSelectedCourse({
+          id: 'custom',
+          name: 'Custom Location',
+          location: [lat, lng],
+          par: 0,
+          holes: 0,
+          rating: 0,
+          difficulty: 'Easy'
+        });
+      }
+    }
+  }, [searchParams, sampleCourses]);
+
   // Helper component to imperatively change map center when selection changes
-  function ChangeView({ center }: { center: [number, number] }) {
+  function ChangeView({ center }: { center: LatLngExpression }) {
     const map = useMap();
     useEffect(() => {
       map.setView(center, map.getZoom(), { animate: true });
@@ -180,7 +210,7 @@ export default function GPSCourseMapper() {
 
   const nearestCourses = findNearestCourses();
 
-  const mapCenter: [number, number] = useMemo(() => {
+  const mapCenter: LatLngExpression = useMemo(() => {
     if (selectedCourse) return selectedCourse.location;
     if (userLocation) return [userLocation.latitude, userLocation.longitude];
     return sampleCourses[0].location; // sensible default
@@ -240,29 +270,29 @@ export default function GPSCourseMapper() {
             <h2 className="text-2xl font-bold mb-4">Course Map</h2>
             <div className="h-96 rounded-lg overflow-hidden">
               <MapContainer
-                {...({ center: mapCenter } as any)}
-                {...({ zoom: 12 } as any)}
-                {...({ scrollWheelZoom: true } as any)}
+                center={mapCenter}
+                zoom={12}
+                scrollWheelZoom
                 style={{ height: '100%', width: '100%' }}
               >
                 <ChangeView center={mapCenter} />
                 <TileLayer
-                  {...({ attribution: '© OpenStreetMap contributors' } as any)}
-                  {...({ url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' } as any)}
+                  attribution="© OpenStreetMap contributors"
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
 
                 {/* User Location + accuracy circle */}
                 {userLocation && (
                   <>
                     <Circle
-                      {...({ center: [userLocation.latitude, userLocation.longitude] } as any)}
-                      {...({ radius: Math.max(10, userLocation.accuracy) } as any)}
-                      {...({ pathOptions: { color: '#60a5fa', fillColor: '#3b82f6', fillOpacity: 0.2 } } as any)}
+                      center={[userLocation.latitude, userLocation.longitude]}
+                      radius={Math.max(10, userLocation.accuracy)}
+                      pathOptions={{ color: '#60a5fa', fillColor: '#3b82f6', fillOpacity: 0.2 }}
                     />
                     <CircleMarker
-                      {...({ center: [userLocation.latitude, userLocation.longitude] } as any)}
-                      {...({ radius: 6 } as any)}
-                      {...({ pathOptions: { color: '#2563eb', fillColor: '#93c5fd', fillOpacity: 1 } } as any)}
+                      center={[userLocation.latitude, userLocation.longitude]}
+                      radius={6}
+                      pathOptions={{ color: '#2563eb', fillColor: '#93c5fd', fillOpacity: 1 }}
                     >
                       <Popup>
                         <div className="text-sm">
@@ -278,14 +308,14 @@ export default function GPSCourseMapper() {
                 {courses.map((course) => (
                   <CircleMarker
                     key={course.id}
-                    {...({ center: course.location } as any)}
-                    {...({ radius: 8 } as any)}
-                    {...({ eventHandlers: { click: () => setSelectedCourse(course) } } as any)}
-                    {...({ pathOptions: {
+                    center={course.location as LatLngExpression}
+                    radius={8}
+                    eventHandlers={{ click: () => setSelectedCourse(course) }}
+                    pathOptions={{
                       color: selectedCourse?.id === course.id ? '#d97706' : '#d4af37',
                       fillColor: selectedCourse?.id === course.id ? '#f59e0b' : '#eab308',
                       fillOpacity: 0.8,
-                    } } as any)}
+                    }}
                   >
                     <Popup>
                       <div className="text-sm">

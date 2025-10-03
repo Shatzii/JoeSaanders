@@ -49,6 +49,20 @@ export default function AIGolfTutorPage() {
                   <Volume2 className="w-5 h-5" />
                   Watch Demo
                 </button>
+                <Link
+                  href="/gps-courses?courseId=1"
+                  className="inline-flex items-center justify-center gap-3 border-2 border-joe-gold/50 text-joe-white px-8 py-4 rounded-lg font-joe-heading font-semibold text-lg hover:bg-joe-gold/20 transition-all duration-300"
+                  title="Open the GPS-powered courses map with Pebble Beach preselected"
+                >
+                  View Courses Map
+                </Link>
+                <Link
+                  href="/gps-courses"
+                  className="inline-flex items-center justify-center gap-3 border-2 border-joe-gold/30 text-joe-white/90 px-8 py-4 rounded-lg font-joe-heading font-semibold text-lg hover:bg-joe-gold/10 transition-all duration-300"
+                  title="Find nearby courses using your location"
+                >
+                  Use My Location
+                </Link>
               </div>
               
               <div className="flex items-center gap-6 text-sm">
