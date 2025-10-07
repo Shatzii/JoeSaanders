@@ -1,0 +1,7 @@
+This folder holds app icons, splash images, lottie animations, and other assets.
+Place files:
+- assets/icon.png
+- assets/splash.png
+- assets/adaptive-icon.png
+- assets/favicon.png
+- assets/animations/connection.json
