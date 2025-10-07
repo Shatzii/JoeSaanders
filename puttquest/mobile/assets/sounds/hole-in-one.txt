@@ -1,0 +1,5 @@
+# Hole In One Sound Effect
+# Placeholder for hole-in-one.mp3
+# Description: Triumphant sound for scoring a hole in one
+# Duration: ~2-3 seconds
+# Format: MP3, 44.1kHz, Stereo

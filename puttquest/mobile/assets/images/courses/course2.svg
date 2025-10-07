@@ -1,0 +1,17 @@
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" fill="#2E7D32"/>
+  <!-- Rough -->
+  <rect x="0" y="0" width="400" height="100" fill="#388E3C"/>
+  <!-- Fairway -->
+  <rect x="100" y="100" width="200" height="150" fill="#4CAF50"/>
+  <!-- Bunker -->
+  <ellipse cx="150" cy="200" rx="30" ry="20" fill="#FBC02D"/>
+  <!-- Green -->
+  <circle cx="250" cy="150" r="35" fill="#8BC34A"/>
+  <!-- Hole -->
+  <circle cx="250" cy="150" r="6" fill="#000"/>
+  <!-- Flag -->
+  <rect x="245" y="115" width="2" height="35" fill="#F44336"/>
+  <rect x="240" y="115" width="10" height="6" fill="#F44336"/>
+  <text x="200" y="280" text-anchor="middle" fill="#FFF" font-size="16" font-family="Arial, sans-serif" font-weight="bold">Pro Challenge</text>
+</svg>

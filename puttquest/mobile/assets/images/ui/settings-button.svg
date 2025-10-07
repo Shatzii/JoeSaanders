@@ -1,0 +1,13 @@
+<svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="30" cy="30" r="25" fill="#9C27B0" stroke="#333" stroke-width="2"/>
+  <!-- Gear teeth -->
+  <path d="M30 5 L35 10 L30 15 L25 10 Z" fill="#FFF"/>
+  <path d="M45 20 L50 25 L45 30 L40 25 Z" fill="#FFF"/>
+  <path d="M45 40 L50 45 L45 50 L40 45 Z" fill="#FFF"/>
+  <path d="M30 55 L35 50 L30 45 L25 50 Z" fill="#FFF"/>
+  <path d="M15 40 L20 45 L15 50 L10 45 Z" fill="#FFF"/>
+  <path d="M15 20 L20 25 L15 30 L10 25 Z" fill="#FFF"/>
+  <!-- Center circle -->
+  <circle cx="30" cy="30" r="8" fill="#FFF"/>
+  <text x="30" y="75" text-anchor="middle" fill="#333" font-size="10" font-family="Arial, sans-serif">Settings</text>
+</svg>

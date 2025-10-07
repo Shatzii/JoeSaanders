@@ -1,0 +1,9 @@
+<svg width="1242" height="2436" viewBox="0 0 1242 2436" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1242" height="2436" fill="#0A1F35"/>
+  <circle cx="621" cy="800" r="300" fill="#4CAF50" opacity="0.3"/>
+  <circle cx="621" cy="800" r="200" fill="#FFF"/>
+  <circle cx="621" cy="800" r="120" fill="#4CAF50"/>
+  <rect x="571" y="750" width="100" height="100" rx="50" fill="#FFF"/>
+  <text x="621" y="1100" text-anchor="middle" fill="#FFF" font-size="72" font-family="Arial, sans-serif" font-weight="bold">PuttQuest</text>
+  <text x="621" y="1200" text-anchor="middle" fill="#4CAF50" font-size="36" font-family="Arial, sans-serif">Loading...</text>
+</svg>

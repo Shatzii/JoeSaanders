@@ -1,0 +1,5 @@
+# Putt Sound Effect
+# Placeholder for putt.mp3
+# Description: Sound of golf ball being struck by putter
+# Duration: ~0.5 seconds
+# Format: MP3, 44.1kHz, Stereo

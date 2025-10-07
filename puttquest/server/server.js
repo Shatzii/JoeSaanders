@@ -48,8 +48,11 @@ class PuttQuestServer {
       await this.redisClient.connect();
       log('✅ Redis connected');
     } catch (error) {
-      console.error('Database connection error:', error);
-      process.exit(1);
+      log('⚠️  Database connection failed - running in offline mode');
+      log('💡 For full functionality, start MongoDB and Redis:');
+      log('   - MongoDB: brew services start mongodb-community (macOS)');
+      log('   - Redis: brew services start redis (macOS)');
+      // Continue without database - some features will be limited
     }
   }
 
@@ -226,7 +229,7 @@ class PuttQuestServer {
     }, 60 * 60 * 1000);
   }
 
-  start(port = process.env.PORT || 3000) {
+  start(port = process.env.PORT || 3001) {
     this.server.listen(port, () => {
       log(`🚀 PuttQuest Server running on port ${port}`);
     });

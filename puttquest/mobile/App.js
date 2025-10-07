@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Alert, Animated, Easing } from 'react-native';
 import { BleManager } from 'react-native-ble-plx';
 import { Audio } from 'expo-av';
@@ -8,6 +8,7 @@ import LottieView from 'lottie-react-native';
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import io from 'socket.io-client';
+import connectionAnimation from './assets/animations/connection.json';
 
 const { width, height } = Dimensions.get('window');
 
@@ -19,14 +20,22 @@ export default function App() {
     screen: 'connection',
     putterConnected: false,
     currentHole: 1,
+    totalHoles: 18,
     strokes: 0,
+    holeStrokes: [], // Array to track strokes per hole
     power: 0,
     angle: 0,
     ballPosition: { x: width * 0.2, y: height * 0.7 },
     holePosition: { x: width * 0.8, y: height * 0.3 },
     isSwinging: false,
     gameId: null,
-    userId: null
+    userId: null,
+    tournamentId: null,
+    courseType: 'standard', // standard, premium, desert, mountain
+    tournamentScore: 0,
+    parTotal: 54, // 3 par per hole
+    gameStartTime: null,
+    gameEndTime: null
   });
 
   const [playerStats, setPlayerStats] = useState({
@@ -37,7 +46,14 @@ export default function App() {
     accuracy: 0,
     longestPutt: 0,
     gamesPlayed: 0,
-    holesInOne: 0
+    holesInOne: 0,
+    achievements: [],
+    currentStreak: 0,
+    bestStreak: 0,
+    totalTournaments: 0,
+    parTournaments: 0,
+    birdieTournaments: 0,
+    eagleTournaments: 0
   });
 
   const [sounds, setSounds] = useState({});
@@ -54,13 +70,16 @@ export default function App() {
         await loadSavedGame();
         setupSocketConnection();
         scanForPutter();
-      } catch (e) {
-        console.error('Initialization error:', e);
+      } catch (error) {
+        console.error('Initialization error:', error);
       }
     };
     initialize();
-    return () => { bleManager.destroy(); socket?.disconnect(); };
-  }, []);
+    return () => { 
+      bleManager.destroy(); 
+      if (socket) socket.disconnect(); 
+    };
+  }, []); // Dependencies are handled inside the effect
 
   const loadSounds = async () => {
     try {
@@ -90,16 +109,16 @@ export default function App() {
     } catch {}
   };
 
-  const setupSocketConnection = () => {
-    const url = 'http://localhost:3000';
+  const setupSocketConnection = useCallback(() => {
+    const url = 'http://localhost:3001';
     const s = io(url, { transports: ['websocket'] });
     s.on('connect', () => setSocket(s));
     s.on('game_joined', (data) => setAppState(prev => ({ ...prev, gameId: data.gameId })));
     s.on('ball_moved', (data) => animateBallMovement(data.newPosition, data.trajectory));
     s.on('error', (data) => Alert.alert('Game Error', data.message));
-  };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const scanForPutter = () => {
+  const scanForPutter = useCallback(() => {
     bleManager.startDeviceScan(null, null, (error, device) => {
       if (error) { return; }
       if (device?.name === 'PuttQuest-Putter-V1') {
@@ -107,7 +126,7 @@ export default function App() {
         connectToPutter(device);
       }
     });
-  };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const connectToPutter = async (device) => {
     try {
@@ -117,7 +136,7 @@ export default function App() {
       await setupPutterNotifications(connected);
       setAppState(prev => ({ ...prev, putterConnected: true, screen: 'home' }));
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch (e) {
+    } catch {
       Alert.alert('Connection Failed', 'Could not connect to putter.');
     }
   };
@@ -191,16 +210,65 @@ export default function App() {
     try {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       if (sounds.successSound) await sounds.successSound.replayAsync();
-      const xpEarned = Math.max(20, 100 - (appState.strokes * 15));
-      const coinsEarned = appState.strokes <= 3 ? 50 : 25;
+      
+      const holeScore = appState.strokes;
+      const newHoleStrokes = [...appState.holeStrokes, holeScore];
+      const newTournamentScore = appState.tournamentScore + holeScore;
+      
+      const xpEarned = Math.max(20, 100 - (holeScore * 15));
+      const coinsEarned = holeScore <= 3 ? 50 : 25;
+      
       setPlayerStats(prev => ({
         ...prev,
         xp: prev.xp + xpEarned,
         coins: prev.coins + coinsEarned,
-        gamesPlayed: prev.gamesPlayed + 1,
-        holesInOne: appState.strokes === 1 ? prev.holesInOne + 1 : prev.holesInOne
+        totalPutts: prev.totalPutts + holeScore,
+        holesInOne: holeScore === 1 ? prev.holesInOne + 1 : prev.holesInOne,
+        gamesPlayed: appState.currentHole === appState.totalHoles ? prev.gamesPlayed + 1 : prev.gamesPlayed
       }));
-      setAppState(prev => ({ ...prev, screen: 'results' }));
+      
+      if (appState.currentHole >= appState.totalHoles) {
+        // Tournament complete - update tournament stats
+        const scoreDiff = newTournamentScore - appState.parTotal;
+        const isPar = scoreDiff <= 2 && scoreDiff >= -2;
+        const isBirdie = scoreDiff <= -2 && scoreDiff >= -5;
+        const isEagle = scoreDiff <= -5;
+        
+        setPlayerStats(prev => {
+          const newStats = {
+            ...prev,
+            totalTournaments: prev.totalTournaments + 1,
+            parTournaments: isPar ? prev.parTournaments + 1 : prev.parTournaments,
+            birdieTournaments: isBirdie ? prev.birdieTournaments + 1 : prev.birdieTournaments,
+            eagleTournaments: isEagle ? prev.eagleTournaments + 1 : prev.eagleTournaments
+          };
+          
+          // Check for new achievements
+          const newAchievements = checkAchievements(prev, newStats);
+          if (newAchievements.length > 0) {
+            newStats.achievements = [...prev.achievements, ...newAchievements];
+          }
+          
+          return newStats;
+        });
+        
+        setAppState(prev => ({
+          ...prev,
+          holeStrokes: newHoleStrokes,
+          tournamentScore: newTournamentScore,
+          gameEndTime: Date.now(),
+          screen: 'tournamentComplete'
+        }));
+      } else {
+        // Next hole
+        setAppState(prev => ({
+          ...prev,
+          holeStrokes: newHoleStrokes,
+          tournamentScore: newTournamentScore,
+          screen: 'results'
+        }));
+      }
+      
       saveGame();
     } catch {}
   };
@@ -219,19 +287,69 @@ export default function App() {
     }));
   };
 
+  const checkAchievements = (stats, newStats) => {
+    const newAchievements = [];
+    
+    // Hole in One Master
+    if (newStats.holesInOne >= 1 && !stats.achievements.includes('hole_in_one')) {
+      newAchievements.push('hole_in_one');
+    }
+    if (newStats.holesInOne >= 5 && !stats.achievements.includes('hole_in_one_master')) {
+      newAchievements.push('hole_in_one_master');
+    }
+    
+    // Tournament Achievements
+    if (newStats.totalTournaments >= 1 && !stats.achievements.includes('first_tournament')) {
+      newAchievements.push('first_tournament');
+    }
+    if (newStats.parTournaments >= 1 && !stats.achievements.includes('par_tournament')) {
+      newAchievements.push('par_tournament');
+    }
+    if (newStats.birdieTournaments >= 1 && !stats.achievements.includes('birdie_tournament')) {
+      newAchievements.push('birdie_tournament');
+    }
+    if (newStats.eagleTournaments >= 1 && !stats.achievements.includes('eagle_tournament')) {
+      newAchievements.push('eagle_tournament');
+    }
+    
+    // Streak Achievements
+    if (newStats.bestStreak >= 3 && !stats.achievements.includes('streak_3')) {
+      newAchievements.push('streak_3');
+    }
+    if (newStats.bestStreak >= 5 && !stats.achievements.includes('streak_5')) {
+      newAchievements.push('streak_5');
+    }
+    
+    // Level Achievements
+    if (newStats.level >= 5 && !stats.achievements.includes('level_5')) {
+      newAchievements.push('level_5');
+    }
+    if (newStats.level >= 10 && !stats.achievements.includes('level_10')) {
+      newAchievements.push('level_10');
+    }
+    
+    return newAchievements;
+  };
+
   return (
     <View style={styles.container}>
       {appState.screen === 'connection' && (
         <ConnectionScreen onRetry={scanForPutter} isConnected={appState.putterConnected} />
       )}
       {appState.screen === 'home' && (
-        <HomeScreen onStartGame={() => setAppState(prev => ({ ...prev, screen: 'playing' }))} playerStats={playerStats} putterConnected={appState.putterConnected} />
+        <HomeScreen onStartTournament={startTournament} playerStats={playerStats} putterConnected={appState.putterConnected} />
       )}
       {appState.screen === 'playing' && (
         <GameScreen appState={appState} playerStats={playerStats} ballAnimation={ballAnimation} />
       )}
       {appState.screen === 'results' && (
         <ResultsScreen appState={appState} playerStats={playerStats} onNextHole={startNewHole} onMenu={() => setAppState(prev => ({ ...prev, screen: 'home' }))} />
+      )}
+      {appState.screen === 'tournamentComplete' && (
+        <TournamentCompleteScreen appState={appState} playerStats={playerStats} onMenu={() => setAppState(prev => ({ ...prev, screen: 'home' }))} onPlayAgain={() => startTournament(appState.courseType)} />
+      )}
+      {appState.screen === 'leaderboard' && (
+        <LeaderboardScreen playerStats={playerStats} onMenu={() => setAppState(prev => ({ ...prev, screen: 'home' }))} />
       )}
     </View>
   );
@@ -254,11 +372,11 @@ const ConnectionScreen = ({ onRetry, isConnected }) => (
         <Text style={styles.retryButtonText}>Search Again</Text>
       </TouchableOpacity>
     )}
-    <LottieView source={require('./assets/animations/connection.json')} autoPlay loop={!isConnected} style={styles.connectionAnimation} />
+    <LottieView source={connectionAnimation} autoPlay loop={!isConnected} style={styles.connectionAnimation} />
   </View>
 );
 
-const HomeScreen = ({ onStartGame, playerStats, putterConnected }) => (
+const HomeScreen = ({ onStartTournament, playerStats, putterConnected }) => (
   <View style={styles.homeContainer}>
     <MotiText from={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} style={styles.title}>PuttQuest</MotiText>
     <MotiView from={{ opacity: 0, translateY: 20 }} animate={{ opacity: 1, translateY: 0 }} delay={300} style={[styles.connectionStatus, { backgroundColor: putterConnected ? 'rgba(76, 175, 80, 0.2)' : 'rgba(244, 67, 54, 0.2)' }]}>
@@ -270,12 +388,27 @@ const HomeScreen = ({ onStartGame, playerStats, putterConnected }) => (
       <StatCard icon="star" value={playerStats.xp} label="XP" color="#4CAF50" />
       <StatCard icon="diamond" value={playerStats.coins} label="Coins" color="#2196F3" />
     </View>
-    <MotiView from={{ opacity: 0, translateY: 40 }} animate={{ opacity: 1, translateY: 0 }} delay={600}>
-      <TouchableOpacity style={[styles.primaryButton, !putterConnected && styles.buttonDisabled]} onPress={onStartGame} disabled={!putterConnected}>
-        <Ionicons name="golf" size={24} color="#FFF" />
-        <Text style={styles.buttonText}>Start Putting</Text>
-      </TouchableOpacity>
-    </MotiView>
+    <View style={styles.courseSelection}>
+      <Text style={styles.courseTitle}>Choose Course:</Text>
+      <View style={styles.courseButtons}>
+        <TouchableOpacity style={styles.courseButton} onPress={() => onStartTournament('standard')}>
+          <Ionicons name="leaf" size={24} color="#4CAF50" />
+          <Text style={styles.courseButtonText}>Standard</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.courseButton} onPress={() => onStartTournament('premium')}>
+          <Ionicons name="diamond" size={24} color="#FFD700" />
+          <Text style={styles.courseButtonText}>Premium</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.courseButton} onPress={() => onStartTournament('desert')}>
+          <Ionicons name="sunny" size={24} color="#FF9800" />
+          <Text style={styles.courseButtonText}>Desert</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.courseButton} onPress={() => onStartTournament('mountain')}>
+          <Ionicons name="snow" size={24} color="#2196F3" />
+          <Text style={styles.courseButtonText}>Mountain</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
     <View style={styles.tutorial}>
       <Text style={styles.tutorialTitle}>How to Play:</Text>
       <Text style={styles.tutorialStep}>🏌️ Hold putter naturally and swing</Text>
@@ -283,6 +416,11 @@ const HomeScreen = ({ onStartGame, playerStats, putterConnected }) => (
       <Text style={styles.tutorialStep}>⭐ Earn XP and coins for good shots</Text>
       <Text style={styles.tutorialStep}>🏆 Level up and unlock new courses</Text>
     </View>
+    
+    <TouchableOpacity style={styles.leaderboardButton} onPress={() => setAppState(prev => ({ ...prev, screen: 'leaderboard' }))}>
+      <Ionicons name="trophy" size={20} color="#FFD700" />
+      <Text style={styles.leaderboardButtonText}>View Leaderboard</Text>
+    </TouchableOpacity>
   </View>
 );
 
@@ -364,6 +502,7 @@ const ResultsScreen = ({ appState, playerStats, onNextHole, onMenu }) => {
   const scoreData = getScoreData(appState.strokes);
   const xpEarned = Math.max(20, 100 - (appState.strokes * 15));
   const coinsEarned = appState.strokes <= 3 ? 50 : 25;
+  
   return (
     <View style={styles.resultsContainer}>
       <MotiView from={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} style={styles.resultsCard}>
@@ -389,6 +528,172 @@ const ResultsScreen = ({ appState, playerStats, onNextHole, onMenu }) => {
           </TouchableOpacity>
         </View>
       </MotiView>
+    </View>
+  );
+};
+
+const TournamentCompleteScreen = ({ appState, playerStats, onMenu, onPlayAgain }) => {
+  const totalScore = appState.tournamentScore;
+  const parScore = appState.parTotal;
+  const scoreDiff = totalScore - parScore;
+  const gameTime = appState.gameEndTime - appState.gameStartTime;
+  const minutes = Math.floor(gameTime / 60000);
+  const seconds = Math.floor((gameTime % 60000) / 1000);
+  
+  const getTournamentResult = () => {
+    if (scoreDiff <= -5) return { text: 'EAGLE TOURNAMENT!', color: '#FFD700', icon: '🏆' };
+    if (scoreDiff <= -2) return { text: 'BIRDIE TOURNAMENT!', color: '#4CAF50', icon: '🦅' };
+    if (scoreDiff <= 2) return { text: 'PAR TOURNAMENT', color: '#2196F3', icon: '✅' };
+    if (scoreDiff <= 5) return { text: 'BOGEY TOURNAMENT', color: '#FF9800', icon: '⛳' };
+    return { text: `${scoreDiff} OVER PAR`, color: '#F44336', icon: '🎯' };
+  };
+  
+  const result = getTournamentResult();
+  const totalXpEarned = appState.holeStrokes.reduce((sum, strokes) => sum + Math.max(20, 100 - (strokes * 15)), 0);
+  const totalCoinsEarned = appState.holeStrokes.reduce((sum, strokes) => sum + (strokes <= 3 ? 50 : 25), 0);
+  
+  // Get achievement names for display
+  const getAchievementName = (achievementId) => {
+    const achievementNames = {
+      'hole_in_one': 'First Hole in One!',
+      'hole_in_one_master': 'Hole in One Master!',
+      'first_tournament': 'First Tournament!',
+      'par_tournament': 'Par Tournament!',
+      'birdie_tournament': 'Birdie Tournament!',
+      'eagle_tournament': 'Eagle Tournament!',
+      'streak_3': '3 Hole Streak!',
+      'streak_5': '5 Hole Streak!',
+      'level_5': 'Level 5 Reached!',
+      'level_10': 'Level 10 Reached!'
+    };
+    return achievementNames[achievementId] || achievementId;
+  };
+  
+  return (
+    <View style={styles.tournamentCompleteContainer}>
+      <MotiView from={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} style={styles.tournamentCompleteCard}>
+        <Text style={styles.tournamentCompleteTitle}>Tournament Complete! {result.icon}</Text>
+        
+        <View style={styles.tournamentStats}>
+          <View style={styles.tournamentStat}>
+            <Text style={styles.tournamentStatLabel}>Final Score</Text>
+            <Text style={styles.tournamentStatValue}>{totalScore}</Text>
+          </View>
+          <View style={styles.tournamentStat}>
+            <Text style={styles.tournamentStatLabel}>Par</Text>
+            <Text style={styles.tournamentStatValue}>{parScore}</Text>
+          </View>
+          <View style={styles.tournamentStat}>
+            <Text style={styles.tournamentStatLabel}>Time</Text>
+            <Text style={styles.tournamentStatValue}>{minutes}:{seconds.toString().padStart(2, '0')}</Text>
+          </View>
+        </View>
+        
+        <MotiText from={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} delay={300} style={[styles.tournamentResultText, { color: result.color }]}>
+          {result.text}
+        </MotiText>
+        
+        <View style={styles.holeBreakdown}>
+          <Text style={styles.breakdownTitle}>Hole Scores:</Text>
+          <View style={styles.holeScores}>
+            {appState.holeStrokes.map((strokes, index) => (
+              <View key={index} style={styles.holeScore}>
+                <Text style={styles.holeNumber}>{index + 1}</Text>
+                <Text style={styles.holeStrokes}>{strokes}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+        
+        <View style={styles.tournamentRewards}>
+          <Text style={styles.rewardsTitle}>Tournament Rewards</Text>
+          <RewardItem icon="star" text={`+${totalXpEarned} XP`} color="#FFD700" />
+          <RewardItem icon="diamond" text={`+${totalCoinsEarned} Coins`} color="#00BCD4" />
+          {appState.holeStrokes.filter(s => s === 1).length > 0 && (
+            <RewardItem icon="trophy" text={`${appState.holeStrokes.filter(s => s === 1).length} Hole(s) in One!`} color="#FFD700" />
+          )}
+        </View>
+        
+        {playerStats.achievements && playerStats.achievements.length > 0 && (
+          <View style={styles.achievementsSection}>
+            <Text style={styles.rewardsTitle}>Achievements Unlocked</Text>
+            {playerStats.achievements.slice(-3).map((achievement, index) => (
+              <RewardItem key={index} icon="trophy" text={getAchievementName(achievement)} color="#FFD700" />
+            ))}
+          </View>
+        )}
+        
+        <View style={styles.tournamentActions}>
+          <TouchableOpacity style={styles.secondaryButton} onPress={onMenu}>
+            <Text style={styles.secondaryButtonText}>Main Menu</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.primaryButton} onPress={onPlayAgain}>
+            <Ionicons name="refresh" size={20} color="#FFF" />
+            <Text style={styles.buttonText}>Play Again</Text>
+          </TouchableOpacity>
+        </View>
+      </MotiView>
+    </View>
+  );
+};
+
+const LeaderboardScreen = ({ playerStats, onMenu }) => {
+  // Mock leaderboard data - in a real app this would come from the server
+  const leaderboardData = [
+    { name: 'You', score: playerStats.totalTournaments > 0 ? Math.round(playerStats.totalTournaments * 54 / playerStats.totalTournaments) : 0, level: playerStats.level, rank: 1 },
+    { name: 'Pro Golfer', score: 52, level: 15, rank: 2 },
+    { name: 'Course Master', score: 55, level: 12, rank: 3 },
+    { name: 'Putt Master', score: 58, level: 10, rank: 4 },
+    { name: 'Beginner', score: 65, level: 5, rank: 5 }
+  ].sort((a, b) => a.score - b.score);
+  
+  return (
+    <View style={styles.leaderboardContainer}>
+      <View style={styles.leaderboardHeader}>
+        <Text style={styles.leaderboardTitle}>Leaderboard</Text>
+        <TouchableOpacity style={styles.closeButton} onPress={onMenu}>
+          <Ionicons name="close" size={24} color="#FFF" />
+        </TouchableOpacity>
+      </View>
+      
+      <View style={styles.leaderboardStats}>
+        <View style={styles.statBox}>
+          <Text style={styles.statNumber}>{playerStats.totalTournaments}</Text>
+          <Text style={styles.statLabel}>Tournaments</Text>
+        </View>
+        <View style={styles.statBox}>
+          <Text style={styles.statNumber}>{playerStats.holesInOne}</Text>
+          <Text style={styles.statLabel}>Holes in One</Text>
+        </View>
+        <View style={styles.statBox}>
+          <Text style={styles.statNumber}>{playerStats.level}</Text>
+          <Text style={styles.statLabel}>Level</Text>
+        </View>
+      </View>
+      
+      <View style={styles.leaderboardList}>
+        {leaderboardData.map((player, index) => (
+          <View key={index} style={[styles.leaderboardItem, player.name === 'You' && styles.currentPlayer]}>
+            <Text style={styles.rank}>#{player.rank}</Text>
+            <View style={styles.playerInfo}>
+              <Text style={styles.playerName}>{player.name}</Text>
+              <Text style={styles.playerLevel}>Level {player.level}</Text>
+            </View>
+            <Text style={styles.playerScore}>{player.score}</Text>
+          </View>
+        ))}
+      </View>
+      
+      <View style={styles.achievementsPreview}>
+        <Text style={styles.achievementsTitle}>Your Achievements</Text>
+        <View style={styles.achievementBadges}>
+          {playerStats.achievements && playerStats.achievements.slice(0, 6).map((achievement, index) => (
+            <View key={index} style={styles.achievementBadge}>
+              <Ionicons name="trophy" size={20} color="#FFD700" />
+            </View>
+          ))}
+        </View>
+      </View>
     </View>
   );
 };
@@ -459,5 +764,47 @@ const styles = StyleSheet.create({
   rewardText: { fontSize: 16, color: '#333', marginLeft: 10, fontWeight: '500' },
   resultsActions: { flexDirection: 'row', justifyContent: 'space-between', width: '100%' },
   secondaryButton: { backgroundColor: '#9E9E9E', paddingHorizontal: 25, paddingVertical: 12, borderRadius: 20, flex: 1, marginRight: 10, alignItems: 'center' },
-  secondaryButtonText: { color: '#FFF', fontWeight: 'bold', fontSize: 16 }
+  secondaryButtonText: { color: '#FFF', fontWeight: 'bold', fontSize: 16 },
+  courseSelection: { marginBottom: 30, alignItems: 'center', width: '100%' },
+  courseTitle: { color: '#4CAF50', fontSize: 20, fontWeight: 'bold', marginBottom: 15 },
+  courseButtons: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' },
+  courseButton: { backgroundColor: 'rgba(255,255,255,0.1)', padding: 15, borderRadius: 15, alignItems: 'center', margin: 5, minWidth: 80, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
+  courseButtonText: { color: '#FFF', fontSize: 12, fontWeight: '600', marginTop: 5 },
+  tournamentCompleteContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: 'rgba(0,0,0,0.8)' },
+  tournamentCompleteCard: { backgroundColor: 'rgba(255,255,255,0.95)', padding: 30, borderRadius: 25, alignItems: 'center', width: '95%', maxHeight: '90%' },
+  tournamentCompleteTitle: { fontSize: 32, fontWeight: 'bold', color: '#333', marginBottom: 30, textAlign: 'center' },
+  tournamentStats: { flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginBottom: 20 },
+  tournamentStat: { alignItems: 'center' },
+  tournamentStatLabel: { color: '#666', fontSize: 14, fontWeight: '600' },
+  tournamentStatValue: { color: '#333', fontSize: 24, fontWeight: 'bold' },
+  tournamentResultText: { fontSize: 28, fontWeight: 'bold', textAlign: 'center', marginBottom: 20 },
+  holeBreakdown: { marginBottom: 20, width: '100%' },
+  breakdownTitle: { color: '#333', fontSize: 18, fontWeight: 'bold', marginBottom: 10, textAlign: 'center' },
+  holeScores: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' },
+  holeScore: { alignItems: 'center', margin: 5, padding: 8, backgroundColor: 'rgba(0,0,0,0.05)', borderRadius: 8 },
+  holeNumber: { color: '#666', fontSize: 12, fontWeight: 'bold' },
+  holeStrokes: { color: '#333', fontSize: 16, fontWeight: 'bold' },
+  tournamentRewards: { marginBottom: 30, alignItems: 'center', width: '100%' },
+  achievementsSection: { marginBottom: 30, alignItems: 'center', width: '100%' },
+  tournamentActions: { flexDirection: 'row', justifyContent: 'space-between', width: '100%' },
+  leaderboardButton: { backgroundColor: 'rgba(255,215,0,0.2)', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,215,0,0.3)' },
+  leaderboardButtonText: { color: '#FFD700', fontSize: 16, fontWeight: 'bold', marginLeft: 8 },
+  leaderboardContainer: { flex: 1, backgroundColor: '#0A1F35' },
+  leaderboardHeader: { paddingTop: 50, paddingHorizontal: 20, paddingBottom: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  leaderboardTitle: { color: '#4CAF50', fontSize: 28, fontWeight: 'bold' },
+  closeButton: { padding: 10 },
+  leaderboardStats: { flexDirection: 'row', justifyContent: 'space-around', paddingHorizontal: 20, marginBottom: 30 },
+  statBox: { backgroundColor: 'rgba(255,255,255,0.1)', padding: 15, borderRadius: 15, alignItems: 'center', minWidth: 80, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
+  leaderboardList: { paddingHorizontal: 20 },
+  leaderboardItem: { backgroundColor: 'rgba(255,255,255,0.1)', padding: 15, borderRadius: 10, flexDirection: 'row', alignItems: 'center', marginBottom: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
+  currentPlayer: { backgroundColor: 'rgba(76, 175, 80, 0.2)', borderColor: 'rgba(76, 175, 80, 0.3)' },
+  rank: { color: '#FFD700', fontSize: 18, fontWeight: 'bold', width: 40, textAlign: 'center' },
+  playerInfo: { flex: 1 },
+  playerName: { color: '#FFF', fontSize: 16, fontWeight: 'bold' },
+  playerLevel: { color: '#CCC', fontSize: 12 },
+  playerScore: { color: '#4CAF50', fontSize: 18, fontWeight: 'bold', width: 50, textAlign: 'center' },
+  achievementsPreview: { padding: 20, marginTop: 20 },
+  achievementsTitle: { color: '#4CAF50', fontSize: 20, fontWeight: 'bold', marginBottom: 15, textAlign: 'center' },
+  achievementBadges: { flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap' },
+  achievementBadge: { backgroundColor: 'rgba(255,215,0,0.2)', padding: 10, borderRadius: 25, margin: 5, borderWidth: 1, borderColor: 'rgba(255,215,0,0.3)' }
 });

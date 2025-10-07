@@ -1,0 +1,6 @@
+# Background Music
+# Placeholder for background.mp3
+# Description: Relaxing golf course ambient music
+# Duration: ~3-5 minutes (looping)
+# Format: MP3, 44.1kHz, Stereo
+# Genre: Ambient/Easy Listening

@@ -1,0 +1,13 @@
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" fill="#4CAF50"/>
+  <!-- Fairway -->
+  <rect x="50" y="50" width="300" height="200" fill="#66BB6A"/>
+  <!-- Green -->
+  <circle cx="320" cy="150" r="40" fill="#8BC34A"/>
+  <!-- Hole -->
+  <circle cx="320" cy="150" r="8" fill="#000"/>
+  <!-- Flag -->
+  <rect x="315" y="110" width="2" height="40" fill="#F44336"/>
+  <rect x="310" y="110" width="12" height="8" fill="#F44336"/>
+  <text x="200" y="280" text-anchor="middle" fill="#FFF" font-size="16" font-family="Arial, sans-serif" font-weight="bold">Beginner Course</text>
+</svg>

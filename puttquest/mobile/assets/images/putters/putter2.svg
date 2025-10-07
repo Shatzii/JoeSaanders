@@ -1,0 +1,11 @@
+<svg width="120" height="80" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Putter shaft -->
+  <rect x="10" y="35" width="80" height="4" fill="#8B4513"/>
+  <!-- Putter head -->
+  <rect x="85" y="25" width="25" height="20" fill="#C0C0C0" stroke="#333" stroke-width="1"/>
+  <!-- Grip -->
+  <rect x="5" y="30" width="10" height="14" fill="#654321" rx="2"/>
+  <!-- Premium markings -->
+  <text x="95" y="40" text-anchor="middle" fill="#FFD700" font-size="6" font-family="Arial, sans-serif">PRO</text>
+  <text x="60" y="90" text-anchor="middle" fill="#333" font-size="10" font-family="Arial, sans-serif">Pro Putter</text>
+</svg>
