@@ -1,5 +1,48 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Alert, Animated, Easing } from 'react-native';
+import React, { useState, useEffect, useRef, useCallback } from 'react  useEffect(() => {
+   useEffect(() => {
+    const initialize = async () => {
+      try {
+        await loadSounds();
+        await loadSavedGame();
+        setupSocketConnection();
+        
+        if (TESTING_MODE) {
+          setupPutterSimulatorConnection();
+        } else {
+          scanForPutter();
+        }
+      } catch (error) {
+        console.error('Initialization error:', error);
+      }
+    };
+    initialize();
+    return () => { 
+      bleManager.destroy(); 
+      if (socket) socket.disconnect(); 
+      if (putterSimulatorSocket) putterSimulatorSocket.close();
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-depsze = async () => {
+      try {
+        await loadSounds();
+        await loadSavedGame();
+        setupSocketConnection();
+        
+        if (TESTING_MODE) {
+          setupPutterSimulatorConnection();
+        } else {
+          scanForPutter();
+        }
+      } catch (error) {
+        console.error('Initialization error:', error);
+      }
+    };
+    initialize();
+    return () => { 
+      bleManager.destroy(); 
+      if (socket) socket.disconnect(); 
+      if (putterSimulatorSocket) putterSimulatorSocket.close();
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps Text, StyleSheet, TouchableOpacity, Dimensions, Alert, Animated, Easing } from 'react-native';
 import { BleManager } from 'react-native-ble-plx';
 import { Audio } from 'expo-av';
 import { MotiView, MotiText } from 'moti';
@@ -11,6 +54,10 @@ import io from 'socket.io-client';
 import connectionAnimation from './assets/animations/connection.json';
 
 const { width, height } = Dimensions.get('window');
+
+// Testing mode configuration - set to true to use WebSocket simulator instead of BLE
+const TESTING_MODE = true;
+const SIMULATOR_URL = 'ws://localhost:8080';
 
 const PUTTER_SERVICE_UUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
 const PUTTER_CHARACTERISTIC_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
@@ -59,6 +106,7 @@ export default function App() {
   const [sounds, setSounds] = useState({});
   const [putterDevice, setPutterDevice] = useState(null);
   const [socket, setSocket] = useState(null);
+  const [putterSimulatorSocket, setPutterSimulatorSocket] = useState(null);
 
   const bleManager = useRef(new BleManager()).current;
   const ballAnimation = useRef(new Animated.Value(0)).current;
@@ -118,6 +166,54 @@ export default function App() {
     s.on('error', (data) => Alert.alert('Game Error', data.message));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const setupPutterSimulatorConnection = useCallback(() => {
+    console.log('🔧 Setting up putter simulator connection...');
+    const ws = new WebSocket(SIMULATOR_URL);
+    
+    ws.onopen = () => {
+      console.log('📡 Connected to putter simulator');
+      setPutterSimulatorSocket(ws);
+      setAppState(prev => ({ ...prev, putterConnected: true, screen: 'home' }));
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    };
+    
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log('📨 Received from simulator:', data);
+        
+        // Handle data directly (no type wrapper for putter data)
+        if (data.power !== undefined || data.angle !== undefined || data.swingComplete) {
+          handlePutterData(data);
+        } else if (data.type === 'putter_connected') {
+          setAppState(prev => ({ ...prev, putterConnected: true }));
+        } else if (data.type === 'putter_disconnected') {
+          setAppState(prev => ({ ...prev, putterConnected: false }));
+        }
+      } catch (error) {
+        console.warn('Error parsing simulator data:', error);
+      }
+    };
+    
+    ws.onclose = () => {
+      console.log('📡 Disconnected from putter simulator');
+      setPutterSimulatorSocket(null);
+      setAppState(prev => ({ ...prev, putterConnected: false }));
+      
+      // Attempt to reconnect after a delay
+      setTimeout(() => {
+        if (!putterSimulatorSocket) {
+          console.log('Attempting to reconnect to simulator...');
+          setupPutterSimulatorConnection();
+        }
+      }, 3000);
+    };
+    
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const scanForPutter = useCallback(() => {
     bleManager.startDeviceScan(null, null, (error, device) => {
       if (error) { return; }
@@ -136,8 +232,47 @@ export default function App() {
       await setupPutterNotifications(connected);
       setAppState(prev => ({ ...prev, putterConnected: true, screen: 'home' }));
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch {
-      Alert.alert('Connection Failed', 'Could not connect to putter.');
+      
+      // Monitor connection state
+      connected.onDisconnected((error) => {
+        console.log('Putter disconnected:', error?.message);
+        setPutterDevice(null);
+        setAppState(prev => ({ ...prev, putterConnected: false }));
+        
+        // Attempt to reconnect after a delay
+        setTimeout(() => {
+          if (!putterDevice) { // Only reconnect if not already connected
+            console.log('Attempting to reconnect to putter...');
+            scanForPutter();
+          }
+        }, 3000);
+      });
+      
+    } catch (error) {
+      console.error('Connection failed:', error);
+      Alert.alert('Connection Failed', 'Could not connect to putter. Please try again.');
+    }
+  };
+
+  const disconnectPutter = async () => {
+    try {
+      if (putterDevice) {
+        await putterDevice.cancelConnection();
+        setPutterDevice(null);
+        setAppState(prev => ({ ...prev, putterConnected: false }));
+      }
+    } catch (error) {
+      console.error('Error disconnecting putter:', error);
+    }
+  };
+
+  const reconnectPutter = () => {
+    if (putterDevice) {
+      disconnectPutter().then(() => {
+        setTimeout(() => scanForPutter(), 1000);
+      });
+    } else {
+      scanForPutter();
     }
   };
 
@@ -147,25 +282,70 @@ export default function App() {
         PUTTER_SERVICE_UUID,
         PUTTER_CHARACTERISTIC_UUID,
         (error, characteristic) => {
-          if (error) return;
+          if (error) {
+            console.warn('BLE notification error:', error);
+            return;
+          }
           const data = characteristic?.value;
           if (!data) return;
           handlePutterData(data);
         }
       );
-    } catch {}
+    } catch (error) {
+      console.error('Error setting up putter notifications:', error);
+    }
   };
 
   const handlePutterData = (data) => {
     try {
-      if (data.includes('SWING_COMPLETE')) {
-        const [, power, angle] = data.split(',');
-        handleSwingComplete(parseFloat(power), parseFloat(angle));
-      } else {
-        const [power, angle] = data.split(',').map(Number);
-        setAppState(prev => ({ ...prev, power: Math.min(100, power || 0), angle: angle || 0 }));
+      // Handle different data formats from the putter
+      let power = 0;
+      let angle = 0;
+      let isSwingComplete = false;
+
+      if (typeof data === 'string') {
+        if (data.includes('SWING_COMPLETE')) {
+          // Format: "SWING_COMPLETE,power,angle"
+          const parts = data.split(',');
+          if (parts.length >= 3) {
+            power = parseFloat(parts[1]) || 0;
+            angle = parseFloat(parts[2]) || 0;
+            isSwingComplete = true;
+          }
+        } else if (data.includes(',')) {
+          // Format: "power,angle" for real-time data
+          const parts = data.split(',');
+          power = parseFloat(parts[0]) || 0;
+          angle = parseFloat(parts[1]) || 0;
+        } else {
+          // Try to parse as single number (power only)
+          power = parseFloat(data) || 0;
+        }
+      } else if (typeof data === 'object') {
+        // Handle object format if putter sends JSON
+        power = data.power || 0;
+        angle = data.angle || 0;
+        isSwingComplete = data.swingComplete || false;
       }
-    } catch {}
+
+      // Validate and clamp values
+      power = Math.max(0, Math.min(100, power));
+      angle = Math.max(-180, Math.min(180, angle));
+
+      if (isSwingComplete) {
+        handleSwingComplete(power, angle);
+      } else {
+        // Update real-time swing data
+        setAppState(prev => ({
+          ...prev,
+          power,
+          angle,
+          isSwinging: power > 10 // Consider swinging if power > 10%
+        }));
+      }
+    } catch (error) {
+      console.warn('Error parsing putter data:', error, data);
+    }
   };
 
   const handleSwingComplete = async (power, angle) => {
@@ -331,10 +511,35 @@ export default function App() {
     return newAchievements;
   };
 
+  const startTournament = (courseType) => {
+    setAppState(prev => ({
+      ...prev,
+      screen: 'playing',
+      courseType,
+      currentHole: 1,
+      totalHoles: 18,
+      strokes: 0,
+      holeStrokes: [],
+      power: 0,
+      angle: 0,
+      ballPosition: { x: width * 0.2, y: height * 0.7 },
+      holePosition: { x: Math.random() * (width - 100) + 50, y: Math.random() * (height - 250) + 50 },
+      isSwinging: false,
+      tournamentScore: 0,
+      parTotal: 54, // 3 par per hole
+      gameStartTime: Date.now(),
+      gameEndTime: null
+    }));
+    saveGame();
+  };
+
   return (
     <View style={styles.container}>
       {appState.screen === 'connection' && (
-        <ConnectionScreen onRetry={scanForPutter} isConnected={appState.putterConnected} />
+        <ConnectionScreen 
+          onRetry={TESTING_MODE ? setupPutterSimulatorConnection : scanForPutter} 
+          isConnected={appState.putterConnected} 
+        />
       )}
       {appState.screen === 'home' && (
         <HomeScreen onStartTournament={startTournament} playerStats={playerStats} putterConnected={appState.putterConnected} />
@@ -358,18 +563,18 @@ export default function App() {
 const ConnectionScreen = ({ onRetry, isConnected }) => (
   <View style={styles.connectionContainer}>
     <MotiView from={{ rotate: '0deg' }} animate={{ rotate: isConnected ? '0deg' : '360deg' }} transition={{ type: 'timing', duration: 2000, loop: !isConnected }} style={styles.connectionIcon}>
-      <Ionicons name="bluetooth" size={80} color={isConnected ? '#4CAF50' : '#007AFF'} />
+      <Ionicons name={TESTING_MODE ? "desktop" : "bluetooth"} size={80} color={isConnected ? '#4CAF50' : '#007AFF'} />
     </MotiView>
     <MotiText from={{ opacity: 0 }} animate={{ opacity: 1 }} style={styles.connectionTitle}>
-      {isConnected ? 'Putter Connected! 🎯' : 'Searching for Putter...'}
+      {isConnected ? 'Simulator Connected! 🎯' : 'Connecting to Simulator...'}
     </MotiText>
     <Text style={styles.connectionSubtitle}>
-      {isConnected ? "You're ready to start putting!" : 'Make sure your PuttQuest putter is powered on and nearby'}
+      {isConnected ? "You're ready to start putting!" : 'Make sure the putter simulator is running on localhost:8080'}
     </Text>
     {!isConnected && (
       <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
         <Ionicons name="refresh" size={20} color="#FFF" />
-        <Text style={styles.retryButtonText}>Search Again</Text>
+        <Text style={styles.retryButtonText}>Retry Connection</Text>
       </TouchableOpacity>
     )}
     <LottieView source={connectionAnimation} autoPlay loop={!isConnected} style={styles.connectionAnimation} />
@@ -381,7 +586,7 @@ const HomeScreen = ({ onStartTournament, playerStats, putterConnected }) => (
     <MotiText from={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} style={styles.title}>PuttQuest</MotiText>
     <MotiView from={{ opacity: 0, translateY: 20 }} animate={{ opacity: 1, translateY: 0 }} delay={300} style={[styles.connectionStatus, { backgroundColor: putterConnected ? 'rgba(76, 175, 80, 0.2)' : 'rgba(244, 67, 54, 0.2)' }]}>
       <Ionicons name={putterConnected ? 'checkmark-circle' : 'close-circle'} size={24} color={putterConnected ? '#4CAF50' : '#F44336'} />
-      <Text style={styles.connectionStatusText}>{putterConnected ? 'Putter Connected' : 'Putter Disconnected'}</Text>
+      <Text style={styles.connectionStatusText}>{putterConnected ? (TESTING_MODE ? 'Simulator Connected' : 'Putter Connected') : (TESTING_MODE ? 'Simulator Disconnected' : 'Putter Disconnected')}</Text>
     </MotiView>
     <View style={styles.statsGrid}>
       <StatCard icon="trophy" value={playerStats.level} label="Level" color="#FFD700" />
