@@ -58,9 +58,9 @@ const nextConfig = {
           priority: 20,
         },
         'three-vendor': {
-          test: /[\\/]node_modules[\\/](three|@react-three)[\\/]/,
+          test: /[\\/]node_modules[\\/](three|@react-three|@tensorflow)[\\/]/,
           name: 'three-vendor',
-          chunks: 'all',
+          chunks: 'async', // Load Three.js and TensorFlow asynchronously
           priority: 15,
         },
       }

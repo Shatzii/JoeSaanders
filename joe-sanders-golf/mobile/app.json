@@ -1,0 +1,77 @@
+{
+  "expo": {
+    "name": "Uncle Joe's Golf",
+    "slug": "uncle-joes-golf",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#000000",
+    "primaryColor": "#FFD700",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.unclejoesgolf.app",
+      "buildNumber": "1.0.0",
+      "requireFullScreen": false,
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera for golf swing analysis and course scanning.",
+        "NSLocationWhenInUseUsageDescription": "This app uses location services to find nearby golf courses and provide location-based features.",
+        "NSPhotoLibraryUsageDescription": "This app may save screenshots and golf swing analysis images to your photo library."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#000000"
+      },
+      "package": "com.unclejoesgolf.app",
+      "versionCode": 1,
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "INTERNET",
+        "VIBRATE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Uncle Joe's Golf to access your camera for swing analysis."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Uncle Joe's Golf to access your location to find nearby courses."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#FFD700",
+          "defaultChannel": "default"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-eas-project-id"
+      }
+    }
+  }
+}

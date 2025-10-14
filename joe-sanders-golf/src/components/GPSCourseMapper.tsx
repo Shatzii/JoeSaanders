@@ -141,7 +141,7 @@ export default function GPSCourseMapper() {
 
   // Get current GPS location
   const getCurrentLocation = () => {
-    if (!navigator.geolocation) {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
       setGeoError('Geolocation is not supported by this browser.');
       return;
     }
@@ -179,7 +179,7 @@ export default function GPSCourseMapper() {
 
   // Start GPS tracking
   const startGPSTracking = () => {
-    if (!navigator.geolocation) {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
       alert('Geolocation is not supported');
       return;
     }
@@ -293,9 +293,15 @@ export default function GPSCourseMapper() {
       url += `?lat=${userLocation.latitude}&lng=${userLocation.longitude}`;
     }
     try {
-      const full = typeof window !== 'undefined' ? window.location.origin + url : url;
-      await navigator.clipboard.writeText(full);
-      alert('Link copied to clipboard!');
+      if (typeof navigator !== 'undefined' && navigator.clipboard) {
+        const full = typeof window !== 'undefined' ? window.location.origin + url : url;
+        await navigator.clipboard.writeText(full);
+        alert('Link copied to clipboard!');
+      } else {
+        // Fallback
+        const full = typeof window !== 'undefined' ? window.location.origin + url : url;
+        prompt('Copy this link:', full);
+      }
     } catch {
       // Fallback
       const full = typeof window !== 'undefined' ? window.location.origin + url : url;

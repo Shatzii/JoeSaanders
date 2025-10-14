@@ -58,15 +58,17 @@ export default function Header() {
             <Link href="/lessons" className="nav-link">
               Lessons
             </Link>
-            <Link href="/simulator" className="nav-link">
+            {/* Temporarily disabled for production build - heavy dependencies */}
+            {/* <Link href="/simulator" className="nav-link">
               Golf Simulator
-            </Link>
-            <Link href="/puttquest" className="nav-link">
+            </Link> */}
+            {/* Temporarily disabled for production build - heavy dependencies */}
+            {/* <Link href="/puttquest" className="nav-link">
               PuttQuest
             </Link>
             <Link href="/advanced-puttquest" className="nav-link">
               Advanced PuttQuest
-            </Link>
+            </Link> */}
             <Link href="/gps-courses" className="nav-link">
               GPS Courses
             </Link>
@@ -145,14 +147,16 @@ export default function Header() {
               >
                 Lessons
               </Link>
-              <Link
+              {/* Temporarily disabled for production build - heavy dependencies */}
+              {/* <Link
                 href="/simulator"
                 className="block px-3 py-3 text-joe-white hover:text-joe-gold hover:bg-joe-gold/10 transition-all duration-300 rounded-lg font-joe-accent font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Golf Simulator
-              </Link>
-              <Link
+              </Link> */}
+              {/* Temporarily disabled for production build - heavy dependencies */}
+              {/* <Link
                 href="/puttquest"
                 className="block px-3 py-3 text-joe-white hover:text-joe-gold hover:bg-joe-gold/10 transition-all duration-300 rounded-lg font-joe-accent font-medium"
                 onClick={() => setIsMenuOpen(false)}
@@ -165,7 +169,7 @@ export default function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Advanced PuttQuest
-              </Link>
+              </Link> */}
               <Link
                 href="/gps-courses"
                 className="block px-3 py-3 text-joe-white hover:text-joe-gold hover:bg-joe-gold/10 transition-all duration-300 rounded-lg font-joe-accent font-medium"
