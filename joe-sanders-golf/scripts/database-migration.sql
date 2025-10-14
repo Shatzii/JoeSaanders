@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS ai_coach_context (
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   tendency TEXT, -- e.g., 'slice', 'early_extension'
   last_advice TEXT,
+  messages JSONB DEFAULT '[]'::jsonb, -- Store conversation history
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
 );

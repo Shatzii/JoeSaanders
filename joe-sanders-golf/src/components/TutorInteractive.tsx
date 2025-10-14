@@ -33,6 +33,9 @@ export default function TutorInteractive() {
   const [plan, setPlan] = useState<PlanResponse | null>(null)
   const [skill, setSkill] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner')
   const [goal, setGoal] = useState<'distance' | 'accuracy' | 'consistency'>('consistency')
+  const [chatMessages, setChatMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string; timestamp: string }>>([])
+  const [currentMessage, setCurrentMessage] = useState('')
+  const [loadingChat, setLoadingChat] = useState(false)
 
   // Restore onboarding preferences
   useEffect(() => {
@@ -72,14 +75,82 @@ export default function TutorInteractive() {
   const fetchPlan = async () => {
     setLoadingPlan(true)
     try {
-      const res = await fetch('/api/ai/coach', { method: 'POST', body: JSON.stringify({ shots: shots.slice(0, 10), skill, goal }) })
+      const message = "Create a personalized 2-week coaching plan for me based on my recent shots and my skill level/goals."
+      const res = await fetch('/api/ai/coach', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: message }],
+          shots: shots.slice(0, 10),
+          skill,
+          goal
+        })
+      })
       if (!res.ok) throw new Error('Failed to generate plan')
-      const data: PlanResponse = await res.json()
-      setPlan(data)
+      const data = await res.json()
+
+      // Parse the response to extract plan structure (this is a simple approach)
+      // In a real implementation, you might want the API to return structured data
+      const response = data.response
+      // For now, just display the response in chat
+      const assistantMessage = {
+        role: 'assistant' as const,
+        content: response,
+        timestamp: data.timestamp
+      }
+      setChatMessages(prev => [...prev, assistantMessage])
+
+      // Keep the old plan format for display, but it's now AI-generated
+      // This is a temporary solution; ideally restructure the API
+      setPlan({
+        days: [], // We'll parse this from the response later
+        checkpoints: ['Day 7 check-in', 'Day 14 assessment']
+      })
     } catch (e) {
       console.error(e)
     } finally {
       setLoadingPlan(false)
+    }
+  }
+
+  const sendMessage = async () => {
+    if (!currentMessage.trim()) return
+
+    const userMessage = { role: 'user' as const, content: currentMessage, timestamp: new Date().toISOString() }
+    setChatMessages(prev => [...prev, userMessage])
+    setCurrentMessage('')
+    setLoadingChat(true)
+
+    try {
+      const res = await fetch('/api/ai/coach', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [...chatMessages, userMessage],
+          shots: shots.slice(0, 10),
+          skill,
+          goal
+        })
+      })
+
+      if (!res.ok) throw new Error('Failed to get response')
+
+      const data = await res.json()
+      const assistantMessage = {
+        role: 'assistant' as const,
+        content: data.response,
+        timestamp: data.timestamp
+      }
+      setChatMessages(prev => [...prev, assistantMessage])
+    } catch (error) {
+      console.error('Chat error:', error)
+      setChatMessages(prev => [...prev, {
+        role: 'assistant',
+        content: 'Sorry, I\'m having trouble right now. Let\'s try again.',
+        timestamp: new Date().toISOString()
+      }])
+    } finally {
+      setLoadingChat(false)
     }
   }
 
@@ -203,6 +274,65 @@ export default function TutorInteractive() {
         ) : (
           <p className="text-joe-white/70">Generate a tailored plan from your recent swings.</p>
         )}
+      </div>
+
+      {/* AI Coach Chat */}
+      <div className="bg-joe-black/30 border border-joe-gold/20 rounded-2xl p-4">
+        <div className="flex items-center gap-2 mb-4">
+          <MessageCircle className="w-5 h-5 text-joe-gold" />
+          <h3 className="text-joe-gold font-joe-heading text-xl">Chat with Uncle Joe</h3>
+        </div>
+        <div className="space-y-4">
+          {/* Chat Messages */}
+          <div className="max-h-96 overflow-y-auto space-y-3">
+            {chatMessages.length === 0 && (
+              <p className="text-joe-white/70 text-center py-8">
+                Start a conversation with Uncle Joe for personalized coaching advice!
+              </p>
+            )}
+            {chatMessages.map((msg, idx) => (
+              <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                  msg.role === 'user'
+                    ? 'bg-joe-gold text-joe-black'
+                    : 'bg-joe-stone text-joe-white'
+                }`}>
+                  <p className="text-sm">{msg.content}</p>
+                  <p className="text-xs opacity-70 mt-1">
+                    {new Date(msg.timestamp).toLocaleTimeString()}
+                  </p>
+                </div>
+              </div>
+            ))}
+            {loadingChat && (
+              <div className="flex justify-start">
+                <div className="bg-joe-stone text-joe-white px-4 py-2 rounded-lg">
+                  <p className="text-sm">Uncle Joe is thinking...</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Chat Input */}
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={currentMessage}
+              onChange={(e) => setCurrentMessage(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+              placeholder="Ask Uncle Joe for coaching advice..."
+              className="flex-1 bg-joe-stone border border-joe-gold/30 rounded-lg px-3 py-2 text-white placeholder-joe-white/50 focus:outline-none focus:border-joe-gold"
+              disabled={loadingChat}
+            />
+            <button
+              onClick={sendMessage}
+              disabled={loadingChat || !currentMessage.trim()}
+              className="px-4 py-2 rounded bg-joe-gold text-joe-black font-semibold hover:bg-amber-400 disabled:opacity-60"
+            >
+              Send
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Voice Caddie */}
