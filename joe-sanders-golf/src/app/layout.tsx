@@ -38,13 +38,13 @@ const MobileAppBridge = dynamic(() => import('@/components/MobileAppBridge').the
 // })
 
 // export const metadata: Metadata = {
-//   title: 'Uncle Joes Golf - Professional Golf Career',
-//   description: 'Experience the raw athleticism and spiritual symbolism of Uncle Joe Sanders. PGA Tour journey, tournament highlights, exclusive fan content, and Stones Golf integration.',
-//   keywords: 'Uncle Joe, Joe Sanders, PGA Tour, professional golf, Stones Golf, tournament highlights, fan club, Uncle Joes Golf',
-//   authors: [{ name: 'Uncle Joe Sanders' }],
+//   title: 'Joe "Uncle Joe" Sanders — Professional Golfer & Founder of STONES GOLF',
+//   description: 'Pro golfer and STONES GOLF founder Joe "Uncle Joe" Sanders—PGA journey, +3.5 index, "Say Uncle" ethos, culture-first brand building. Nashville native rewriting golf\'s rules.',
+//   keywords: 'Joe Sanders golfer, Uncle Joe, Stones Golf, Say Uncle, culture golf brand, PGA qualifier, Nashville golfer, player-owned brand, golf culture',
+//   authors: [{ name: 'Joe "Uncle Joe" Sanders' }],
 //   openGraph: {
-//     title: 'Uncle Joes Golf - Professional Golf Career',
-//     description: 'Follow Uncle Joe\'s journey from amateur to PGA Tour professional. Exclusive content, tournament highlights, and fan experiences.',
+//     title: 'Joe "Uncle Joe" Sanders — Professional Golfer & STONES GOLF',
+//     description: 'Player-founder rewriting golf\'s rules. PGA track, +3.5 handicap, culture-first brand builder. Reverse Time. Play Bold. Build Family.',
 //     type: 'website',
 //   },
 // }

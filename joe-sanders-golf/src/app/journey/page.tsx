@@ -120,10 +120,21 @@ export default async function JourneyPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="hero-tagline mb-4">The Journey</h1>
-            <p className="text-xl text-joe-stone max-w-3xl mx-auto font-joe-body">
-              Every tournament, every shot, every lesson learned. Follow my path
-              from amateur to professional golfer.
+            <p className="text-xl text-joe-stone max-w-3xl mx-auto font-joe-body mb-8">
+              From a Nashville backyard par-3 to the PGA Tour. Every tournament, every breakthrough, every lesson learned on the path to professional golf.
             </p>
+            <div className="max-w-4xl mx-auto bg-joe-stone/20 border border-joe-gold/30 rounded-2xl p-8 text-left">
+              <h2 className="text-2xl font-joe-heading font-bold text-joe-gold mb-4">The Origin Story</h2>
+              <p className="text-joe-white font-joe-body leading-relaxed mb-4">
+                Joe &quot;Uncle Joe&quot; Sanders is a competitor, creator, and cultural architect shaping a new era of golf. His story begins in Nashville, Tennessee, where a youth basketball teammate&apos;s backyard par-3 introduced him to the game. The early years were pure curiosity—drivers, putters, grips, and shafts cycled through in an obsessive search for feel. That tinkerer&apos;s mindset became his competitive edge.
+              </p>
+              <p className="text-joe-white font-joe-body leading-relaxed mb-4">
+                In July 2024, everything aligned. After years of grinding without the results he knew were inside him, Joe experienced what he calls a God-given unlock—the moment when mechanics, rhythm, and mind finally clicked. Within days he pured thousands of shots and knew his life had changed. He sold his house, cleared debts, became his own sponsor, and invested in a complete competitive kit—treating golf like the profession it had already become in his mind.
+              </p>
+              <p className="text-joe-white font-joe-body leading-relaxed">
+                Now a +3.5 handicap, Joe combines elite competitive goals with mentorship energy—competing, creating, and architecting a movement where golf meets culture, family, and design through his player-owned brand, STONES GOLF.
+              </p>
+            </div>
           </div>
         </div>
       </section>

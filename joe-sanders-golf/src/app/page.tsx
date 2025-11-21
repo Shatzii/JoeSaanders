@@ -35,7 +35,7 @@ export default async function Home() {
               Say Uncle
             </h1>
             <p className="text-xl md:text-2xl text-joe-stone font-joe-body mb-8">
-              Professional Golfer • PGA Tour Dreamer • Storyteller
+              Player-founder rewriting golf's rules—PGA track, culture-first brand builder, and the soul behind STONES GOLF
             </p>
           </div>
 
@@ -56,20 +56,20 @@ export default async function Home() {
 
           <div className="mt-12">
             <p className="text-joe-stone font-joe-body text-lg mb-4">
-              Building a legacy one swing at a time
+              Reverse Time. Play Bold. Build Family.
             </p>
             <div className="flex justify-center space-x-8">
               <div className="text-center">
-                <div className="text-3xl font-joe-heading font-bold text-joe-gold">47</div>
-                <div className="text-sm text-joe-stone font-joe-accent">Tournaments</div>
+                <div className="text-3xl font-joe-heading font-bold text-joe-gold">+3.5</div>
+                <div className="text-sm text-joe-stone font-joe-accent">Handicap</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-joe-heading font-bold text-joe-gold">12</div>
-                <div className="text-sm text-joe-stone font-joe-accent">Top 10s</div>
+                <div className="text-3xl font-joe-heading font-bold text-joe-gold">64</div>
+                <div className="text-sm text-joe-stone font-joe-accent">Career Low</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-joe-heading font-bold text-joe-gold">3</div>
-                <div className="text-sm text-joe-stone font-joe-accent">Wins</div>
+                <div className="text-3xl font-joe-heading font-bold text-joe-gold">2024</div>
+                <div className="text-sm text-joe-stone font-joe-accent">Breakthrough</div>
               </div>
             </div>
           </div>
@@ -258,10 +258,9 @@ export default async function Home() {
       <section className="py-16 bg-joe-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-joe-heading font-semibold text-joe-gold mb-4">Why Joe?</h2>
+            <h2 className="text-3xl font-joe-heading font-semibold text-joe-gold mb-4">The Uncle Joe Story</h2>
             <p className="text-lg text-joe-stone font-joe-body max-w-3xl mx-auto">
-              Discover what makes my journey unique and why I&apos;m building something special
-              in the world of professional golf.
+              A Nashville tinkerer turned PGA competitor. A player-owned brand builder. A cultural architect rewriting golf&apos;s rules.
             </p>
           </div>
 
@@ -270,10 +269,9 @@ export default async function Home() {
               <div className="w-16 h-16 bg-joe-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Zap className="w-8 h-8 text-joe-gold" />
               </div>
-              <h3 className="text-xl font-joe-heading font-semibold text-joe-gold mb-2">Relentless Work Ethic</h3>
+              <h3 className="text-xl font-joe-heading font-semibold text-joe-gold mb-2">The Breakthrough</h3>
               <p className="text-joe-stone font-joe-body">
-                Every practice session, every swing, every putt - I give 100% effort
-                to improve and achieve my goals.
+                July 2024 changed everything. After years of tinkering, God revealed the gift—thousands of pure strikes, a 64 at Glendoveer, and a destiny that couldn&apos;t be ignored.
               </p>
             </div>
 
@@ -281,10 +279,9 @@ export default async function Home() {
               <div className="w-16 h-16 bg-joe-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Heart className="w-8 h-8 text-joe-gold" />
               </div>
-              <h3 className="text-xl font-joe-heading font-semibold text-joe-gold mb-2">Passionate Storyteller</h3>
+              <h3 className="text-xl font-joe-heading font-semibold text-joe-gold mb-2">Player-Owned Brand</h3>
               <p className="text-joe-stone font-joe-body">
-                I believe in sharing the real journey - the struggles, the victories,
-                and the lessons learned along the way.
+                Sold his home, became his own sponsor, and launched STONES GOLF—the first player-owned golf brand built for culture, not just the course.
               </p>
             </div>
 
@@ -292,10 +289,9 @@ export default async function Home() {
               <div className="w-16 h-16 bg-joe-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Users className="w-8 h-8 text-joe-gold" />
               </div>
-              <h3 className="text-xl font-joe-heading font-semibold text-joe-gold mb-2">Community Builder</h3>
+              <h3 className="text-xl font-joe-heading font-semibold text-joe-gold mb-2">Say Uncle Movement</h3>
               <p className="text-joe-stone font-joe-body">
-                Building a supportive community of golf enthusiasts who believe
-                in the power of perseverance and passion.
+                &quot;Uncles raise families. I&apos;m raising a movement.&quot; A chant, a brand, a family ritual bringing new fans to golf without asking them to change who they are.
               </p>
             </div>
           </div>
