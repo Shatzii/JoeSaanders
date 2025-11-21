@@ -31,15 +31,50 @@ export default function GolfSimulatorWithAnalysis({ disabled = false, onShotTake
   const [activeTab, setActiveTab] = useState<'simulator' | 'analysis' | 'performance' | 'predictive' | 'learning' | 'tournaments' | 'social' | 'multiplayer' | 'analytics' | 'mobile'>('simulator');
   const [swingHistory, setSwingHistory] = useState<SwingAnalysis[]>([]);
   const [shotHistory, setShotHistory] = useState<any[]>([]);
+  const [aiCoachFeedback, setAiCoachFeedback] = useState<string | null>(null);
+  const [loadingCoachFeedback, setLoadingCoachFeedback] = useState(false);
 
   const handleSwingAnalysis = (analysis: SwingAnalysis) => {
     setSwingHistory(prev => [analysis, ...prev.slice(0, 19)]); // Keep last 20 analyses
   };
 
-  const handleShotTaken = (shotData: any) => {
+  const handleShotTaken = async (shotData: any) => {
     setShotHistory(prev => [shotData, ...prev.slice(0, 19)]); // Keep last 20 shots
     if (typeof onShotTakenExternal === 'function') {
       try { onShotTakenExternal(shotData) } catch {}
+    }
+    
+    // Get real-time AI coaching feedback
+    setLoadingCoachFeedback(true);
+    try {
+      const response = await fetch('/api/ai/coach', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          shots: [shotData, ...shotHistory.slice(0, 4)], // Last 5 shots for context
+          messages: [{
+            role: 'user',
+            content: `I just hit a shot with ${shotData.club || '7-iron'}. Distance: ${Math.round(shotData.distance || 0)} yards, outcome: ${shotData.outcome || 'straight'}. What's your immediate feedback?`
+          }],
+          skill: 'intermediate',
+          goal: 'consistency'
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAiCoachFeedback(data.response);
+        
+        // Auto-play voice if available
+        if (data.audio) {
+          const audio = new Audio(`data:audio/mpeg;base64,${data.audio}`);
+          audio.play().catch(console.error);
+        }
+      }
+    } catch (error) {
+      console.error('AI coach feedback error:', error);
+    } finally {
+      setLoadingCoachFeedback(false);
     }
   };
 
@@ -156,6 +191,26 @@ export default function GolfSimulatorWithAnalysis({ disabled = false, onShotTake
               <h2 className="text-2xl font-bold text-white mb-2">3D Golf Simulator</h2>
               <p className="text-gray-400">Practice your shots in a realistic 3D environment</p>
             </div>
+            
+            {/* Real-time AI Coach Feedback */}
+            {(aiCoachFeedback || loadingCoachFeedback) && (
+              <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-xl p-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center flex-shrink-0">
+                    <Camera className="w-5 h-5 text-yellow-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-yellow-500 mb-2">Uncle Joe&apos;s Real-Time Feedback</h3>
+                    {loadingCoachFeedback ? (
+                      <p className="text-gray-300 italic">Analyzing your shot...</p>
+                    ) : (
+                      <p className="text-gray-300 leading-relaxed">{aiCoachFeedback}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div className="flex justify-center">
               <GolfSimulator3D
                 onShotTaken={handleShotTaken}

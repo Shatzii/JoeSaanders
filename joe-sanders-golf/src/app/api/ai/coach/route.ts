@@ -114,8 +114,32 @@ export async function POST(req: NextRequest) {
         })
     }
 
+    // Generate voice response if enabled
+    let audioBase64: string | undefined
+    if (process.env.ELEVENLABS_API_KEY && process.env.NEXT_PUBLIC_ENABLE_VOICE === 'true') {
+      try {
+        const ttsResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/ai/tts`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            text: response,
+            voiceId: process.env.ELEVENLABS_VOICE_ID 
+          })
+        })
+        
+        if (ttsResponse.ok) {
+          const { audio } = await ttsResponse.json()
+          audioBase64 = audio
+        }
+      } catch (ttsError) {
+        console.warn('TTS generation failed:', ttsError)
+        // Continue without voice - not critical
+      }
+    }
+
     return NextResponse.json({
       response,
+      audio: audioBase64,
       timestamp: new Date().toISOString()
     })
 

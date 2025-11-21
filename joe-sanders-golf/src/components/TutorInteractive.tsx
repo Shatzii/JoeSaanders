@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import { useEffect, useMemo, useState } from 'react'
-import { Play, Video, MessageCircle, BookOpen, Calendar } from 'lucide-react'
+import { Play, Video, MessageCircle, BookOpen, Calendar, Volume2 } from 'lucide-react'
 import SwingCapture from '@/components/SwingCapture'
 import { ShotHistory } from '@/components/ShotHistory'
 import { PerformanceMetrics } from '@/components/PerformanceMetrics'
@@ -33,9 +33,10 @@ export default function TutorInteractive() {
   const [plan, setPlan] = useState<PlanResponse | null>(null)
   const [skill, setSkill] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner')
   const [goal, setGoal] = useState<'distance' | 'accuracy' | 'consistency'>('consistency')
-  const [chatMessages, setChatMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string; timestamp: string }>>([])
+  const [chatMessages, setChatMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string; timestamp: string; audio?: string }>>([])
   const [currentMessage, setCurrentMessage] = useState('')
   const [loadingChat, setLoadingChat] = useState(false)
+  const [playingAudio, setPlayingAudio] = useState(false)
 
   // Restore onboarding preferences
   useEffect(() => {
@@ -70,6 +71,19 @@ export default function TutorInteractive() {
 
   const handleShotExternal = (shot: Shot) => {
     setShots((prev) => [shot, ...prev].slice(0, 50))
+  }
+
+  const playAudio = (audioBase64: string) => {
+    try {
+      setPlayingAudio(true)
+      const audio = new Audio(`data:audio/mpeg;base64,${audioBase64}`)
+      audio.onended = () => setPlayingAudio(false)
+      audio.onerror = () => setPlayingAudio(false)
+      audio.play()
+    } catch (error) {
+      console.error('Audio playback error:', error)
+      setPlayingAudio(false)
+    }
   }
 
   const fetchPlan = async () => {
@@ -139,9 +153,15 @@ export default function TutorInteractive() {
       const assistantMessage = {
         role: 'assistant' as const,
         content: data.response,
-        timestamp: data.timestamp
+        timestamp: data.timestamp,
+        audio: data.audio
       }
       setChatMessages(prev => [...prev, assistantMessage])
+      
+      // Auto-play voice response if available
+      if (data.audio) {
+        playAudio(data.audio)
+      }
     } catch (error) {
       console.error('Chat error:', error)
       setChatMessages(prev => [...prev, {
@@ -298,9 +318,21 @@ export default function TutorInteractive() {
                     : 'bg-joe-stone text-joe-white'
                 }`}>
                   <p className="text-sm">{msg.content}</p>
-                  <p className="text-xs opacity-70 mt-1">
-                    {new Date(msg.timestamp).toLocaleTimeString()}
-                  </p>
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-xs opacity-70">
+                      {new Date(msg.timestamp).toLocaleTimeString()}
+                    </p>
+                    {msg.role === 'assistant' && msg.audio && (
+                      <button
+                        onClick={() => playAudio(msg.audio!)}
+                        disabled={playingAudio}
+                        className="ml-2 p-1 hover:bg-joe-gold/20 rounded transition"
+                        title="Play voice response"
+                      >
+                        <Volume2 className="w-4 h-4 text-joe-gold" />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
