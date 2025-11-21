@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { dataClient } from '@/lib/data-client'
 import { Sponsor } from '@/types'
 import { Check, Zap, Heart, Users, Target, Volume2, TrendingUp } from 'lucide-react'
+import SponsorLogo from '@/components/SponsorLogo'
 
 async function getSponsors(): Promise<Sponsor[]> {
   try {
@@ -22,11 +23,15 @@ export default async function Home() {
       <section className="hero-container relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-joe-black via-joe-black/95 to-joe-black/90"></div>
 
-        {/* Stones Golf Integration */}
-        <div className="stones-logo-container absolute top-8 right-8 z-10">
-          <div className="stones-dot"></div>
-          <div className="stones-dot"></div>
-          <div className="stones-dot"></div>
+        {/* Stones Golf Logo */}
+        <div className="absolute top-8 right-8 z-10">
+          <Image
+            src="/images/sponsor-stones-golf.svg"
+            alt="STONES GOLF"
+            width={120}
+            height={60}
+            className="object-contain opacity-80 hover:opacity-100 transition-opacity"
+          />
         </div>
 
         <div className="relative z-10 text-center max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -311,8 +316,9 @@ export default async function Home() {
               {sponsors.map((sponsor) => (
                 <div key={sponsor.id} className="bg-joe-black p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-joe-gold/20">
                   {sponsor.logo_url ? (
-                    <Image
+                    <SponsorLogo
                       src={sponsor.logo_url}
+                      fallbackSrc={sponsor.logo_url.endsWith('.webp') ? sponsor.logo_url.replace('.webp', '.svg') : sponsor.logo_url.replace('.svg', '.webp')}
                       alt={sponsor.name}
                       width={120}
                       height={60}
