@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 import { Camera, Gamepad2, BarChart3, Cpu, Zap, BookOpen, Trophy, Users, TrendingUp, Smartphone } from 'lucide-react';
-import GolfSimulator3D from './GolfSimulator3D';
 import VideoSwingAnalysis from './VideoSwingAnalysis';
 import PredictivePerformanceAI from './PredictivePerformanceAI';
 import PersonalizedLearningPaths from './PersonalizedLearningPaths';
@@ -192,30 +191,33 @@ export default function GolfSimulatorWithAnalysis({ disabled = false, onShotTake
               <p className="text-gray-400">Practice your shots in a realistic 3D environment</p>
             </div>
             
-            {/* Real-time AI Coach Feedback */}
-            {(aiCoachFeedback || loadingCoachFeedback) && (
-              <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-xl p-6">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center flex-shrink-0">
-                    <Camera className="w-5 h-5 text-yellow-500" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-yellow-500 mb-2">Uncle Joe&apos;s Real-Time Feedback</h3>
-                    {loadingCoachFeedback ? (
-                      <p className="text-gray-300 italic">Analyzing your shot...</p>
-                    ) : (
-                      <p className="text-gray-300 leading-relaxed">{aiCoachFeedback}</p>
-                    )}
-                  </div>
+            <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-xl p-8 text-center">
+              <div className="max-w-2xl mx-auto">
+                <h3 className="text-2xl font-semibold text-yellow-500 mb-4">3D Simulator Coming Soon</h3>
+                <p className="text-gray-300 mb-4">
+                  The advanced 3D golf simulator is being optimized for production. In the meantime, try our other features:
+                </p>
+                <div className="flex flex-wrap gap-3 justify-center">
+                  <button
+                    onClick={() => setActiveTab('analysis')}
+                    className="px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-500 rounded-lg transition"
+                  >
+                    Swing Analysis
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('learning')}
+                    className="px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-500 rounded-lg transition"
+                  >
+                    Learning Paths
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('tournaments')}
+                    className="px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-500 rounded-lg transition"
+                  >
+                    Tournaments
+                  </button>
                 </div>
               </div>
-            )}
-            
-            <div className="flex justify-center">
-              <GolfSimulator3D
-                onShotTaken={handleShotTaken}
-                disabled={disabled}
-              />
             </div>
           </div>
         )}

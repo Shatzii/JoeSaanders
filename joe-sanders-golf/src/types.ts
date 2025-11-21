@@ -19,10 +19,13 @@ interface ConsentParams {
 
 // Shot data structure for simulator
 export interface ShotData {
-  id: string;
+  id?: string;
   distance: number;
-  accuracy: number;
+  accuracy?: number;
+  outcome?: string;
   club: string;
+  angle?: number;
+  force?: number;
   timestamp: string;
   userId?: string;
 }

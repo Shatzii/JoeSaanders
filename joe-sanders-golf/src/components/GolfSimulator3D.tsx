@@ -151,7 +151,7 @@ export default function GolfSimulator3D({ onShotTaken, disabled }: GolfSimulator
             club: 'driver',
             angle: angle,
             force: power / 10,
-            timestamp: Date.now()
+            timestamp: new Date().toISOString()
           });
         }
       }

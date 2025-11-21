@@ -26,7 +26,7 @@ type PlanResponse = {
 
 export default function TutorInteractive() {
   const [demoEnabled, setDemoEnabled] = useState(true)
-  type Shot = { distance?: number; outcome?: string; club?: string; angle?: number; force?: number; timestamp?: number }
+  type Shot = { distance?: number; outcome?: string; club?: string; angle?: number; force?: number; timestamp?: string }
   const [shots, setShots] = useState<Shot[]>([])
   const [showCaddie, setShowCaddie] = useState(false)
   const [loadingPlan, setLoadingPlan] = useState(false)
