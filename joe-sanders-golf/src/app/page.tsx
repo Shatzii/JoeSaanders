@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { dataClient } from '@/lib/data-client'
 import { Sponsor } from '@/types'
-import { Check, Zap, Heart, Users, Target, Volume2, TrendingUp } from 'lucide-react'
+import { Check, Zap, Heart, Users, Target, Volume2, TrendingUp, Smartphone, Gamepad2 } from 'lucide-react'
 import SponsorLogo from '@/components/SponsorLogo'
 
 async function getSponsors(): Promise<Sponsor[]> {
@@ -46,16 +46,17 @@ export default async function Home() {
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
             <Link
+              href="/game"
+              className="bg-gradient-to-r from-joe-gold to-amber-400 text-joe-black hover:from-amber-400 hover:to-joe-gold px-8 py-4 rounded-lg font-joe-heading font-bold text-lg transform hover:scale-105 transition-all duration-300 flex items-center gap-2"
+            >
+              <Smartphone className="w-5 h-5" />
+              <span>Play Phone-as-Putter</span>
+            </Link>
+            <Link
               href="/journey"
               className="merch-button px-8 py-4 rounded-lg font-joe-accent font-bold text-lg"
             >
               <span>Follow The Journey</span>
-            </Link>
-            <Link
-              href="/shop"
-              className="btn-outline border-2 border-joe-gold text-joe-gold hover:bg-joe-gold hover:text-joe-black px-8 py-4 rounded-lg font-joe-accent font-bold text-lg"
-            >
-              Visit Pro Shop
             </Link>
           </div>
 
@@ -86,6 +87,178 @@ export default async function Home() {
         </div>
         <div className="absolute top-16 left-16 opacity-20">
           <div className="w-24 h-24 border border-joe-gold rounded-full"></div>
+        </div>
+      </section>
+
+      {/* Phone-as-Putter Feature Section - NEW MAIN FEATURE */}
+      <section className="py-20 bg-gradient-to-br from-joe-black via-joe-stone/50 to-joe-black relative overflow-hidden">
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-10 left-10 w-64 h-64 bg-joe-gold rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-joe-gold rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-12">
+            <div className="inline-block bg-joe-gold/20 border border-joe-gold/40 rounded-full px-6 py-2 mb-6">
+              <span className="text-joe-gold font-joe-accent font-bold text-sm uppercase tracking-wider">
+                🚀 World's First Real Putter Golf Game
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-6xl font-joe-heading font-bold text-joe-gold mb-6">
+              Phone-as-Putter Golf
+            </h2>
+            <p className="text-xl md:text-2xl text-joe-white font-joe-body max-w-3xl mx-auto leading-relaxed">
+              Turn your phone into a real golf putter. Make actual putting strokes. 
+              The first golf game that feels like the real thing.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+            {/* Feature Showcase */}
+            <div className="space-y-8">
+              <div className="flex items-start gap-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-joe-gold to-amber-400 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Smartphone className="w-8 h-8 text-joe-black" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-joe-heading font-bold text-joe-gold mb-2">
+                    Your Phone = Your Putter
+                  </h3>
+                  <p className="text-joe-white/90 font-joe-body leading-relaxed">
+                    Hold your phone like a putter grip. The accelerometer and gyroscope track your 
+                    swing speed, angle, and tempo—just like a real putter.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-joe-gold to-amber-400 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Gamepad2 className="w-8 h-8 text-joe-black" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-joe-heading font-bold text-joe-gold mb-2">
+                    Real Physics, Real Feel
+                  </h3>
+                  <p className="text-joe-white/90 font-joe-body leading-relaxed">
+                    Power from your swing speed. Direction from your stroke angle. Face control from 
+                    your wrist rotation. Every putt feels authentic.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-joe-gold to-amber-400 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Target className="w-8 h-8 text-joe-black" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-joe-heading font-bold text-joe-gold mb-2">
+                    Practice Anywhere
+                  </h3>
+                  <p className="text-joe-white/90 font-joe-body leading-relaxed">
+                    Living room. Office. Hotel room. Build muscle memory and perfect your stroke 
+                    without stepping on a course.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Call to Action Box */}
+            <div className="bg-gradient-to-br from-joe-gold/10 to-amber-400/5 rounded-2xl p-8 border-2 border-joe-gold/30 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-joe-gold/10 rounded-full blur-3xl"></div>
+              
+              <div className="relative z-10">
+                <div className="text-center mb-8">
+                  <div className="text-7xl mb-6">📱⛳</div>
+                  <h3 className="text-3xl font-joe-heading font-bold text-joe-gold mb-4">
+                    Ready to Play?
+                  </h3>
+                  <p className="text-joe-white/90 font-joe-body mb-2">
+                    Open the game on your desktop/laptop
+                  </p>
+                  <p className="text-joe-white/90 font-joe-body mb-6">
+                    Open the controller on your phone
+                  </p>
+                  <p className="text-sm text-joe-gold/80 font-joe-accent mb-8">
+                    Works on iOS & Android • No app download needed
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <Link
+                    href="/game"
+                    className="block w-full bg-gradient-to-r from-joe-gold via-amber-400 to-joe-gold text-joe-black px-8 py-5 rounded-xl font-joe-heading font-bold text-xl hover:scale-105 transition-all duration-300 text-center shadow-lg shadow-joe-gold/30"
+                  >
+                    🎮 Launch Game Now
+                  </Link>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <Link
+                      href="/controller"
+                      target="_blank"
+                      className="bg-joe-stone/30 hover:bg-joe-stone/40 border border-joe-gold/40 text-joe-gold px-4 py-3 rounded-lg font-joe-accent font-semibold text-center transition-colors flex items-center justify-center gap-2"
+                    >
+                      <Smartphone className="w-4 h-4" />
+                      Controller
+                    </Link>
+                    <Link
+                      href="/fan-club"
+                      className="bg-joe-black/40 hover:bg-joe-black/60 border border-joe-gold/40 text-joe-white px-4 py-3 rounded-lg font-joe-accent font-semibold text-center transition-colors"
+                    >
+                      Members Get More
+                    </Link>
+                  </div>
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-joe-gold/20">
+                  <div className="text-sm text-joe-white/70 font-joe-body text-center">
+                    ✅ Free to try • ✅ No credit card • ✅ Play instantly
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* How It Works */}
+          <div className="bg-joe-black/40 rounded-2xl p-8 border border-joe-gold/20">
+            <h3 className="text-2xl font-joe-heading font-bold text-joe-gold mb-8 text-center">
+              How It Works (3 Simple Steps)
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-joe-gold/20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-joe-gold">
+                  <span className="text-2xl font-joe-heading font-bold text-joe-gold">1</span>
+                </div>
+                <h4 className="text-lg font-joe-heading font-semibold text-joe-gold mb-2">
+                  Open on Desktop
+                </h4>
+                <p className="text-sm text-joe-white/80 font-joe-body">
+                  Click "Launch Game" to open the golf game on your computer screen
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-joe-gold/20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-joe-gold">
+                  <span className="text-2xl font-joe-heading font-bold text-joe-gold">2</span>
+                </div>
+                <h4 className="text-lg font-joe-heading font-semibold text-joe-gold mb-2">
+                  Connect Phone
+                </h4>
+                <p className="text-sm text-joe-white/80 font-joe-body">
+                  Open controller on your phone, enter the same room code, and calibrate
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-joe-gold/20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-joe-gold">
+                  <span className="text-2xl font-joe-heading font-bold text-joe-gold">3</span>
+                </div>
+                <h4 className="text-lg font-joe-heading font-semibold text-joe-gold mb-2">
+                  Make Your Putt
+                </h4>
+                <p className="text-sm text-joe-white/80 font-joe-body">
+                  Hold phone like a putter and swing. Watch your ball roll on screen!
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

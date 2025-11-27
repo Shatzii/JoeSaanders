@@ -128,6 +128,24 @@ export async function middleware(request: NextRequest) {
     // For example: if (session.user.role !== 'admin') { ... }
   }
 
+  // Phone-as-Putter game protection (members only)
+  // In development, allow access. In production, require authentication.
+  if (pathname.startsWith('/game')) {
+    if (!DEV_BYPASS && process.env.NODE_ENV === 'production') {
+      // Check for authentication session
+      const session = await auth()
+      if (!session) {
+        // Redirect to fan club signup page
+        return NextResponse.redirect(new URL('/fan-club?feature=phone-putter', request.url))
+      }
+      
+      // Optional: Add membership tier check
+      // if (session.user.membershipTier !== 'premium') {
+      //   return NextResponse.redirect(new URL('/fan-club?upgrade=phone-putter', request.url))
+      // }
+    }
+  }
+
   // API route protection
   if (pathname.startsWith('/api')) {
     // CORS headers for API routes
@@ -184,6 +202,7 @@ export const config = {
     '/admin/:path*',
     '/api/:path*',
     '/simulator/:path*',
+    '/game/:path*',
     '/auth/:path*',
     '/((?!_next/static|_next/image|favicon.ico|public/).*)'
   ]
