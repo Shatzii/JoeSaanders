@@ -1,5 +1,8 @@
-<svg width="200" height="100" xmlns="http://www.w3.org/2000/svg">
-  <rect width="200" height="100" fill="#0a0a0a" stroke="#d4af37" stroke-width="2"/>
-  <text x="100" y="40" text-anchor="middle" fill="#d4af37" font-family="Arial" font-size="18" font-weight="bold">Titleist</text>
-  <text x="100" y="65" text-anchor="middle" fill="#fafafa" font-family="Arial" font-size="14">Silver Partner</text>
+<svg width="240" height="120" viewBox="0 0 240 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- White background -->
+  <rect width="240" height="120" fill="#ffffff" rx="8"/>
+  <!-- Titleist classic logo -->
+  <text x="120" y="70" text-anchor="middle" fill="#000000" font-family="'Times New Roman', serif" font-size="42" font-weight="700" letter-spacing="1">Titleist</text>
+  <!-- Tagline -->
+  <text x="120" y="95" text-anchor="middle" fill="#c00000" font-family="Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="2">THE #1 BALL IN GOLF</text>
 </svg>

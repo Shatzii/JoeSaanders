@@ -1,5 +1,19 @@
-<svg width="200" height="100" xmlns="http://www.w3.org/2000/svg">
-  <rect width="200" height="100" fill="#0a0a0a" stroke="#d4af37" stroke-width="2"/>
-  <text x="100" y="40" text-anchor="middle" fill="#d4af37" font-family="Arial" font-size="18" font-weight="bold">Stones Golf</text>
-  <text x="100" y="65" text-anchor="middle" fill="#fafafa" font-family="Arial" font-size="14">Gold Partner</text>
+<svg width="240" height="120" viewBox="0 0 240 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#d4af37;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#f9e076;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#d4af37;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="240" height="120" fill="#0a0a0a" rx="8"/>
+  <!-- Three stones dots -->
+  <circle cx="70" cy="40" r="6" fill="url(#goldGrad)"/>
+  <circle cx="90" cy="40" r="6" fill="url(#goldGrad)"/>
+  <circle cx="110" cy="40" r="6" fill="url(#goldGrad)"/>
+  <!-- STONES text -->
+  <text x="120" y="75" text-anchor="middle" fill="url(#goldGrad)" font-family="'Cormorant Garamond', serif" font-size="32" font-weight="700" letter-spacing="2">STONES</text>
+  <!-- GOLF text -->
+  <text x="120" y="95" text-anchor="middle" fill="#fafafa" font-family="Inter, sans-serif" font-size="14" font-weight="500" letter-spacing="4">GOLF</text>
 </svg>
