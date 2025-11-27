@@ -78,20 +78,27 @@ class SupabaseDataClient {
 
   async getSponsors() {
     if (!supabase) {
-      logger.warn('Supabase not configured, returning empty sponsors')
-      return []
+      logger.warn('Supabase not configured, falling back to local sponsors data')
+      return this.getLocalData().sponsors || []
     }
     
     try {
       const { data, error } = await supabase.from('sponsors').select('*')
       if (error) {
-        logger.error('Error fetching sponsors from Supabase', { error })
-        return []
+        logger.error('Error fetching sponsors from Supabase, falling back to local data', { error })
+        return this.getLocalData().sponsors || []
       }
+      
+      // If Supabase returns empty, fall back to local data
+      if (!data || data.length === 0) {
+        logger.warn('No sponsors in Supabase, falling back to local data')
+        return this.getLocalData().sponsors || []
+      }
+      
       return data || []
     } catch (error) {
-      logger.error('Error fetching sponsors from Supabase', { error })
-      return []
+      logger.error('Error fetching sponsors from Supabase, falling back to local data', { error })
+      return this.getLocalData().sponsors || []
     }
   }
 

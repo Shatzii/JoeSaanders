@@ -31,10 +31,10 @@ export default function SponsorLogo({ src, alt, width, height, className, fallba
   if (hasError && imgSrc === fallbackSrc) {
     return (
       <div 
-        className={`flex items-center justify-center bg-gradient-to-br from-joe-stone to-joe-black border border-joe-gold/20 rounded ${className}`}
+        className={`flex items-center justify-center bg-gradient-to-br from-joe-stone to-joe-black border border-joe-gold/20 rounded p-4 ${className}`}
         style={{ width, height }}
       >
-        <span className="text-joe-gold font-joe-accent font-semibold text-sm text-center px-2">
+        <span className="text-joe-gold font-joe-accent font-semibold text-sm text-center">
           {alt}
         </span>
       </div>
@@ -49,6 +49,7 @@ export default function SponsorLogo({ src, alt, width, height, className, fallba
       height={height}
       className={className}
       onError={handleError}
+      unoptimized={imgSrc.endsWith('.svg')}
       priority={false}
     />
   )
