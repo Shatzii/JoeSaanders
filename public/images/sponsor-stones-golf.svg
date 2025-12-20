@@ -1,0 +1,5 @@
+<svg width="200" height="100" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="100" fill="#0a0a0a" stroke="#d4af37" stroke-width="2"/>
+  <text x="100" y="40" text-anchor="middle" fill="#d4af37" font-family="Arial" font-size="18" font-weight="bold">Stones Golf</text>
+  <text x="100" y="65" text-anchor="middle" fill="#fafafa" font-family="Arial" font-size="14">Gold Partner</text>
+</svg>

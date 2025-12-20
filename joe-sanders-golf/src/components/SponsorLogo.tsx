@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { useState } from 'react'
 
 type Props = {
@@ -30,7 +29,7 @@ export default function SponsorLogo({ src, alt, width, height, className, fallba
   // If all images failed, show text fallback
   if (hasError && imgSrc === fallbackSrc) {
     return (
-      <div 
+      <div
         className={`flex items-center justify-center bg-gradient-to-br from-joe-stone to-joe-black border border-joe-gold/20 rounded p-4 ${className}`}
         style={{ width, height }}
       >
@@ -42,15 +41,14 @@ export default function SponsorLogo({ src, alt, width, height, className, fallba
   }
 
   return (
-    <Image
+    <img
       src={imgSrc}
       alt={alt}
       width={width}
       height={height}
       className={className}
       onError={handleError}
-      unoptimized={imgSrc.endsWith('.svg')}
-      priority={false}
+      loading="lazy"
     />
   )
 }

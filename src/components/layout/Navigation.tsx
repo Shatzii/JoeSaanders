@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
-import { Menu, X, Trophy } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -21,9 +22,27 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
-              <Trophy className="h-8 w-8 text-green-600" />
-              <span className="font-bold text-xl text-gray-900">Joe Sanders</span>
+            <Link href="/" className="flex items-center space-x-3">
+              <picture>
+                <source srcSet="/images/UnkJoeLogo.avif" type="image/avif" />
+                <source srcSet="/images/UnkJoeLogo.webp" type="image/webp" />
+                <Image
+                  src="/images/UnkJoeLogo.png"
+                  alt="Uncle Joe Golf Logo"
+                  width={40}
+                  height={40}
+                  className="rounded"
+                  priority
+                />
+              </picture>
+              <div className="flex flex-col">
+                <span className="font-bold text-xl text-gray-900 leading-snug">
+                  Uncle Joe
+                </span>
+                <span className="text-xs font-medium text-green-700 -mt-1 tracking-wide">
+                  Stones Golf
+                </span>
+              </div>
             </Link>
           </div>
 

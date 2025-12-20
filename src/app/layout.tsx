@@ -14,11 +14,20 @@ export const metadata: Metadata = {
     description: "Official website of professional golfer Joe Sanders",
     type: "website",
     locale: "en_US",
+    images: [
+      {
+        url: "/images/UnkJoeLogo.png",
+        width: 512,
+        height: 512,
+        alt: "Uncle Joe Golf Logo",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Joe Sanders | Professional Golfer",
     description: "Official website of professional golfer Joe Sanders",
+    images: ["/images/UnkJoeLogo.png"],
   },
   robots: "index, follow",
 };

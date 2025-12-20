@@ -1,0 +1,39 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d4af37;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#f9e076;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#d4af37;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="blackBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0a0a0a;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="98" fill="url(#blackBg)" stroke="url(#goldGradient)" stroke-width="4"/>
+  
+  <!-- Uncle Joe text - circular layout -->
+  <path id="circlePath" d="M 100,100 m -70,0 a 70,70 0 1,1 140,0 a 70,70 0 1,1 -140,0" fill="none"/>
+  <text font-family="'Cormorant Garamond', serif" font-size="24" font-weight="700" fill="url(#goldGradient)" letter-spacing="4">
+    <textPath href="#circlePath" startOffset="50%" text-anchor="middle">
+      UNCLE JOE
+    </textPath>
+  </text>
+  
+  <!-- Golf club icon in center -->
+  <g transform="translate(100, 100)">
+    <!-- Putter shaft -->
+    <line x1="-2" y1="-30" x2="-2" y2="20" stroke="url(#goldGradient)" stroke-width="3" stroke-linecap="round"/>
+    <!-- Putter head -->
+    <rect x="-12" y="18" width="20" height="8" rx="2" fill="url(#goldGradient)"/>
+    <!-- Ball -->
+    <circle cx="-2" cy="-35" r="5" fill="#fafafa"/>
+  </g>
+  
+  <!-- SAY UNCLE tagline at bottom -->
+  <text x="100" y="165" text-anchor="middle" fill="url(#goldGradient)" font-family="'Inter', sans-serif" font-size="16" font-weight="700" letter-spacing="3">
+    SAY UNCLE
+  </text>
+</svg>

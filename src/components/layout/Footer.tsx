@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Trophy, Mail, Instagram, Twitter, Facebook } from "lucide-react";
+import Image from "next/image";
+import { Mail, Instagram, Twitter, Facebook } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -8,9 +9,22 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="col-span-1 md:col-span-1">
-            <div className="flex items-center space-x-2 mb-4">
-              <Trophy className="h-8 w-8 text-green-400" />
-              <span className="font-bold text-xl">Joe Sanders</span>
+            <div className="flex items-center space-x-3 mb-4">
+              <picture>
+                <source srcSet="/images/UnkJoeLogo.avif" type="image/avif" />
+                <source srcSet="/images/UnkJoeLogo.webp" type="image/webp" />
+                <Image
+                  src="/images/UnkJoeLogo.png"
+                  alt="Uncle Joe Golf Logo"
+                  width={40}
+                  height={40}
+                  className="rounded"
+                />
+              </picture>
+              <div>
+                <span className="font-bold text-xl block">Uncle Joe Sanders</span>
+                <span className="text-xs text-green-300 uppercase tracking-wide">Stones Golf Professional</span>
+              </div>
             </div>
             <p className="text-gray-300 text-sm">
               Professional golfer dedicated to excellence on and off the course.
