@@ -19,14 +19,19 @@ jest.mock('@/lib/rate-limit', () => ({
   })
 }))
 
-// Mock the logger
-jest.mock('@/lib/logger', () => ({
-  default: {
+// Mock the logger with proper structure
+jest.mock('@/lib/logger', () => {
+  const mockLogger = {
     info: jest.fn(),
     error: jest.fn(),
-    warn: jest.fn()
+    warn: jest.fn(),
+    debug: jest.fn()
   }
-}))
+  return {
+    __esModule: true,
+    default: mockLogger
+  }
+})
 
 describe('/api/contact', () => {
   let mockRequest: Partial<NextRequest>

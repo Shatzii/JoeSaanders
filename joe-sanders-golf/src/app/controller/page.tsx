@@ -157,6 +157,19 @@ export default function ControllerPage() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <picture>
+              <source srcSet="/images/UnkJoeLogo.avif" type="image/avif" />
+              <source srcSet="/images/UnkJoeLogo.webp" type="image/webp" />
+              <img
+                src="/images/UnkJoeLogo.png"
+                alt="Uncle Joe Golf Logo"
+                width={56}
+                height={56}
+                className="rounded-full shadow-lg"
+              />
+            </picture>
+          </div>
           <div className="flex items-center justify-center gap-3 mb-4">
             <Smartphone className="w-12 h-12 text-joe-gold" />
             <h1 className="text-4xl font-joe-heading font-bold text-joe-gold">

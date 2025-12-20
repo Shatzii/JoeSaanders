@@ -80,18 +80,16 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Quick Links - MVP + Shop */}
           <div>
             <h4 className="text-lg font-joe-heading font-semibold mb-4 text-joe-gold">Quick Links</h4>
             <ul className="space-y-2">
-              <li><Link href="/journey" className="text-joe-stone hover:text-joe-gold transition-all duration-300 font-joe-accent">The Journey</Link></li>
+              <li><Link href="/game" className="text-joe-stone hover:text-joe-gold transition-all duration-300 font-joe-accent">Play</Link></li>
+              <li><Link href="/ai-golf-tutor" className="text-joe-stone hover:text-joe-gold transition-all duration-300 font-joe-accent">AI Golf Tutor</Link></li>
+              <li><Link href="/shop" className="text-joe-stone hover:text-joe-gold transition-all duration-300 font-joe-accent">Shop</Link></li>
+              <li><Link href="/lessons" className="text-joe-stone hover:text-joe-gold transition-all duration-300 font-joe-accent">Lessons</Link></li>
               <li><Link href="/sponsors" className="text-joe-stone hover:text-joe-gold transition-all duration-300 font-joe-accent">Sponsors</Link></li>
-              <li><Link href="/sponsorship" className="text-joe-stone hover:text-joe-gold transition-all duration-300 font-joe-accent">Sponsorship</Link></li>
-              <li><Link href="/shop" className="text-joe-stone hover:text-joe-gold transition-all duration-300 font-joe-accent">Pro Shop</Link></li>
               <li><Link href="/contact" className="text-joe-stone hover:text-joe-gold transition-all duration-300 font-joe-accent">Contact</Link></li>
-              <li><Link href="/fan-club" className="text-joe-stone hover:text-joe-gold transition-all duration-300 font-joe-accent">Fan Club</Link></li>
-              <li><Link href="/privacy-policy" className="text-joe-stone hover:text-joe-gold transition-all duration-300 font-joe-accent">Privacy Policy</Link></li>
-              <li><Link href="/terms-of-service" className="text-joe-stone hover:text-joe-gold transition-all duration-300 font-joe-accent">Terms of Service</Link></li>
             </ul>
           </div>
 

@@ -1,21 +1,86 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { dataClient } from '@/lib/data-client'
 import { Sponsor } from '@/types'
+import path from 'path'
+import fs from 'fs'
+import { supabaseServer } from '@/lib/supabase'
 import { Check, Zap, Heart, Users, Target, Volume2, TrendingUp, Smartphone, Gamepad2 } from 'lucide-react'
 import SponsorLogo from '@/components/SponsorLogo'
 
-async function getSponsors(): Promise<Sponsor[]> {
+type DbSponsor = {
+  id?: string | number
+  name: string
+  logo_url?: string
+  logo?: string
+  tier?: string
+  website_url?: string
+  url?: string
+}
+
+async function getLocalSponsors(): Promise<Sponsor[]> {
   try {
-    return await dataClient.getSponsors()
-  } catch (error) {
-    console.error('Error fetching sponsors:', error)
+    const filePath = path.join(process.cwd(), 'data', 'local-data.json')
+    const raw = fs.readFileSync(filePath, 'utf-8')
+    const json = JSON.parse(raw)
+    return (json.sponsors || []) as Sponsor[]
+  } catch {
     return []
   }
 }
 
+async function getSupabaseSponsors(): Promise<Sponsor[]> {
+  if (!supabaseServer) return []
+  try {
+    const { data, error } = await supabaseServer.from('sponsors').select('*')
+    if (error || !data) return []
+    return (data as DbSponsor[]).map((s) => ({
+      id: String(s.id ?? s.name),
+      name: s.name,
+      logo_url: s.logo_url || s.logo || '',
+      // Coerce tier into known union, default to 'gold' if missing
+      tier: (['platinum','gold','silver','bronze'].includes(String(s.tier || '').toLowerCase())
+        ? (String(s.tier).toLowerCase() as Sponsor['tier'])
+        : 'gold'),
+      website_url: s.website_url || s.url,
+      description: '',
+      is_active: true,
+    }))
+  } catch {
+    return []
+  }
+}
+
+function mergeSponsors(primary: Sponsor[], fallback: Sponsor[]): Sponsor[] {
+  const byKey = new Map<string, Sponsor>()
+  const key = (s: Sponsor) => (s.name || s.id).toLowerCase().trim()
+
+  fallback.forEach(s => byKey.set(key(s), { ...s }))
+
+  primary.forEach(s => {
+    const k = key(s)
+    const base = (byKey.get(k) || {}) as Partial<Sponsor>
+    byKey.set(k, {
+      id: s.id || base.id || s.name,
+      name: s.name || base.name || String(s.id || ''),
+      logo_url: s.logo_url || base.logo_url || '',
+      tier: (['platinum','gold','silver','bronze'].includes(String(s.tier || '').toLowerCase())
+        ? (String(s.tier).toLowerCase() as Sponsor['tier'])
+        : (base.tier as Sponsor['tier']) || 'gold'),
+      website_url: s.website_url || base.website_url,
+      description: (base as any).description || '',
+      is_active: (base as any).is_active ?? true,
+    })
+  })
+
+  return Array.from(byKey.values())
+}
+
 export default async function Home() {
-  const sponsors = await getSponsors()
+  const [dbSponsors, localSponsors] = await Promise.all([
+    getSupabaseSponsors(),
+    getLocalSponsors(),
+  ])
+  const sponsors = mergeSponsors(dbSponsors, localSponsors)
 
   return (
     <div className="min-h-screen">
@@ -23,15 +88,19 @@ export default async function Home() {
       <section className="hero-container relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-joe-black via-joe-black/95 to-joe-black/90"></div>
 
-        {/* Stones Golf Logo */}
+        {/* Uncle Joe Logo */}
         <div className="absolute top-8 right-8 z-10">
-          <Image
-            src="/images/sponsor-stones-golf.svg"
-            alt="STONES GOLF"
-            width={120}
-            height={60}
-            className="object-contain opacity-80 hover:opacity-100 transition-opacity"
-          />
+          <picture>
+            <source srcSet="/images/UnkJoeLogo.avif" type="image/avif" />
+            <source srcSet="/images/UnkJoeLogo.webp" type="image/webp" />
+            <img
+              src="/images/UnkJoeLogo.png"
+              alt="Uncle Joes Golf Logo"
+              width={80}
+              height={80}
+              className="rounded object-contain opacity-90 hover:opacity-100 transition-opacity"
+            />
+          </picture>
         </div>
 
         <div className="relative z-10 text-center max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

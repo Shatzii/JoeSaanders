@@ -37,31 +37,20 @@ export default function AIGolfTutorPage() {
                 professional-grade coaching on every shot.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                <Link
-                  href="/ai-golf-tutor/demo"
+              <div className="flex flex-col sm:flex-row flex-wrap gap-4 mb-8">
+                <a
+                  href="#start-demo"
                   className="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-joe-gold to-amber-400 text-joe-black px-8 py-4 rounded-lg font-joe-heading font-bold text-lg hover:from-amber-400 hover:to-joe-gold transition-all duration-300 transform hover:scale-105"
                 >
                   <Play className="w-5 h-5" />
-                  Try FREE Demo Now
-                </Link>
-                <button className="inline-flex items-center justify-center gap-3 border-2 border-joe-gold text-joe-gold px-8 py-4 rounded-lg font-joe-heading font-semibold text-lg hover:bg-joe-gold hover:text-joe-black transition-all duration-300">
-                  <Volume2 className="w-5 h-5" />
-                  Watch Demo
-                </button>
+                  Start Coaching Session
+                </a>
                 <Link
-                  href="/gps-courses?courseId=1"
-                  className="inline-flex items-center justify-center gap-3 border-2 border-joe-gold/50 text-joe-white px-8 py-4 rounded-lg font-joe-heading font-semibold text-lg hover:bg-joe-gold/20 transition-all duration-300"
-                  title="Open the GPS-powered courses map with Pebble Beach preselected"
+                  href="/lessons"
+                  className="inline-flex items-center justify-center gap-3 border-2 border-joe-gold text-joe-gold px-8 py-4 rounded-lg font-joe-heading font-semibold text-lg hover:bg-joe-gold hover:text-joe-black transition-all duration-300"
                 >
-                  View Courses Map
-                </Link>
-                <Link
-                  href="/gps-courses"
-                  className="inline-flex items-center justify-center gap-3 border-2 border-joe-gold/30 text-joe-white/90 px-8 py-4 rounded-lg font-joe-heading font-semibold text-lg hover:bg-joe-gold/10 transition-all duration-300"
-                  title="Find nearby courses using your location"
-                >
-                  Use My Location
+                  <Calendar className="w-5 h-5" />
+                  Book a Lesson with Joe
                 </Link>
               </div>
               
@@ -84,8 +73,8 @@ export default function AIGolfTutorPage() {
             <div className="relative">
               <div className="bg-gradient-to-br from-joe-gold/20 to-joe-gold/5 rounded-2xl p-2 sm:p-4 border border-joe-gold/30 flex items-center justify-center">
                 <SponsorLogo
-                  src="/images/uncle-joe-cartoon.png"
-                  fallbackSrc="/images/JoeCartoon.webp"
+                  src="/images/JoeCartoon.webp"
+                  fallbackSrc="/images/JoeCartoon.png"
                   alt="Uncle Joe Cartoon"
                   width={768}
                   height={1152}

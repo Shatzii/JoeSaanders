@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import logger from './logger'
+// Note: Do not import 'fs' or 'path' here; this module is used in client bundles.
 
 // Local data client for fallback when Supabase is not available
 class LocalDataClient {
@@ -38,6 +39,7 @@ export const localDataClient = new LocalDataClient()
 
 // Supabase data client for production
 class SupabaseDataClient {
+  // Client-safe: no local file system access; fallbacks handled at page level (server-only)
   async getTournaments() {
     if (!supabase) {
       logger.warn('Supabase not configured, returning empty tournaments')
@@ -78,27 +80,27 @@ class SupabaseDataClient {
 
   async getSponsors() {
     if (!supabase) {
-      logger.warn('Supabase not configured, falling back to local sponsors data')
-      return this.getLocalData().sponsors || []
+      logger.warn('Supabase not configured, returning empty sponsors')
+      return []
     }
     
     try {
       const { data, error } = await supabase.from('sponsors').select('*')
       if (error) {
-        logger.error('Error fetching sponsors from Supabase, falling back to local data', { error })
-        return this.getLocalData().sponsors || []
+        logger.error('Error fetching sponsors from Supabase', { error })
+        return []
       }
       
       // If Supabase returns empty, fall back to local data
       if (!data || data.length === 0) {
-        logger.warn('No sponsors in Supabase, falling back to local data')
-        return this.getLocalData().sponsors || []
+        logger.warn('No sponsors in Supabase')
+        return []
       }
       
       return data || []
     } catch (error) {
-      logger.error('Error fetching sponsors from Supabase, falling back to local data', { error })
-      return this.getLocalData().sponsors || []
+      logger.error('Error fetching sponsors from Supabase', { error })
+      return []
     }
   }
 
