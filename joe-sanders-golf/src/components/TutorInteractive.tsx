@@ -38,6 +38,32 @@ export default function TutorInteractive() {
   const [loadingChat, setLoadingChat] = useState(false)
   const [playingAudio, setPlayingAudio] = useState(false)
 
+  // Restore previous chat history on mount
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem('tutor:chat')
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        if (Array.isArray(parsed)) {
+          setChatMessages(parsed)
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, [])
+
+  // Persist chat history locally so returning users see context
+  useEffect(() => {
+    try {
+      if (chatMessages.length) {
+        window.localStorage.setItem('tutor:chat', JSON.stringify(chatMessages))
+      }
+    } catch {
+      // ignore
+    }
+  }, [chatMessages])
+
   // Restore onboarding preferences
   useEffect(() => {
     try {

@@ -149,7 +149,16 @@ export default function ControllerPage() {
       })
     }
 
-    alert(`✅ Calibrated!\nNeutral yaw: ${Math.round(alpha)}°\n\nNow make your putting stroke on the game page.`)
+    // Haptic feedback where supported
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        navigator.vibrate(200)
+      } catch {
+        // ignore vibration errors
+      }
+    }
+
+    alert(`✅ Calibrated!\nNeutral aim set to ${Math.round(alpha)}°.\n\nNow look at the hole and make your putting stroke on the game page.`)
   }
 
   return (

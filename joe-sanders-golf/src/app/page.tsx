@@ -122,10 +122,16 @@ export default async function Home() {
               <span>Play Phone-as-Putter</span>
             </Link>
             <Link
-              href="/journey"
+              href="/ai-golf-tutor"
               className="merch-button px-8 py-4 rounded-lg font-joe-accent font-bold text-lg"
             >
-              <span>Follow The Journey</span>
+              <span>AI Golf Tutor</span>
+            </Link>
+            <Link
+              href="/lessons"
+              className="text-joe-gold font-joe-accent font-semibold underline underline-offset-4 decoration-joe-gold/60 hover:decoration-joe-gold transition-colors text-sm md:text-base"
+            >
+              Book a private lesson with Joe 
             </Link>
           </div>
 

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 // Next/Image not needed here; using SponsorLogo abstraction
 import SponsorLogo from '@/components/SponsorLogo'
-import { Target, Volume2, TrendingUp, Users, Star, Play, CheckCircle } from 'lucide-react'
+import { Target, Volume2, TrendingUp, Users, Star, Play, CheckCircle, Calendar } from 'lucide-react'
 import TutorInteractiveWrapper from '@/components/TutorInteractiveWrapper'
 
 export const metadata = {
